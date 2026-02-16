@@ -20,14 +20,23 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
+"assets": [
+  {
+    "glob": "**/*",
+    "input": "public"
+  },
+  "src/assets",
+  "src/favicon.ico"
+],
+
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css", 
+              "node_modules/material-icons/iconfont/material-icons.css"
+
+            ],
+            "scripts": [
+            "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ],
             "server": "src/main.server.ts",
             "outputMode": "server",
@@ -86,7 +95,9 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/material-icons/iconfont/material-icons.css"
             ]
           }
         }

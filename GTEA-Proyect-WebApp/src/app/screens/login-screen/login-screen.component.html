@@ -1,1 +1,88 @@
-<p>login-screen works!</p>
+<div class="page">
+  <section class="card">
+
+    <div class="header">
+      <img class="logo" src="/assets/LogoGTEA.png" alt="Logo GTEA" />
+      <h1>Iniciar sesión</h1>
+    </div>
+
+    <div class="form">
+      <form class="form" [formGroup]="form" (ngSubmit)="login()" novalidate>
+
+        <!-- CORREO -->
+        <div class="field">
+          <span>Correo institucional</span>
+
+          <div class="input-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px"
+              viewBox="0 -960 960 960" width="24px" fill="#000000">
+              <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200Z"/>
+            </svg>
+
+            <input
+              type="email"
+              placeholder="usuario@alumno.com"
+              formControlName="email"
+              autocomplete="email"
+            />
+          </div>
+
+          <small class="error" *ngIf="email?.touched && email?.hasError('required')">
+            Campo requerido
+          </small>
+          <small class="error" *ngIf="email?.touched && email?.hasError('email')">
+            Correo inválido
+          </small>
+        </div>
+
+        <!-- CONTRASEÑA -->
+        <div class="field">
+          <span>Contraseña</span>
+
+          <div class="input-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px"
+              viewBox="0 -960 960 960" width="24px" fill="#000000">
+              <path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Z"/>
+            </svg>
+
+            <input
+              type="password"
+              placeholder="Password123"
+              formControlName="password"
+              autocomplete="current-password"
+            />
+          </div>
+
+          <small class="error" *ngIf="password?.touched && password?.hasError('required')">
+            Campo requerido
+          </small>
+        </div>
+
+        <!-- RECORDAR -->
+        <div class="remember">
+          <label>
+            <input type="checkbox" formControlName="remember" />
+            <span>Recordar sesión</span>
+          </label>
+        </div>
+
+        <!-- BOTÓN -->
+        <button class="primary" type="submit">
+          Iniciar sesión
+        </button>
+
+        <!-- OLVIDASTE -->
+        <div class="forgot">
+          <a href="#">¿Olvidaste tu contraseña?</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <span>¿No tienes cuenta?</span>
+      <a href="#">Regístrate aquí</a>
+    </div>
+
+  </section>
+</div>
