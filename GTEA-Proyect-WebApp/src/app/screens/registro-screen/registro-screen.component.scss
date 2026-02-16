@@ -5,6 +5,7 @@
   --muted: #6a7184;
   --primary: #1e3aa9;
   --border: #d7dbe6;
+  --error:#EF4444;
   display: block;
   font-family:
     'Inter',
@@ -22,6 +23,10 @@
 }
 .page {
   animation: rise 0.6s ease-out;
+  background:
+  radial-gradient(120px 120px at 12% 10%, rgba(30, 58, 169, 0.18), transparent 60%),
+  radial-gradient(160px 160px at 90% 20%, rgba(10, 122, 107, 0.2), transparent 60%),
+  linear-gradient(180deg, #fff 0%, #fff 100%);
 }
 .header {
   padding-top: 16px;
@@ -62,7 +67,6 @@ form {
     font-size: 14px;
     color: var(--ink);
     &:hover {
-      background: var(--primary-dark);
       transform: translateY(-1px);
     }
     &:focus-within {
@@ -70,8 +74,7 @@ form {
       box-shadow: 0 0 0 3px rgba(30, 58, 169, 0.12);
     }
     &.invalid {
-      border-color: var(--danger);
-      background: #fff4f4;
+      border-color: var(--error);
     }
     transition:
       border-color 0.2s ease,
@@ -100,6 +103,9 @@ form {
     color: var(--primary);
     text-decoration: none;
   }
+  span{
+     align-items: flex-start;
+  }
 }
 button {
   padding: 14px 16px;
@@ -110,6 +116,16 @@ button {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+}
+button[disabled], .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  background-color: #bfc9d9 !important;
+  color: #fff !important;
+  border-color: #bfc9d9 !important;
+  box-shadow: none !important;
+  transition: none;
 }
 .footer {
   padding-bottom: 24px;
@@ -126,6 +142,59 @@ button {
     text-decoration: none;
   }
 }
+
+.error {
+  font-size: 12px;
+  color: var(--error);
+  margin: 6px 0 0;
+  align-self: flex-start;
+}
+.input-wrap.invalid {
+  border-color: var(--error);
+}
+.strength {
+  flex-direction: column;
+  align-items: flex-start;
+  
+  .bars {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    margin-bottom: 6px;
+
+    span {
+      height: 4px;
+      flex: 1;
+      border-radius: 6px;
+      background: #e2e6f1;
+      display: block;
+
+      &.active {
+        background: #f6c348;
+      }
+    }
+  }
+
+  .strength-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+    width: auto;
+  }
+  &[data-level='1'] .bars span.active {
+    background: #ef4444;
+  }
+  &[data-level='2'] .bars span.active {
+    background: #eab308;
+  }
+  &[data-level='3'] .bars span.active {
+    background: #4aa3df;
+  }
+  &[data-level='4'] .bars span.active {
+    background: #10b981;
+  }
+}
+
 @keyframes rise {
   from {
     opacity: 0;

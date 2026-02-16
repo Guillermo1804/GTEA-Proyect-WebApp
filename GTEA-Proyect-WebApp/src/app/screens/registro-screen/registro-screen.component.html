@@ -1,45 +1,86 @@
 <div class="page">
-        <div class="header">
-            <img class="logo" src="favicon.png" alt="Logo GTEA" />
-            <h1>Crear cuenta nueva</h1>
-        </div>
-        <div class="form">
-            <form action="">
-                <div class="field">
-                    <span>Correo Institucional</span>
-                    <div class="input-wrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z"/></svg>
-                        <input type="email" placeholder="usuario@alumno.com">
+    <div class="header">
+        <img class="logo" src="favicon.png" alt="Logo GTEA" />
+        <h1>Crear cuenta nueva</h1>
+    </div>
+    <div class="form">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+            <div class="field">
+                <span>Correo Institucional</span>
+                <div class="input-wrap" [class.invalid]="isInvalid('email')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#000000">
+                        <path
+                            d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z" />
+                    </svg>
+                    <input type="email" formControlName="email" placeholder="usuario@alumno.com">
+                </div>
+                @if (isInvalid('email')) {
+                <p class="error">
+                    @if (form.controls.email.hasError('pattern')) {
+                    Usa @alumno.com, @admin.com o @organizador.com.
+                    } @else {
+                    Ingresa un correo valido.
+                    }
+                </p>
+                }
+            </div>
+            <div class="field">
+                <span>Contrasena</span>
+                <div class="input-wrap" [class.invalid]="isInvalid('password')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#000000">
+                        <path
+                            d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm296.5-143.5Q560-327 560-360t-23.5-56.5Q513-440 480-440t-56.5 23.5Q400-393 400-360t23.5 56.5Q447-280 480-280t56.5-23.5ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80ZM240-160v-400 400Z" />
+                    </svg>
+                    <input type="password" formControlName="password" placeholder="Password123">
+                </div>
+                @if (form.controls.password.value) {
+                <div class="strength" [attr.data-level]="passwordStrength.level">
+                    <p class="strength-label">Nivel de seguridad: {{ passwordStrength.label }}</p>
+                    <div class="bars">
+                        <span [class.active]="passwordStrength.level >= 1"></span>
+                        <span [class.active]="passwordStrength.level >= 2"></span>
+                        <span [class.active]="passwordStrength.level >= 3"></span>
+                        <span [class.active]="passwordStrength.level >= 4"></span>
                     </div>
                 </div>
-                <div class="field">
-                    <span>Contrasena</span>
-                    <div class="input-wrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm296.5-143.5Q560-327 560-360t-23.5-56.5Q513-440 480-440t-56.5 23.5Q400-393 400-360t23.5 56.5Q447-280 480-280t56.5-23.5ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80ZM240-160v-400 400Z"/></svg>
-                        <input type="password" placeholder="Password123">
-                    </div>
+                }
+                @if (isInvalid('password')) {
+                <p class="error">Minimo 8 caracteres.</p>
+                }
+            </div>
+            <div class="field">
+                <span>Confirmar Contrasena</span>
+                <div class="input-wrap" [class.invalid]="isInvalid('confirmPassword')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#000000">
+                        <path
+                            d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm296.5-143.5Q560-327 560-360t-23.5-56.5Q513-440 480-440t-56.5 23.5Q400-393 400-360t23.5 56.5Q447-280 480-280t56.5-23.5ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80ZM240-160v-400 400Z" />
+                    </svg>
+                    <input type="password" formControlName="confirmPassword" placeholder="Password123">
                 </div>
-                <div class="field">
-                    <span>Confirmar Contrasena</span>
-                    <div class="input-wrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm296.5-143.5Q560-327 560-360t-23.5-56.5Q513-440 480-440t-56.5 23.5Q400-393 400-360t23.5 56.5Q447-280 480-280t56.5-23.5ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80ZM240-160v-400 400Z"/></svg>
-                        <input type="password" placeholder="Password123">
-                    </div>
-                </div>
-                <div >
-                    <label for="" class="terms">
-                        <input type="checkbox">
-                        <span>Acepto los terminos y condiciones y la Politica de Privacidad</span>
-                    </label>
-                </div>
-                <button class="primary" type="submit">
-                    Crear mi cuenta
-                </button>
-            </form>
+                @if (showPasswordMismatch) {
+                <p class="error">Las contrasenas no coinciden.</p>
+                }
+            </div>
+            <div>
+                <label for="" class="terms">
+                    <input type="checkbox" formControlName="terms">
+                    <span>Acepto los terminos y condiciones y la Politica de Privacidad</span>
+                </label>
+                @if (isInvalid('terms')) {
+                <p class="error">Debes aceptar los terminos.</p>
+                }
+            </div>
+            <button class="primary" type="submit" [disabled]="form.invalid || isSubmitting">
+                Crear mi cuenta
+            </button>
+        </form>
 
-        </div>
+    </div>
     <div class="footer">
         <span>¿Ya tienes cuenta?</span>
-        <a href="#">Inicia sesión</a>
+        <a routerLink="/login">Inicia sesión</a>
     </div>
 </div>
