@@ -14,11 +14,11 @@ const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
 
-const session_cookie_name = 'sistema-fcc-token';
-const user_email_cookie_name = 'sistema-fcc-email';
-const user_id_cookie_name = 'sistema-fcc-user_id';
-const user_complete_name_cookie_name = 'sistema-fcc-user_complete_name';
-const group_name_cookie_name = 'sistema-fcc-group_name';
+const session_cookie_name = 'gtea-proyecto-token';
+const user_email_cookie_name = 'gtea-proyecto-email';
+const user_id_cookie_name = 'gtea-proyecto-user_id';
+const user_complete_name_cookie_name = 'gtea-proyecto-user_complete_name';
+const group_name_cookie_name = 'gtea-proyecto-group_name';
 
 @Injectable({
   providedIn: 'root',
