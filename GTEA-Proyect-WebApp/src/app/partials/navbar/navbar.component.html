@@ -2,7 +2,7 @@
   <div class="navbar-container">
     <!-- Logo -->
     <div class="navbar-brand">
-      <a routerLink="/landing" (click)="closeMenu()" class="logo-link">
+      <a (click)="navigate('/landing')" class="logo-link">
         <img src="favicon.png" alt="Logo GTEA" class="logo">
         <span class="brand-text">GTEA</span>
       </a>
@@ -18,26 +18,20 @@
     <!-- Navigation Links -->
     <ul class="nav-menu" [class.active]="isMenuOpen">
       <li class="nav-item">
-        <a routerLink="/landing" 
-           routerLinkActive="active"
-           (click)="closeMenu()"
-           class="nav-link">
+          <a (click)="navigate('/landing')"
+            class="nav-link">
           Inicio
         </a>
       </li>
       <li class="nav-item">
-        <a routerLink="/login" 
-           routerLinkActive="active"
-           (click)="closeMenu()"
-           class="nav-link">
+          <a (click)="navigate('/login')"
+            class="nav-link">
           Inicia sesión
         </a>
       </li>
       <li class="nav-item">
-        <a routerLink="/registro" 
-           routerLinkActive="active"
-           (click)="closeMenu()"
-           class="nav-link nav-link-primary">
+          <a (click)="navigate('/registro')"
+            class="nav-link nav-link-primary">
           Crear cuenta
         </a>
       </li>

@@ -5,8 +5,8 @@
       <h1>Bienvenido a GTEA</h1>
       <p>Plataforma integral de gestión de eventos académicos</p>
       <div class="hero-actions">
-        <a routerLink="/login" class="btn btn-primary">Inicia sesión</a>
-        <a routerLink="/registro" class="btn btn-secondary">Crear cuenta</a>
+        <a (click)="navigate('/login')" class="btn btn-primary">Inicia sesión</a>
+         <a (click)="navigate('/registro')" class="btn btn-secondary">Crear cuenta</a>
       </div>
     </div>
     <div class="hero-visual">
@@ -60,7 +60,7 @@
             <span class="label">Email:</span>
             <code>{{ role.email }}</code>
           </div>
-          <a routerLink="/registro" class="role-btn">Crear cuenta como {{ role.title }}</a>
+            <a (click)="navigate('/registro')" class="role-btn">Crear cuenta como {{ role.title }}</a>
         </div>
       </div>
     </div>
@@ -71,7 +71,7 @@
     <div class="cta-content">
       <h2>¿Ya tienes cuenta?</h2>
       <p>Accede a tu cuenta para ver tus eventos y participaciones</p>
-      <a routerLink="/login" class="btn btn-primary-large">Iniciar sesión</a>
+      <a (click)="navigate('/login')" class="btn btn-primary-large">Iniciar sesión</a>
     </div>
   </section>
 
@@ -86,9 +86,9 @@
         <div class="footer-section">
           <h4>Enlaces</h4>
           <ul>
-            <li><a routerLink="/landing">Inicio</a></li>
-            <li><a routerLink="/login">Iniciar sesión</a></li>
-            <li><a routerLink="/registro">Registrarse</a></li>
+            <li><a (click)="navigate('/landing')">Inicio</a></li>
+            <li><a (click)="navigate('/login')">Iniciar sesión</a></li>
+            <li><a (click)="navigate('/registro')">Registrarse</a></li>
           </ul>
         </div>
         <div class="footer-section">

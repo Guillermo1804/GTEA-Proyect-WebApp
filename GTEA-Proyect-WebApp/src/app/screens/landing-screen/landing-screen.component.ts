@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SHARED_IMPORTS } from '../../shared/shared';
 
 interface RoleCard {
   title: string;
@@ -13,7 +14,7 @@ interface RoleCard {
 @Component({
   selector: 'app-landing-screen',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [CommonModule],
   templateUrl: './landing-screen.component.html',
   styleUrl: './landing-screen.component.scss'
 })
@@ -41,4 +42,9 @@ export class LandingScreenComponent {
       color: '#7c2d12'
     }
   ];
+  constructor(private router: Router) {}
+
+  navigate(path: string): void {
+    this.router.navigate([path]);
+  }
 }

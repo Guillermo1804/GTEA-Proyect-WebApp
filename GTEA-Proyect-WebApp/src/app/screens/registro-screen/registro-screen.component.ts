@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { first } from 'rxjs';
 import { FacadeService } from '../../services/facade-service';
+import { SHARED_IMPORTS } from '../../shared/shared';
 const EMAIL_DOMAIN_REGEX = /^[^@\s]+@(alumno|admin|organizador)\.com$/i;
 @Component({
   selector: 'app-registro-screen',
@@ -106,5 +107,9 @@ export class RegistroScreenComponent {
         this.errorMessage = error?.error?.message || error?.error?.detail || 'Error al registrar usuario. Intenta de nuevo.';
       },
     });
+  }
+  
+  navigate(path: string): void {
+    this.router.navigate([path]);
   }
 }

@@ -25,4 +25,9 @@ export class NavbarComponent {
   isActive(route: string): boolean {
     return this.router.url === route;
   }
+  
+  navigate(path: string): void {
+    this.router.navigate([path]);
+    this.closeMenu();
+  }
 }

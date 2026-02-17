@@ -9,6 +9,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { RegistroScreenComponent } from '../screens/registro-screen/registro-screen.component';
+import { LandingScreenComponent } from '../screens/landing-screen/landing-screen.component';
+import { LoginScreenComponent } from '../screens/login-screen/login-screen.component';
 
 export const SHARED_IMPORTS = [
   CommonModule,
@@ -20,4 +23,9 @@ export const SHARED_IMPORTS = [
   MatIconModule,
   MatButtonModule,
   MatSlideToggleModule,
+
+  //Componentes
+  RegistroScreenComponent,
+  LandingScreenComponent,
+  LoginScreenComponent
 ];

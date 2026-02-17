@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { SHARED_IMPORTS } from '../../shared/shared';
 
 @Component({
   selector: 'app-login-screen',
@@ -35,5 +36,9 @@ export class LoginScreenComponent {
     // aquí iría tu llamada al backend
     // this.router.navigate(['home']);
     console.log('login ok', this.form.value);
+  }
+
+  navigate(path: string): void {
+    this.router.navigate([path]);
   }
 }
