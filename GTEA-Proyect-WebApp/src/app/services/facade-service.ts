@@ -153,7 +153,7 @@ export class FacadeService {
       // Preparar payload según el rol
       let payload: any;
 
-      switch (rol) {
+            switch (rol) {
         case 'alumno':
           payload = {
             rol: 'alumno',
@@ -170,7 +170,7 @@ export class FacadeService {
         case 'organizador':
           payload = {
             rol: 'organizador',
-            clave_org: formData.idNumber,
+            id_trabajador: formData.idNumber,
             first_name: formData.firstName,
             last_name: formData.lastName,
             email: formData.email,
@@ -180,9 +180,9 @@ export class FacadeService {
           const orgSvc = this.injector.get(OrganizadorService);
           return orgSvc.registrarOrg(payload);
 
-        case 'admin':
+        case 'administrador':
           payload = {
-            rol: 'admin',
+            rol: 'administrador',
             clave_admin: formData.idNumber,
             first_name: formData.firstName,
             last_name: formData.lastName,
@@ -209,7 +209,7 @@ export class FacadeService {
       const domainToRoleMap: { [key: string]: string } = {
         'alumno': 'alumno',
         'organizador': 'organizador',
-        'admin': 'admin',
+        'admin': 'administrador',
       };
       return domainToRoleMap[domain] || '';
     }
