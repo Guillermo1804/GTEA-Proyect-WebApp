@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { RegistroScreenComponent } from './screens/registro-screen/registro-screen.component';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'landing' },
@@ -21,4 +22,6 @@ export const routes: Routes = [
         .then(m => m.RegistroScreenComponent),
   },
   { path: '**', redirectTo: 'landing' },    
+    { path: 'registro', pathMatch: 'full', redirectTo: 'registro' },    
+
 ];

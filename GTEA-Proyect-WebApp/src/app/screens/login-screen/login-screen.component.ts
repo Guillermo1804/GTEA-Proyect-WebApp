@@ -7,7 +7,7 @@ import { SHARED_IMPORTS } from '../../shared/shared';
 @Component({
   selector: 'app-login-screen',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login-screen.component.html',
   styleUrl: './login-screen.component.scss',
 })

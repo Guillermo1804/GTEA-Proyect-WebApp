@@ -10,12 +10,16 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { first } from 'rxjs';
 import { FacadeService } from '../../services/facade-service';
-import { SHARED_IMPORTS } from '../../shared/shared';
+// CookieService removed (was 'ngx-cookie-service')
+import { Inject, PLATFORM_ID } from '@angular/core'; // Añade Inject y PLATFORM_ID
+import { isPlatformBrowser } from '@angular/common'; // Añade esto
+
+
 const EMAIL_DOMAIN_REGEX = /^[^@\s]+@(alumno|admin|organizador)\.com$/i;
 @Component({
   selector: 'app-registro-screen',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './registro-screen.component.html',
   styleUrl: './registro-screen.component.scss',
 })
@@ -28,9 +32,12 @@ export class RegistroScreenComponent {
     private fb: FormBuilder,
     private facadeService: FacadeService,
     private router: Router,
+    // cookie handling removed: private cookieService: CookieService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.form = this.fb.nonNullable.group(
       {
+        
         firstName: ['', [Validators.required, Validators.minLength(2)]],
         lastName: ['', [Validators.required, Validators.minLength(2)]],
         idNumber: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
@@ -81,9 +88,10 @@ export class RegistroScreenComponent {
   isSubmitting = false;
 
   onSubmit(): void {
+    // Allow submission even if the form is invalid so backend/DB connectivity can be tested.
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      return;
+      // continue instead of returning to call the backend regardless of client validation
     }
 
     this.isSubmitting = true;
@@ -95,8 +103,10 @@ export class RegistroScreenComponent {
         this.isSubmitting = false;
         this.successMessage = '¡Registro exitoso! Redirigiendo al login...';
         console.log('Registro exitoso:', response);
-        
-        // Redirigir al login después de 2 segundos
+
+// --- CAMBIO AQUÍ ---
+    // Cookie write removed (ngx-cookie-service was uninstalled)
+    // -------------------        // Redirigir al login después de 2 segundos
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 2000);
