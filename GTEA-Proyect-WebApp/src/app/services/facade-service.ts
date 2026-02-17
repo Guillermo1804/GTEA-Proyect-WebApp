@@ -1,6 +1,5 @@
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Injectable, Inject } from '@angular/core';
-import { Router } from 'express';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ErrorsService } from './tools/errors-service';
@@ -26,7 +25,6 @@ const group_name_cookie_name = 'gtea-proyecto-group_name';
 export class FacadeService {
    constructor(
     private http: HttpClient,
-    public router: Router,
     private cookieService: CookieService,
     private validatorService: ValidatorService,
     private errorService: ErrorsService,

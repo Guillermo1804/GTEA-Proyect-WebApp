@@ -6,13 +6,15 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { first } from 'rxjs';
 import { FacadeService } from '../../services/facade-service';
 const EMAIL_DOMAIN_REGEX = /^[^@\s]+@(alumno|admin|organizador)\.com$/i;
 @Component({
   selector: 'app-registro-screen',
-  imports: [ReactiveFormsModule, RouterLink],
+  standalone: true,
+  imports: [ReactiveFormsModule, RouterLink, CommonModule],
   templateUrl: './registro-screen.component.html',
   styleUrl: './registro-screen.component.scss',
 })
@@ -76,7 +78,7 @@ export class RegistroScreenComponent {
       : null;
   }
   isSubmitting = false;
-  
+
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();

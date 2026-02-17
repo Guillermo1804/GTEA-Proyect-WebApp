@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login-screen',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login-screen.component.html',
   styleUrl: './login-screen.component.scss',
 })
@@ -35,9 +35,5 @@ export class LoginScreenComponent {
     // aquí iría tu llamada al backend
     // this.router.navigate(['home']);
     console.log('login ok', this.form.value);
-  }
-
-  Register(): void {
-    this.router.navigate(['registro']);
   }
 }

@@ -1,3 +1,105 @@
-<div>
-    landing works!
+<div class="landing-page">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Bienvenido a GTEA</h1>
+      <p>Plataforma integral de gestión de eventos académicos</p>
+      <div class="hero-actions">
+        <a routerLink="/login" class="btn btn-primary">Inicia sesión</a>
+        <a routerLink="/registro" class="btn btn-secondary">Crear cuenta</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="gradient-circle circle-1"></div>
+      <div class="gradient-circle circle-2"></div>
+      <div class="gradient-circle circle-3"></div>
+    </div>
+  </section>
+
+  <!-- Descripción Section -->
+  <section class="description">
+    <div class="container">
+      <h2>¿Qué es GTEA?</h2>
+      <p>GTEA es una plataforma moderna diseñada para facilitar la gestión, participación y seguimiento de eventos académicos. Conecta estudiantes, organizadores y administradores en un ecosistema colaborativo.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📅</div>
+          <h3>Eventos Centralizados</h3>
+          <p>Encuentra todos los eventos académicos en un solo lugar</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">👥</div>
+          <h3>Comunidad</h3>
+          <p>Conecta con estudiantes y organizadores de tu institución</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Seguimiento</h3>
+          <p>Monitorea tu participación y progreso en eventos</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Seguro</h3>
+          <p>Tu información está protegida con estándares de seguridad</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roles Section -->
+  <section class="roles">
+    <div class="container">
+      <h2>Elige tu rol</h2>
+      <p class="section-subtitle">Selecciona el tipo de cuenta que deseas crear</p>
+      <div class="roles-grid">
+        <div class="role-card" *ngFor="let role of roles" [style.--card-color]="role.color">
+          <div class="role-icon">{{ role.icon }}</div>
+          <h3>{{ role.title }}</h3>
+          <p>{{ role.description }}</p>
+          <div class="role-email">
+            <span class="label">Email:</span>
+            <code>{{ role.email }}</code>
+          </div>
+          <a routerLink="/registro" class="role-btn">Crear cuenta como {{ role.title }}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta">
+    <div class="cta-content">
+      <h2>¿Ya tienes cuenta?</h2>
+      <p>Accede a tu cuenta para ver tus eventos y participaciones</p>
+      <a routerLink="/login" class="btn btn-primary-large">Iniciar sesión</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>GTEA</h4>
+          <p>Plataforma de gestión de eventos académicos</p>
+        </div>
+        <div class="footer-section">
+          <h4>Enlaces</h4>
+          <ul>
+            <li><a routerLink="/landing">Inicio</a></li>
+            <li><a routerLink="/login">Iniciar sesión</a></li>
+            <li><a routerLink="/registro">Registrarse</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Información</h4>
+          <p>Versión 1.0</p>
+          <p>&copy; 2026 GTEA. Todos los derechos reservados.</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>Hecho con ❤️ para la comunidad académica</p>
+      </div>
+    </div>
+  </footer>
 </div>
