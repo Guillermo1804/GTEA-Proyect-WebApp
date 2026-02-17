@@ -6,6 +6,9 @@ import { environment } from '../../environments/environment';
 import { ErrorsService } from './tools/errors-service';
 import { ValidatorService } from './tools/validator-service';
 import { CookieService } from 'ngx-cookie-service';
+import { AlumnoService } from './alumno-service';
+import { OrganizadorService } from './organizador-service';
+import { AdminServiceService } from './admin-service.service';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -27,6 +30,9 @@ export class FacadeService {
     private cookieService: CookieService,
     private validatorService: ValidatorService,
     private errorService: ErrorsService,
+    private alumnoService: AlumnoService,
+    private organizadorService: OrganizadorService,
+    private adminService: AdminServiceService,
   ) { }
 
   //Validar login
@@ -129,5 +135,74 @@ export class FacadeService {
 
     getUserGroup(){
       return this.cookieService.get(group_name_cookie_name);
+    }
+
+    // Método para registrar usuario con rol automático basado en dominio de email
+    registroUsuario(formData: any): Observable<any> {
+      // Extraer dominio del email
+      const emailDomain = this.extractEmailDomain(formData.email);
+      
+      // Mapear dominio a rol
+      const rol = this.mapDomainToRole(emailDomain);
+
+      // Preparar payload según el rol
+      let payload: any;
+
+      switch (rol) {
+        case 'alumno':
+          payload = {
+            rol: 'alumno',
+            matricula: formData.idNumber,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            password: formData.password,
+            confirmar_password: formData.confirmPassword,
+          };
+          return this.alumnoService.registrarAlumno(payload);
+
+        case 'organizador':
+          payload = {
+            rol: 'organizador',
+            clave_org: formData.idNumber,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            password: formData.password,
+            confirmar_password: formData.confirmPassword,
+          };
+          return this.organizadorService.registrarOrg(payload);
+
+        case 'admin':
+          payload = {
+            rol: 'admin',
+            clave_admin: formData.idNumber,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            password: formData.password,
+            confirmar_password: formData.confirmPassword,
+          };
+          return this.adminService.registrarAdmin(payload);
+
+        default:
+          throw new Error(`Rol desconocido: ${rol}`);
+      }
+    }
+
+    // Helper: Extraer dominio del email (ej: "usuario@alumno.com" -> "alumno")
+    private extractEmailDomain(email: string): string {
+      const match = email.match(/@([a-z]+)\.com$/i);
+      return match ? match[1].toLowerCase() : '';
+    }
+
+    // Helper: Mapear dominio a rol
+    private mapDomainToRole(domain: string): string {
+      const domainToRoleMap: { [key: string]: string } = {
+        'alumno': 'alumno',
+        'organizador': 'organizador',
+        'admin': 'admin',
+      };
+      return domainToRoleMap[domain] || '';
     }
 }

@@ -6,8 +6,9 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { first } from 'rxjs';
+import { FacadeService } from '../../services/facade-service';
 const EMAIL_DOMAIN_REGEX = /^[^@\s]+@(alumno|admin|organizador)\.com$/i;
 @Component({
   selector: 'app-registro-screen',
@@ -17,8 +18,14 @@ const EMAIL_DOMAIN_REGEX = /^[^@\s]+@(alumno|admin|organizador)\.com$/i;
 })
 export class RegistroScreenComponent {
   readonly form;
+  errorMessage: string = '';
+  successMessage: string = '';
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private facadeService: FacadeService,
+    private router: Router,
+  ) {
     this.form = this.fb.nonNullable.group(
       {
         firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -69,6 +76,7 @@ export class RegistroScreenComponent {
       : null;
   }
   isSubmitting = false;
+  
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -76,9 +84,25 @@ export class RegistroScreenComponent {
     }
 
     this.isSubmitting = true;
-    setTimeout(() => {
-      this.isSubmitting = false;
-      console.log('Registro', this.form.getRawValue());
-    }, 1000);
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.facadeService.registroUsuario(this.form.getRawValue()).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        this.successMessage = '¡Registro exitoso! Redirigiendo al login...';
+        console.log('Registro exitoso:', response);
+        
+        // Redirigir al login después de 2 segundos
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        console.error('Error en registro:', error);
+        this.errorMessage = error?.error?.message || error?.error?.detail || 'Error al registrar usuario. Intenta de nuevo.';
+      },
+    });
   }
 }

@@ -7,6 +7,16 @@
             </div>
         </div>
         <div class="form">
+            @if (errorMessage) {
+            <div class="alert alert-error">
+                {{ errorMessage }}
+            </div>
+            }
+            @if (successMessage) {
+            <div class="alert alert-success">
+                {{ successMessage }}
+            </div>
+            }
             <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
                 <div class="field">
                     <span>Nombre (s)</span>

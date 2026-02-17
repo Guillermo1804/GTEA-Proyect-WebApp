@@ -24,7 +24,7 @@ export class OrganizadorService {
   public esquemaOrga(){
     return {
       'rol':'',
-      'clave_orga': '',
+      'clave_org': '',
       'first_name': '',
       'last_name': '',
       'email': '',
@@ -38,8 +38,8 @@ public validarOrga(data: any, editar: boolean){
   console.log("Validando organizador... ", data);
   let error: any = [];
 
-  if(!this.validatorService.required(data["clave_orga"])){
-    error["clave_orga"] = this.errorService.required;
+  if(!this.validatorService.required(data["clave_org"])){
+    error["clave_org"] = this.errorService.required;
   }
 
   if(!this.validatorService.required(data["first_name"])){
@@ -67,70 +67,45 @@ public validarOrga(data: any, editar: boolean){
       error["confirmar_password"] = this.errorService.required;
     }
   }
-
-  if(!this.validatorService.required(data["rfc"])){
-    error["rfc"] = this.errorService.required;
-  }else if(!this.validatorService.min(data["rfc"], 12)){
-    error["rfc"] = this.errorService.min(12);
-    alert("La longitud de caracteres deL RFC es menor, deben ser 12");
-  }else if(!this.validatorService.max(data["rfc"], 13)){
-    error["rfc"] = this.errorService.max(13);
-    alert("La longitud de caracteres deL RFC es mayor, deben ser 13");
-  }
-
-  if(!this.validatorService.required(data["edad"])){
-    error["edad"] = this.errorService.required;
-  }else if(!this.validatorService.numeric(data["edad"])){
-    alert("El formato es solo números");
-  }
-
-  if(!this.validatorService.required(data["telefono"])){
-    error["telefono"] = this.errorService.required;
-  }
-
-  if(!this.validatorService.required(data["ocupacion"])){
-    error["ocupacion"] = this.errorService.required;
-  }
-
   //Return arreglo
   return error;
 }
 
   //Aquí van los servicios HTTP
   //Servicio para registrar un nuevo usuario
-  public registrarOrga (data: any): Observable <any>{
-    return this.http.post<any>(`${environment.url_api}/admin/`,data, httpOptions);
+  public registrarOrg (data: any): Observable <any>{
+    return this.http.post<any>(`${environment.url_api}/organizadores/`,data, httpOptions);
   }
 
-  public obtenerListaOrgas (): Observable <any>{
+  public obtenerListaOrgs (): Observable <any>{
     var token = this.facadeService.getSessionToken();
     var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    return this.http.get<any>(`${environment.url_api}/lista-orgas/`, {headers:headers});
+    return this.http.get<any>(`${environment.url_api}/lista-org/`, {headers:headers});
   }
 
     //Obtener un solo usuario dependiendo su ID
-    public getOrgaByID(idUser: Number){
-      return this.http.get<any>(`${environment.url_api}/admin/?id=${idUser}`,httpOptions);
+    public getOrgByID(idUser: Number){
+      return this.http.get<any>(`${environment.url_api}/organizadores/?id=${idUser}`,httpOptions);
     }
 
     //Servicio para actualizar un usuario
-    public editarOrga (data: any): Observable <any>{
+    public editarOrg (data: any): Observable <any>{
       var token = this.facadeService.getSessionToken();
       var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-      return this.http.put<any>(`${environment.url_api}/orgas-edit/`, data, {headers:headers});
+      return this.http.put<any>(`${environment.url_api}/organizadores-edit/`, data, {headers:headers});
     }
 
     //Eliminar Admin
-  public eliminarOrga(idUser: number): Observable <any>{
+  public eliminarOrg(idUser: number): Observable <any>{
     var token = this.facadeService.getSessionToken();
     var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    return this.http.delete<any>(`${environment.url_api}/orgas-edit/?id=${idUser}`,{headers:headers});
+    return this.http.delete<any>(`${environment.url_api}/organizadores-edit/?id=${idUser}`,{headers:headers});
   }
 
     //Obtener el total de cada uno de los usuarios
     public getTotalUsuarios(){
       var token = this.facadeService.getSessionToken();
       var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-      return this.http.get<any>(`${environment.url_api}/orgas-edit/`, {headers:headers});
+      return this.http.get<any>(`${environment.url_api}/organizadores-edit/`, {headers:headers});
     }
 }
