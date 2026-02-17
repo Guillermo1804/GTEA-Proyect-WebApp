@@ -24,7 +24,7 @@ export class OrganizadorService {
   public esquemaOrga(){
     return {
       'rol':'',
-      'clave_admin': '',
+      'clave_orga': '',
       'first_name': '',
       'last_name': '',
       'email': '',
@@ -38,8 +38,8 @@ public validarOrga(data: any, editar: boolean){
   console.log("Validando organizador... ", data);
   let error: any = [];
 
-  if(!this.validatorService.required(data["clave_admin"])){
-    error["clave_admin"] = this.errorService.required;
+  if(!this.validatorService.required(data["clave_orga"])){
+    error["clave_orga"] = this.errorService.required;
   }
 
   if(!this.validatorService.required(data["first_name"])){
@@ -98,39 +98,39 @@ public validarOrga(data: any, editar: boolean){
 
   //Aquí van los servicios HTTP
   //Servicio para registrar un nuevo usuario
-  public registrarAdmin (data: any): Observable <any>{
+  public registrarOrga (data: any): Observable <any>{
     return this.http.post<any>(`${environment.url_api}/admin/`,data, httpOptions);
   }
 
-  public obtenerListaAdmins (): Observable <any>{
+  public obtenerListaOrgas (): Observable <any>{
     var token = this.facadeService.getSessionToken();
     var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    return this.http.get<any>(`${environment.url_api}/lista-admins/`, {headers:headers});
+    return this.http.get<any>(`${environment.url_api}/lista-orgas/`, {headers:headers});
   }
 
     //Obtener un solo usuario dependiendo su ID
-    public getAdminByID(idUser: Number){
+    public getOrgaByID(idUser: Number){
       return this.http.get<any>(`${environment.url_api}/admin/?id=${idUser}`,httpOptions);
     }
 
     //Servicio para actualizar un usuario
-    public editarAdmin (data: any): Observable <any>{
+    public editarOrga (data: any): Observable <any>{
       var token = this.facadeService.getSessionToken();
       var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-      return this.http.put<any>(`${environment.url_api}/admins-edit/`, data, {headers:headers});
+      return this.http.put<any>(`${environment.url_api}/orgas-edit/`, data, {headers:headers});
     }
 
     //Eliminar Admin
-  public eliminarAdmin(idUser: number): Observable <any>{
+  public eliminarOrga(idUser: number): Observable <any>{
     var token = this.facadeService.getSessionToken();
     var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    return this.http.delete<any>(`${environment.url_api}/admins-edit/?id=${idUser}`,{headers:headers});
+    return this.http.delete<any>(`${environment.url_api}/orgas-edit/?id=${idUser}`,{headers:headers});
   }
 
     //Obtener el total de cada uno de los usuarios
     public getTotalUsuarios(){
       var token = this.facadeService.getSessionToken();
       var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-      return this.http.get<any>(`${environment.url_api}/admins-edit/`, {headers:headers});
+      return this.http.get<any>(`${environment.url_api}/orgas-edit/`, {headers:headers});
     }
 }

@@ -1,14 +1,24 @@
 import { Routes } from '@angular/router';
-import { RegistroScreenComponent } from './screens/registro-screen/registro-screen.component';
-import { LoginScreenComponent } from './screens/login-screen/login-screen.component'
 
 export const routes: Routes = [
-  { path: 'registro', component: RegistroScreenComponent },
-  { path: 'login', component: LoginScreenComponent },
+  { path: '', pathMatch: 'full', redirectTo: 'landing' },
   {
-    path: '',
+    path: 'landing',
+    loadComponent: () =>
+      import('./screens/landing-screen/landing-screen.component')
+        .then(m => m.LandingScreenComponent),
+  },
+  {
+    path: 'login',
     loadComponent: () =>
       import('./screens/login-screen/login-screen.component')
         .then(m => m.LoginScreenComponent),
   },
+  {
+    path: 'registro',
+    loadComponent: () =>
+      import('./screens/registro-screen/registro-screen.component')
+        .then(m => m.RegistroScreenComponent),
+  },
+  { path: '**', redirectTo: 'landing' },    
 ];

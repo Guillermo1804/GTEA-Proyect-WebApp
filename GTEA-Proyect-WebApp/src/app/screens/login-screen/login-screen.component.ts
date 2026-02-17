@@ -36,4 +36,8 @@ export class LoginScreenComponent {
     // this.router.navigate(['home']);
     console.log('login ok', this.form.value);
   }
+
+  Register(): void {
+    this.router.navigate(['registro']);
+  }
 }
