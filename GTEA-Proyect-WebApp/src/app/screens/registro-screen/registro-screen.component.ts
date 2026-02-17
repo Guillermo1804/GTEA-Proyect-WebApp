@@ -7,6 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { first } from 'rxjs';
 const EMAIL_DOMAIN_REGEX = /^[^@\s]+@(alumno|admin|organizador)\.com$/i;
 @Component({
   selector: 'app-registro-screen',
@@ -20,6 +21,9 @@ export class RegistroScreenComponent {
   constructor(private fb: FormBuilder) {
     this.form = this.fb.nonNullable.group(
       {
+        firstName: ['', [Validators.required, Validators.minLength(2)]],
+        lastName: ['', [Validators.required, Validators.minLength(2)]],
+        idNumber: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
         email: [
           '',
           [Validators.required, Validators.email, Validators.pattern(EMAIL_DOMAIN_REGEX)],
@@ -31,6 +35,7 @@ export class RegistroScreenComponent {
       { validators: [this.passwordsMatchValidator] },
     );
   }
+  
 
   get passwordStrength(): { level: number; label: string } {
     const value = this.form.controls.password.value || '';
@@ -51,9 +56,9 @@ export class RegistroScreenComponent {
     const { password, confirmPassword } = this.form.controls;
     return this.form.hasError('passwordMismatch') && (password.touched || confirmPassword.touched);
   }
-  isInvalid(controlName: 'email' | 'password' | 'confirmPassword' | 'terms'): boolean {
+  isInvalid(controlName: 'firstName' | 'lastName' | 'idNumber' | 'email' | 'password' | 'confirmPassword' | 'terms'): boolean {
     const control = this.form.controls[controlName];
-    return control.invalid && (control.dirty || control.touched);
+    return !!(control?.invalid && (control.dirty || control.touched));
   }
 
   private passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
@@ -74,5 +79,6 @@ export class RegistroScreenComponent {
     setTimeout(() => {
       this.isSubmitting = false;
       console.log('Registro', this.form.getRawValue());
-  }, 1000);}
+    }, 1000);
+  }
 }
