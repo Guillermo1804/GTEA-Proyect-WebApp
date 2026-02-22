@@ -86,6 +86,13 @@ export class RegistroScreenComponent {
       : null;
   }
   isSubmitting = false;
+  showPassword = false;
+  showConfirmPassword = false;
+
+  get passwordsMatch(): boolean {
+    const { password, confirmPassword } = this.form.controls;
+    return !!password.value && !!confirmPassword.value && password.value === confirmPassword.value;
+  }
 
   onSubmit(): void {
     // Allow submission even if the form is invalid so backend/DB connectivity can be tested.
