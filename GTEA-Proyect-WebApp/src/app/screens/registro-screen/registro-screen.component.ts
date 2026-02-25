@@ -6,21 +6,38 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink, Router } from '@angular/router';
 import { first } from 'rxjs';
+import { FacadeService } from '../../services/facade-service';
+// CookieService removed (was 'ngx-cookie-service')
+import { Inject, PLATFORM_ID } from '@angular/core'; // Añade Inject y PLATFORM_ID
+import { isPlatformBrowser } from '@angular/common'; // Añade esto
+
+
 const EMAIL_DOMAIN_REGEX = /^[^@\s]+@(alumno|admin|organizador)\.com$/i;
 @Component({
   selector: 'app-registro-screen',
-  imports: [ReactiveFormsModule, RouterLink],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './registro-screen.component.html',
   styleUrl: './registro-screen.component.scss',
 })
 export class RegistroScreenComponent {
   readonly form;
+  errorMessage: string = '';
+  successMessage: string = '';
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private facadeService: FacadeService,
+    private router: Router,
+    // cookie handling removed: private cookieService: CookieService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
     this.form = this.fb.nonNullable.group(
       {
+        
         firstName: ['', [Validators.required, Validators.minLength(2)]],
         lastName: ['', [Validators.required, Validators.minLength(2)]],
         idNumber: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
@@ -69,16 +86,40 @@ export class RegistroScreenComponent {
       : null;
   }
   isSubmitting = false;
+
   onSubmit(): void {
+    // Allow submission even if the form is invalid so backend/DB connectivity can be tested.
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      return;
+      // continue instead of returning to call the backend regardless of client validation
     }
 
     this.isSubmitting = true;
-    setTimeout(() => {
-      this.isSubmitting = false;
-      console.log('Registro', this.form.getRawValue());
-    }, 1000);
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.facadeService.registroUsuario(this.form.getRawValue()).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        this.successMessage = '¡Registro exitoso! Redirigiendo al login...';
+        console.log('Registro exitoso:', response);
+
+// --- CAMBIO AQUÍ ---
+    // Cookie write removed (ngx-cookie-service was uninstalled)
+    // -------------------        // Redirigir al login después de 2 segundos
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        console.error('Error en registro:', error);
+        this.errorMessage = error?.error?.message || error?.error?.detail || 'Error al registrar usuario. Intenta de nuevo.';
+      },
+    });
+  }
+  
+  navigate(path: string): void {
+    this.router.navigate([path]);
   }
 }
