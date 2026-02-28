@@ -1,0 +1,90 @@
+<app-top-navbar role="admin"></app-top-navbar>
+<app-back-header title="Gestión de Sedes y Aulas" [showAvatar]="true"></app-back-header>
+
+<div class="page-content">
+    <main class="main">
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn-primary" (click)="openNewSede()">
+                <span class="material-icons">add</span>
+                Nueva Sede
+            </button>
+            <button class="btn-primary" (click)="openNewAula()">
+                <span class="material-icons">add</span>
+                Nueva Aula
+            </button>
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="filter-pills">
+            <button class="pill active">
+                <span class="material-icons">picture_as_pdf</span>
+                Exportar PDF
+            </button>
+            <button class="pill">
+                <span class="material-icons">table_chart</span>
+                Exportar Excel
+            </button>
+            <button class="pill">
+                <span class="material-icons">filter_list</span>
+                Filtrar
+            </button>
+        </div>
+
+        <!-- Venue Cards -->
+        <div class="venue-list">
+            @for (venue of venues; track venue.name) {
+            <div class="venue-card">
+                <div class="venue-header" (click)="toggleVenue(venue)">
+                    <div class="venue-info">
+                        <span class="material-icons venue-icon">{{ venue.icon }}</span>
+                        <div class="venue-text">
+                            <span class="venue-name">{{ venue.name }}</span>
+                            <span class="venue-meta">{{ venue.classroomCount }} aulas · {{ venue.totalCapacity }}
+                                asientos</span>
+                        </div>
+                    </div>
+                    <span class="material-icons expand-icon">{{ venue.expanded ? 'expand_less' : 'expand_more' }}</span>
+                </div>
+
+                @if (venue.expanded && venue.classrooms.length) {
+                <div class="classroom-list">
+                    @for (room of venue.classrooms; track room.name) {
+                    <div class="classroom-row">
+                        <div class="classroom-info">
+                            <span class="classroom-name">{{ room.name }}</span>
+                            <span class="classroom-capacity">Capacidad: {{ room.capacity }}</span>
+                        </div>
+                        <span class="status-badge" [class]="getStatusClass(room.status)">{{ room.status }}</span>
+                    </div>
+                    }
+                </div>
+                }
+
+                @if (venue.expanded) {
+                <button class="add-classroom-btn" (click)="openNewAula()">
+                    <span class="material-icons">add</span>
+                    Agregar Aula
+                </button>
+                }
+            </div>
+            }
+        </div>
+    </main>
+</div>
+
+<app-bottom-nav role="admin" activeTab="/admin/sedes" (fabAction)="onFabAction($event)"></app-bottom-nav>
+
+<!-- Modals -->
+@if (activeModal === 'nueva-aula') {
+<app-nueva-aula-modal (close)="closeModal()"></app-nueva-aula-modal>
+}
+@if (activeModal === 'nueva-sede') {
+<app-nueva-sede-modal (close)="closeModal()"></app-nueva-sede-modal>
+}
+@if (activeModal === 'nueva-categoria') {
+<app-nueva-categoria-modal (close)="closeModal()"></app-nueva-categoria-modal>
+}
+@if (activeModal === 'nuevo-usuario') {
+<app-nuevo-usuario-modal (close)="closeModal()"></app-nuevo-usuario-modal>
+}

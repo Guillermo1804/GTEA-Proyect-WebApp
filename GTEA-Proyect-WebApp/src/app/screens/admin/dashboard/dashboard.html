@@ -1,0 +1,136 @@
+<app-top-navbar role="admin"></app-top-navbar>
+
+<div class="page-content">
+    <main class="main">
+        <!-- Page Title -->
+        <div class="page-title">
+            <h1>Panel de Control</h1>
+            <p>Resumen de actividad académica</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            @for (stat of stats; track stat.label) {
+            <div class="stat-card">
+                <div class="stat-header">
+                    @if (stat.icon) {
+                    <div class="stat-icon-wrap" [style.background]="stat.iconBg">
+                        <span class="material-icons" [style.color]="stat.iconColor">{{ stat.icon }}</span>
+                    </div>
+                    }
+                    <span class="stat-label">{{ stat.label }}</span>
+                </div>
+                <div class="stat-body">
+                    <span class="stat-value">{{ stat.value }}</span>
+                    <div class="stat-sublabel-row">
+                        @if (stat.sublabelIcon) {
+                        <span class="material-icons stat-sublabel-icon" [style.color]="stat.sublabelColor">{{
+                            stat.sublabelIcon }}</span>
+                        }
+                        <span class="stat-sublabel" [style.color]="stat.sublabelColor">{{ stat.sublabel }}</span>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Category Chart -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Eventos por Categoría</h2>
+                <p>Distribución semestral</p>
+            </div>
+            <div class="chart-container">
+                <div class="bar-chart">
+                    @for (cat of categoryData; track cat.label) {
+                    <div class="bar-group">
+                        <div class="bar-wrapper" [style.height.%]="(cat.value / maxCategoryValue) * 100">
+                            <div class="bar-bg" [style.background]="cat.bgColor"></div>
+                            <div class="bar-fill" [style.background]="cat.color"
+                                [style.height.%]="(cat.value / maxCategoryValue) * 100"></div>
+                        </div>
+                        <span class="bar-label">{{ cat.label }}</span>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Inscriptions Card (expandable) -->
+        <div class="card inscriptions-card" [class.expanded]="inscriptionsExpanded" (click)="toggleInscriptions()">
+            <div class="inscriptions-top">
+                <div class="inscriptions-left">
+                    <h2>Inscripciones</h2>
+                    <span class="inscriptions-subtitle">Últimos 6 meses</span>
+                </div>
+                <div class="inscriptions-right">
+                    <span class="inscriptions-value">{{ totalInscriptions }}</span>
+                    <span class="inscriptions-trend">{{ inscriptionsTrend }}</span>
+                </div>
+            </div>
+
+            @if (inscriptionsExpanded) {
+            <div class="inscriptions-chart">
+                <div class="line-chart">
+                    <div class="chart-grid">
+                        @for (i of [0, 1, 2, 3]; track i) {
+                        <div class="grid-line"></div>
+                        }
+                    </div>
+                    <div class="chart-bars">
+                        @for (d of monthlyData; track d.label) {
+                        <div class="chart-point">
+                            <div class="point-bar" [style.height.%]="(d.value / maxMonthlyValue) * 100"></div>
+                        </div>
+                        }
+                    </div>
+                </div>
+                <div class="chart-labels">
+                    @for (d of monthlyData; track d.label) {
+                    <span>{{ d.label }}</span>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Recent Events -->
+        <div class="recent-events">
+            <div class="section-header">
+                <h2>Eventos Recientes</h2>
+                <a class="view-all" (click)="goToEventos()">Ver todo</a>
+            </div>
+            <div class="event-list">
+                @for (event of recentEvents; track event.title) {
+                <div class="event-item">
+                    <div class="event-date-badge">
+                        <span class="event-month">{{ event.month }}</span>
+                        <span class="event-day">{{ event.day }}</span>
+                    </div>
+                    <div class="event-info">
+                        <span class="event-title">{{ event.title }}</span>
+                        <span class="event-location">{{ event.location }}</span>
+                    </div>
+                    <span class="event-status" [class]="event.statusClass">{{ event.status }}</span>
+                </div>
+                }
+            </div>
+        </div>
+    </main>
+</div>
+
+<app-bottom-nav role="admin" activeTab="/admin/dashboard" (fabAction)="onFabAction($event)"></app-bottom-nav>
+
+<!-- Modals -->
+@if (activeModal === 'nueva-aula') {
+<app-nueva-aula-modal (close)="closeModal()"></app-nueva-aula-modal>
+}
+@if (activeModal === 'nueva-sede') {
+<app-nueva-sede-modal (close)="closeModal()"></app-nueva-sede-modal>
+}
+@if (activeModal === 'nueva-categoria') {
+<app-nueva-categoria-modal (close)="closeModal()"></app-nueva-categoria-modal>
+}
+@if (activeModal === 'nuevo-usuario') {
+<app-nuevo-usuario-modal (close)="closeModal()"></app-nuevo-usuario-modal>
+}

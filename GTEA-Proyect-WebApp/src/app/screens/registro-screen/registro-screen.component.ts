@@ -1,43 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
-  AbstractControl,
   FormBuilder,
   ReactiveFormsModule,
-  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
-import { first } from 'rxjs';
-import { FacadeService } from '../../services/facade-service';
-// CookieService removed (was 'ngx-cookie-service')
-import { Inject, PLATFORM_ID } from '@angular/core'; // Añade Inject y PLATFORM_ID
-import { isPlatformBrowser } from '@angular/common'; // Añade esto
+import { Router } from '@angular/router';
+import { FacadeService, EMAIL_DOMAIN_REGEX } from '../../services/facade-service';
+import { TopNavbar } from '../../partials/top-navbar/top-navbar';
 
-
-const EMAIL_DOMAIN_REGEX = /^[^@\s]+@(alumno|admin|organizador)\.com$/i;
 @Component({
   selector: 'app-registro-screen',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, TopNavbar],
   templateUrl: './registro-screen.component.html',
   styleUrl: './registro-screen.component.scss',
 })
-export class RegistroScreenComponent {
+export class RegistroScreenComponent implements OnInit {
   readonly form;
   errorMessage: string = '';
   successMessage: string = '';
+  ngOnInit(): void {
 
+  }
   constructor(
     private fb: FormBuilder,
     private facadeService: FacadeService,
     private router: Router,
-    // cookie handling removed: private cookieService: CookieService,
-    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.form = this.fb.nonNullable.group(
       {
-        
         firstName: ['', [Validators.required, Validators.minLength(2)]],
         lastName: ['', [Validators.required, Validators.minLength(2)]],
         idNumber: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
@@ -49,49 +41,36 @@ export class RegistroScreenComponent {
         confirmPassword: ['', [Validators.required]],
         terms: [false, [Validators.requiredTrue]],
       },
-      { validators: [this.passwordsMatchValidator] },
+      { validators: [this.facadeService.passwordsMatchValidator] },
     );
   }
-  
 
   get passwordStrength(): { level: number; label: string } {
-    const value = this.form.controls.password.value || '';
-    let score = 0;
-
-    if (value.length >= 8) score += 1;
-    if (value.length >= 12) score += 1;
-    if (/[A-Z]/.test(value)) score += 1;
-    if (/[0-9]/.test(value)) score += 1;
-    if (/[^A-Za-z0-9]/.test(value)) score += 1;
-
-    const level = Math.min(4, score);
-    const labels = ['Muy debil', 'Debil', 'Medio', 'Fuerte', 'Muy fuerte'];
-
-    return { level, label: labels[level] };
+    return this.facadeService.getPasswordStrength(this.form.controls.password.value || '');
   }
+
   get showPasswordMismatch(): boolean {
     const { password, confirmPassword } = this.form.controls;
     return this.form.hasError('passwordMismatch') && (password.touched || confirmPassword.touched);
   }
+
   isInvalid(controlName: 'firstName' | 'lastName' | 'idNumber' | 'email' | 'password' | 'confirmPassword' | 'terms'): boolean {
     const control = this.form.controls[controlName];
     return !!(control?.invalid && (control.dirty || control.touched));
   }
 
-  private passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
-    const password = control.get('password')?.value;
-    const confirmPassword = control.get('confirmPassword')?.value;
-    return password && confirmPassword && password !== confirmPassword
-      ? { passwordMismatch: true }
-      : null;
-  }
   isSubmitting = false;
+  showPassword = false;
+  showConfirmPassword = false;
+
+  get passwordsMatch(): boolean {
+    const { password, confirmPassword } = this.form.controls;
+    return !!password.value && !!confirmPassword.value && password.value === confirmPassword.value;
+  }
 
   onSubmit(): void {
-    // Allow submission even if the form is invalid so backend/DB connectivity can be tested.
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      // continue instead of returning to call the backend regardless of client validation
     }
 
     this.isSubmitting = true;
@@ -103,10 +82,6 @@ export class RegistroScreenComponent {
         this.isSubmitting = false;
         this.successMessage = '¡Registro exitoso! Redirigiendo al login...';
         console.log('Registro exitoso:', response);
-
-// --- CAMBIO AQUÍ ---
-    // Cookie write removed (ngx-cookie-service was uninstalled)
-    // -------------------        // Redirigir al login después de 2 segundos
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 2000);
@@ -118,7 +93,7 @@ export class RegistroScreenComponent {
       },
     });
   }
-  
+
   navigate(path: string): void {
     this.router.navigate([path]);
   }
