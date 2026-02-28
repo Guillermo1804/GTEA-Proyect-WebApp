@@ -1,0 +1,68 @@
+<div class="modal-overlay" (click)="onCancel()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Nuevo Usuario</h2>
+            <button class="close-btn" (click)="onCancel()">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nombre</label>
+                    <input class="form-input" type="text" placeholder="Nombre" [(ngModel)]="firstName">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Apellido</label>
+                    <input class="form-input" type="text" placeholder="Apellido" [(ngModel)]="lastName">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Correo electrónico</label>
+                <input class="form-input" type="email" placeholder="usuario@universidad.edu" [(ngModel)]="email">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Teléfono</label>
+                <input class="form-input" type="tel" placeholder="(000) 000-0000" [(ngModel)]="phone">
+            </div>
+
+            <!-- Role Selector -->
+            <div class="form-group">
+                <label class="form-label">Rol</label>
+                <div class="role-grid">
+                    @for (role of roles; track role) {
+                    <button class="role-option" [class.selected]="selectedRole === role" (click)="selectedRole = role">
+                        {{ role }}
+                    </button>
+                    }
+                </div>
+            </div>
+
+            <!-- Send Invite Toggle -->
+            <div class="invite-toggle">
+                <div class="invite-info">
+                    <span class="material-icons">mail_outline</span>
+                    <div>
+                        <span class="invite-title">Enviar invitación</span>
+                        <span class="invite-sub">El usuario recibirá un correo para activar su cuenta</span>
+                    </div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" [checked]="sendInvite" (change)="sendInvite = !sendInvite">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="onCancel()">Cancelar</button>
+            <button class="btn-save" (click)="onSave()">Crear Usuario</button>
+        </div>
+    </div>
+</div>

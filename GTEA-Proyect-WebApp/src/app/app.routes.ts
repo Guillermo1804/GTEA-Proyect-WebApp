@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { RegistroScreenComponent } from './screens/registro-screen/registro-screen.component';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'landing' },
@@ -21,7 +20,48 @@ export const routes: Routes = [
       import('./screens/registro-screen/registro-screen.component')
         .then(m => m.RegistroScreenComponent),
   },
-  { path: '**', redirectTo: 'landing' },    
-    { path: 'registro', pathMatch: 'full', redirectTo: 'registro' },    
-
+  // Admin routes
+  {
+    path: 'admin',
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./screens/admin/dashboard/dashboard')
+            .then(m => m.Dashboard),
+      },
+      {
+        path: 'sedes',
+        loadComponent: () =>
+          import('./screens/admin/sedes/sedes')
+            .then(m => m.Sedes),
+      },
+      {
+        path: 'categorias',
+        loadComponent: () =>
+          import('./screens/admin/categorias/categorias')
+            .then(m => m.Categorias),
+      },
+      {
+        path: 'usuarios',
+        loadComponent: () =>
+          import('./screens/admin/usuarios/usuarios')
+            .then(m => m.Usuarios),
+      },
+      {
+        path: 'eventos',
+        loadComponent: () =>
+          import('./screens/admin/eventos/eventos')
+            .then(m => m.Eventos),
+      },
+      {
+        path: 'reportes',
+        loadComponent: () =>
+          import('./screens/admin/reportes/reportes')
+            .then(m => m.Reportes),
+      },
+    ],
+  },
+  { path: '**', redirectTo: 'landing' },
 ];
