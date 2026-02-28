@@ -155,6 +155,19 @@ button.primary {
   transition: transform 0.05s ease, filter 0.2s ease;
 }
 
+button.primary-register {
+  width: 20%;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 100;
+  cursor: pointer;
+  transition: transform 0.05s ease, filter 0.2s ease;
+}
+
 button.primary:hover {
   filter: brightness(0.95);
 }

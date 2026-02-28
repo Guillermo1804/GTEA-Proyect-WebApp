@@ -1,1 +1,40 @@
-<p>navbar works!</p>
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo -->
+    <div class="navbar-brand">
+      <a (click)="navigate('/landing')" class="logo-link">
+        <img src="favicon.png" alt="Logo GTEA" class="logo">
+        <span class="brand-text">GTEA</span>
+      </a>
+    </div>
+
+    <!-- Hamburger Menu (Mobile) -->
+    <button class="hamburger" [class.active]="isMenuOpen" (click)="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- Navigation Links -->
+    <ul class="nav-menu" [class.active]="isMenuOpen">
+      <li class="nav-item">
+          <a (click)="navigate('/landing')"
+            class="nav-link">
+          Inicio
+        </a>
+      </li>
+      <li class="nav-item">
+          <a (click)="navigate('/login')"
+            class="nav-link">
+          Inicia sesión
+        </a>
+      </li>
+      <li class="nav-item">
+          <a (click)="navigate('/registro')"
+            class="nav-link nav-link-primary">
+          Crear cuenta
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>

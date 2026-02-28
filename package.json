@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "ngx-cookie": "^6.0.1",
+    "ngx-cookie-service": "^21.1.0"
+  }
+}
