@@ -1,50 +1,79 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { SHARED_IMPORTS } from '../../shared/shared';
+import { TopNavbar } from '../../partials/top-navbar/top-navbar';
 
-interface RoleCard {
+interface EventCard {
+  image: string;
+  category: string;
+  categoryColor: string;
+  title: string;
+  date: string;
+  enrolled: number;
+  capacity: number;
+}
+
+interface Benefit {
+  icon: string;
   title: string;
   description: string;
-  icon: string;
-  email: string;
-  color: string;
 }
 
 @Component({
   selector: 'app-landing-screen',
-  standalone: true,
-  imports: [CommonModule],
+  imports: [TopNavbar],
   templateUrl: './landing-screen.component.html',
   styleUrl: './landing-screen.component.scss'
 })
-export class LandingScreenComponent {
-  roles: RoleCard[] = [
+export class LandingScreenComponent implements OnInit {
+  readonly form: any;
+  errorMessage: string = '';
+  successMessage: string = '';
+  ngOnInit(): void {
+
+  }
+  events: EventCard[] = [
     {
-      title: 'Alumno',
-      description: 'Accede a eventos, gestiona tu perfil y conecta con otros estudiantes.',
-      icon: '🎓',
-      email: 'usuario@alumno.com',
-      color: '#1e3aa9'
+      image: '', category: 'Ingeniería', categoryColor: '#1e40af',
+      title: 'Taller de Robótica', date: '12 Oct • 10:00 AM',
+      enrolled: 28, capacity: 40
     },
     {
-      title: 'Organizador',
-      description: 'Crea y gestiona eventos académicos para la comunidad.',
-      icon: '📋',
-      email: 'usuario@organizador.com',
-      color: '#0a7a6b'
+      image: '', category: 'Artes', categoryColor: '#7c3aed',
+      title: 'Seminario de Diseño', date: '15 Oct • 14:00 PM',
+      enrolled: 35, capacity: 50
     },
     {
-      title: 'Administrador',
-      description: 'Supervisa la plataforma y gestiona todos los usuarios y eventos.',
-      icon: '⚙️',
-      email: 'usuario@admin.com',
-      color: '#7c2d12'
-    }
+      image: '', category: 'Ciencias', categoryColor: '#059669',
+      title: 'Conferencia AI', date: '20 Oct • 09:00 AM',
+      enrolled: 180, capacity: 200
+    },
   ];
-  constructor(private router: Router) {}
+
+  benefits: Benefit[] = [
+    {
+      icon: 'app_registration',
+      title: 'Registro Fácil',
+      description: 'Inscríbete a tus talleres favoritos con un solo clic usando tu cuenta institucional.'
+    },
+    {
+      icon: 'workspace_premium',
+      title: 'Certificados Digitales',
+      description: 'Recibe constancias con valor curricular automáticamente al finalizar el evento.'
+    },
+    {
+      icon: 'calendar_month',
+      title: 'Agenda Personalizada',
+      description: 'Organiza tu tiempo y recibe recordatorios antes de cada sesión académica.'
+    },
+  ];
+
+  constructor(private router: Router) { }
 
   navigate(path: string): void {
     this.router.navigate([path]);
+  }
+
+  getOccupancy(event: EventCard): number {
+    return Math.round((event.enrolled / event.capacity) * 100);
   }
 }
