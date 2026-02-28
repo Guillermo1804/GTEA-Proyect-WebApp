@@ -12,7 +12,7 @@
   <div class="wizard-header">
     <div class="wizard-brand">
       <div class="brand-avatar">GT</div>
-      <span class="brand-name">GTEA</span>
+      <span class="brand-name">{{ isEditMode ? 'Editar Evento' : 'Nuevo Evento' }}</span>
     </div>
     <button class="header-close-btn" (click)="onClose()" aria-label="Cerrar">
       <span class="material-icons">close</span>
@@ -505,9 +505,9 @@
         @if (isSubmitting) {
           <span class="spinner"></span>
         } @else {
-          <span class="material-icons">rocket_launch</span>
+          <span class="material-icons">{{ isEditMode ? 'save' : 'rocket_launch' }}</span>
         }
-        Publicar Evento
+        {{ isEditMode ? 'Guardar Cambios' : 'Publicar Evento' }}
       </button>
     }
   </div>

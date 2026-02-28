@@ -50,44 +50,17 @@ export class Eventos implements OnInit {
   // ── Estado de modales ──
   activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | 'nuevo-evento' | null = null;
 
+  // ── Modo edición del wizard ──
+  editingEventId: number | null = null;
+  editingEventData: Evento | null = null;
+
   // ── Búsqueda y filtros ──
   searchQuery = '';
   activeFilter = 'Todos';
   filters = ['Todos', 'Activo', 'Borrador', 'Finalizado', 'Cancelado'];
 
-  // ── Lista de eventos (mock hasta que el backend esté listo) ──
-  events: EventItem[] = [
-    {
-      id: 1, title: 'Taller de Python Avanzado', category: 'Talleres', categoryColor: '#1e3fae',
-      date: '12 Mar 2026', time: '09:00 - 12:00', location: 'Lab. Sistemas #3',
-      organizer: 'Dr. Carlos Mendoza', capacity: 40, enrolled: 38, status: 'Activo',
-    },
-    {
-      id: 2, title: 'Conferencia Inteligencia Artificial', category: 'Conferencias', categoryColor: '#7c3aed',
-      date: '15 Mar 2026', time: '16:00 - 18:00', location: 'Auditorio Principal',
-      organizer: 'Dra. Ana García', capacity: 200, enrolled: 195, status: 'Activo',
-    },
-    {
-      id: 3, title: 'Torneo de Ajedrez Interuniversitario', category: 'Deportes', categoryColor: '#059669',
-      date: '20 Mar 2026', time: '10:00 - 17:00', location: 'Sala de Usos Múltiples',
-      organizer: 'Prof. Roberto Sánchez', capacity: 50, enrolled: 50, status: 'Activo',
-    },
-    {
-      id: 4, title: 'Seminario de Metodología de Investigación', category: 'Seminarios', categoryColor: '#f97316',
-      date: '25 Mar 2026', time: '14:00 - 16:00', location: 'Aula Magna',
-      organizer: 'Dra. María Rodríguez', capacity: 80, enrolled: 45, status: 'Borrador',
-    },
-    {
-      id: 5, title: 'Hackathon GTEA 2026', category: 'Talleres', categoryColor: '#1e3fae',
-      date: '01 Abr 2026', time: '08:00 - 20:00', location: 'Lab. Sistemas #1 y #2',
-      organizer: 'Ing. Pedro Ramírez', capacity: 60, enrolled: 55, status: 'Activo',
-    },
-    {
-      id: 6, title: 'Exposición de Arte Digital', category: 'Culturales', categoryColor: '#e11d48',
-      date: '05 Feb 2026', time: '11:00 - 19:00', location: 'Galería Central',
-      organizer: 'Lic. Laura Gómez', capacity: 100, enrolled: 100, status: 'Finalizado',
-    },
-  ];
+  // ── Lista de eventos (cargada desde el servicio) ──
+  events: EventItem[] = [];
 
   constructor(
     private router: Router,
@@ -95,25 +68,56 @@ export class Eventos implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // TODO: Cuando el backend esté listo, descomentar y reemplazar los datos mock:
-    // this.loadEvents();
+    // Cargar eventos desde el servicio (ahora retorna mocks centralizados)
+    this.loadEvents();
   }
 
-  // ── Carga desde API (preparado, actualmente comentado) ──
-  // loadEvents(): void {
-  //   this.isLoading = true;
-  //   this.eventoService.obtenerEventos().subscribe({
-  //     next: (data) => {
-  //       this.events = data;
-  //       this.isLoading = false;
-  //     },
-  //     error: (err) => {
-  //       console.error('Error cargando eventos:', err);
-  //       this.errorMessage = 'Error al cargar eventos.';
-  //       this.isLoading = false;
-  //     },
-  //   });
-  // }
+  // ── Carga desde API (usa mocks centralizados hasta que llegue el backend) ──
+  loadEvents(): void {
+    this.isLoading = true;
+    this.eventoService.obtenerEventos().subscribe({
+      next: (data: Evento[]) => {
+        // Mapear Evento[] a EventItem[] para la vista
+        this.events = data.map(e => ({
+          id: e.id ?? 0,
+          title: e.titulo,
+          category: this.eventoService.getCategoriaNombre(e.categoriaId),
+          categoryColor: this._getCategoryColor(e.categoriaId),
+          date: this._formatDate(e.fechaInicio),
+          time: `${e.horaInicio} - ${e.horaFin}`,
+          location: e.modalidad === 'Virtual' ? 'Virtual' : this.eventoService.getAulaNombre(e.aulaId, e.sedeId),
+          organizer: 'Organizador', // TODO: obtener del backend
+          capacity: e.cupoMaximo,
+          enrolled: 0, // TODO: obtener del backend
+          status: e.publicarInmediatamente ? 'Activo' : 'Borrador',
+        }));
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando eventos:', err);
+        this.errorMessage = 'Error al cargar eventos.';
+        this.isLoading = false;
+      },
+    });
+  }
+
+  private _getCategoryColor(categoriaId: string | number): string {
+    const colors: { [key: number]: string } = {
+      1: '#1e3fae', // Talleres
+      2: '#7c3aed', // Conferencias
+      3: '#f97316', // Seminarios
+      4: '#059669', // Deportes
+      5: '#e11d48', // Culturales
+    };
+    return colors[Number(categoriaId)] || '#6b7280';
+  }
+
+  private _formatDate(fecha: string): string {
+    if (!fecha) return '—';
+    const date = new Date(fecha);
+    if (isNaN(date.getTime())) return fecha;
+    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
 
   // ── Filtrado reactivo ──
   get filteredEvents(): EventItem[] {
@@ -165,16 +169,50 @@ export class Eventos implements OnInit {
 
   // ── Acciones sobre eventos ──
   viewEvent(event: EventItem): void {
-    // TODO: navegar a detalle del evento o abrir drawer
-    console.log('Ver evento:', event);
+    this.router.navigate(['/admin/eventos', event.id]);
   }
 
   editEvent(event: EventItem): void {
-    // TODO: abrir wizard en modo edición con los datos del evento
-    // this.eventoService.getEventoByID(event.id).subscribe({
-    //   next: (data) => { this.activeModal = 'nuevo-evento'; ... }
-    // });
-    console.log('Editar evento:', event);
+    // Cargar datos completos del evento desde el servicio
+    // Esto asegura que descripcion, sedeId y aulaId estén disponibles
+    this.eventoService.getEventoByID(event.id).subscribe({
+      next: (data: Evento | null) => {
+        if (data) {
+          this.editingEventId   = event.id;
+          this.editingEventData = data;
+          this.activeModal      = 'nuevo-evento';
+        } else {
+          // Fallback si el servicio retorna null (modo mock sin datos)
+          const eventoData: Evento = {
+            id:                    event.id,
+            titulo:                event.title,
+            categoriaId:           event.category,
+            descripcion:           'Descripción del evento (cargar desde backend)',
+            imagenPortada:         null,
+            fechaInicio:           event.date,
+            horaInicio:            event.time.split(' - ')[0] ?? '',
+            fechaFin:              event.date,
+            horaFin:               event.time.split(' - ')[1] ?? '',
+            modalidad:             event.location === 'Virtual' ? 'Virtual' : 'Presencial',
+            sedeId:                1, // Mock: usar ID 1 por defecto
+            aulaId:                101, // Mock: usar ID 101 por defecto
+            cupoMaximo:            event.capacity,
+            costoEntrada:          0,
+            listaEspera:           false,
+            publicarInmediatamente: event.status === 'Activo',
+            esOrganizador:         true,
+          };
+          this.editingEventId   = event.id;
+          this.editingEventData = eventoData;
+          this.activeModal      = 'nuevo-evento';
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando evento para editar:', err);
+        this.errorMessage = 'No se pudo cargar el evento para editar.';
+        setTimeout(() => (this.errorMessage = ''), 4000);
+      },
+    });
   }
 
   deleteEvent(event: EventItem): void {
@@ -194,33 +232,61 @@ export class Eventos implements OnInit {
     });
   }
 
-  // ── Callback: evento creado desde el wizard ──
+  // ── Callback: evento creado o actualizado desde el wizard ──
   onEventoCreado(evento: Evento): void {
-    // Cuando el backend esté listo, el id vendrá del response real
-    const nuevo: EventItem = {
-      id: Date.now(),
-      title: evento.titulo,
-      category: String(evento.categoriaId),
-      categoryColor: '#1e3fae',
-      date: evento.fechaInicio,
-      time: `${evento.horaInicio} - ${evento.horaFin}`,
-      location: String(evento.aulaId || 'Virtual'),
-      organizer: 'Tú',
-      capacity: evento.cupoMaximo,
-      enrolled: 0,
-      status: evento.publicarInmediatamente ? 'Activo' : 'Borrador',
-    };
-    this.events.unshift(nuevo);
-    this.successMessage = `Evento "${evento.titulo}" creado exitosamente.`;
+    if (this.editingEventId !== null) {
+      // Modo edición — actualizar el item existente en la lista
+      const idx = this.events.findIndex((e) => e.id === this.editingEventId);
+      if (idx !== -1) {
+        this.events[idx] = {
+          ...this.events[idx],
+          title:    evento.titulo,
+          category: String(evento.categoriaId),
+          date:     evento.fechaInicio,
+          time:     `${evento.horaInicio} - ${evento.horaFin}`,
+          location: evento.modalidad === 'Virtual' ? 'Virtual' : String(evento.aulaId || '—'),
+          capacity: evento.cupoMaximo,
+          status:   evento.publicarInmediatamente ? 'Activo' : 'Borrador',
+        };
+        // Forzar re-render de la lista
+        this.events = [...this.events];
+      }
+      this.successMessage = `Evento "${evento.titulo}" actualizado exitosamente.`;
+    } else {
+      // Modo creación — agregar al inicio de la lista
+      const nuevo: EventItem = {
+        id:            evento.id ?? Date.now(),
+        title:         evento.titulo,
+        category:      String(evento.categoriaId),
+        categoryColor: '#1e3fae',
+        date:          evento.fechaInicio,
+        time:          `${evento.horaInicio} - ${evento.horaFin}`,
+        location:      evento.modalidad === 'Virtual' ? 'Virtual' : String(evento.aulaId || '—'),
+        organizer:     'Tú',
+        capacity:      evento.cupoMaximo,
+        enrolled:      0,
+        status:        evento.publicarInmediatamente ? 'Activo' : 'Borrador',
+      };
+      this.events.unshift(nuevo);
+      this.successMessage = `Evento "${evento.titulo}" creado exitosamente.`;
+    }
+
     setTimeout(() => (this.successMessage = ''), 4000);
   }
 
   // ── FAB y modales ──
   onFabAction(action: string): void {
+    if (action !== 'nuevo-evento') {
+      // Asegurarse de limpiar el modo edición si se abre otro modal
+      this.editingEventId   = null;
+      this.editingEventData = null;
+    }
     this.activeModal = action as any;
   }
 
   closeModal(): void {
-    this.activeModal = null;
+    this.activeModal      = null;
+    this.editingEventId   = null;
+    this.editingEventData = null;
   }
 }

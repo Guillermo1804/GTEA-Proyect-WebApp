@@ -505,7 +505,7 @@ $bp-xl:  1280px;
 
   p {
     font-size: 12px;
-    color: darken($warning, 10%);
+    color: color.adjust($warning, $lightness: -10%);
     margin: 0;
     line-height: 1.4;
   }

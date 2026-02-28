@@ -148,6 +148,8 @@
 }
 @if (activeModal === 'nuevo-evento') {
 <app-nuevo-evento-wizard
+    [editId]="editingEventId"
+    [editData]="editingEventData"
     (close)="closeModal()"
     (eventoCreado)="onEventoCreado($event)">
 </app-nuevo-evento-wizard>

@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -35,8 +35,17 @@ function fechaFinValidator(group: AbstractControl): ValidationErrors | null {
   styleUrl: './nuevo-evento-wizard.scss',
 })
 export class NuevoEventoWizard implements OnInit {
+  // ── Modo edición: si se pasan estos inputs, el wizard actúa como editor ──
+  @Input() editId: number | null = null;
+  @Input() editData: Evento | null = null;
+
   @Output() close = new EventEmitter<void>();
   @Output() eventoCreado = new EventEmitter<Evento>();
+
+  /** true cuando se está editando un evento existente */
+  get isEditMode(): boolean {
+    return this.editId !== null && this.editData !== null;
+  }
 
   // ── Estado del wizard ──
   currentStep = 1;
@@ -70,6 +79,71 @@ export class NuevoEventoWizard implements OnInit {
   ngOnInit(): void {
     this._buildForms();
     this._cargarCatalogos();
+
+    // Si hay datos de edición, pre-rellenar los formularios
+    if (this.editData) {
+      this._prefillForms(this.editData);
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // Pre-relleno en modo edición
+  // ─────────────────────────────────────────────
+  private _prefillForms(data: Evento): void {
+    this.step1Form.patchValue({
+      titulo:       data.titulo,
+      categoriaId:  data.categoriaId,
+      descripcion:  data.descripcion,
+      imagenPortada: null,  // No se puede pre-rellenar un File; se muestra la URL existente
+    });
+
+    // Si la imagen es una URL (string), mostrar como preview
+    if (data.imagenPortada && typeof data.imagenPortada === 'string') {
+      this.imagenPreviewUrl = data.imagenPortada;
+    }
+
+    // Guardar el aulaId antes de cambiar sedeId (para evitar que se limpie)
+    const aulaIdToRestore = data.aulaId ?? '';
+
+    this.step2Form.patchValue({
+      fechaInicio:  data.fechaInicio,
+      horaInicio:   data.horaInicio,
+      fechaFin:     data.fechaFin,
+      horaFin:      data.horaFin,
+      modalidad:    data.modalidad,
+      cupoMaximo:   data.cupoMaximo,
+      costoEntrada: data.costoEntrada,
+      listaEspera:  data.listaEspera,
+    }, { emitEvent: false }); // No disparar listeners para evitar que se limpie aulaId
+
+    this.step3Form.patchValue({
+      publicarInmediatamente: data.publicarInmediatamente,
+      esOrganizador:          data.esOrganizador,
+    });
+
+    // Disparar carga de aulas si hay sede seleccionada
+    if (data.sedeId) {
+      // Establecer sedeId sin disparar el listener
+      this.step2Form.get('sedeId')?.setValue(data.sedeId, { emitEvent: false });
+      
+      // Cargar aulas y restaurar aulaId después
+      this.eventoService.obtenerAulasPorSede(Number(data.sedeId)).subscribe({
+        next: (aulas) => {
+          this.aulas = aulas;
+          // Restaurar aulaId después de que el select tenga opciones
+          // Usar setTimeout para asegurar que el DOM se haya actualizado
+          setTimeout(() => {
+            this.step2Form.get('aulaId')?.setValue(aulaIdToRestore);
+          }, 0);
+        },
+      });
+    } else {
+      // Si no hay sede, establecer aulaId directamente
+      this.step2Form.get('aulaId')?.setValue(aulaIdToRestore, { emitEvent: false });
+    }
+
+    // Activar validadores presenciales si aplica
+    this._togglePresencialValidators(data.modalidad);
   }
 
   // ─────────────────────────────────────────────
@@ -330,8 +404,27 @@ export class NuevoEventoWizard implements OnInit {
       ...this.step3Form.value,
     };
 
+    // ── Modo edición ──
+    if (this.isEditMode && this.editId !== null) {
+      this.eventoService.editarEvento(this.editId, payload).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.successMessage = '¡Evento actualizado exitosamente!';
+          this.eventoCreado.emit({ ...payload, id: this.editId! });
+          setTimeout(() => this.onClose(), 1500);
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.errorMessage =
+            err?.error?.message || err?.error?.detail || 'Error al actualizar el evento.';
+        },
+      });
+      return;
+    }
+
+    // ── Modo creación ──
     this.eventoService.crearEvento(payload).subscribe({
-      next: (response) => {
+      next: () => {
         this.isSubmitting = false;
         this.successMessage = '¡Evento creado exitosamente!';
         this.eventoCreado.emit(payload);
