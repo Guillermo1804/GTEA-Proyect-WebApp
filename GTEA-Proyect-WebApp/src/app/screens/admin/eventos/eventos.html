@@ -8,7 +8,25 @@
                 <h1>Gestión de Eventos</h1>
                 <p>Administra todos los eventos de la plataforma</p>
             </div>
+            <button class="btn-add" (click)="onFabAction('nuevo-evento')">
+                <span class="material-icons">add</span>
+                Nuevo Evento
+            </button>
         </div>
+
+        <!-- Mensajes de feedback -->
+        @if (successMessage) {
+            <div class="feedback-alert success">
+                <span class="material-icons">check_circle_outline</span>
+                {{ successMessage }}
+            </div>
+        }
+        @if (errorMessage) {
+            <div class="feedback-alert error">
+                <span class="material-icons">error_outline</span>
+                {{ errorMessage }}
+            </div>
+        }
 
         <!-- Quick Stats -->
         <div class="quick-stats">
@@ -127,4 +145,10 @@
 }
 @if (activeModal === 'nuevo-usuario') {
 <app-nuevo-usuario-modal (close)="closeModal()"></app-nuevo-usuario-modal>
+}
+@if (activeModal === 'nuevo-evento') {
+<app-nuevo-evento-wizard
+    (close)="closeModal()"
+    (eventoCreado)="onEventoCreado($event)">
+</app-nuevo-evento-wizard>
 }

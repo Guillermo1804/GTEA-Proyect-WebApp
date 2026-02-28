@@ -65,10 +65,11 @@ export class BottomNav {
   };
 
   fabActions: FabAction[] = [
-    { icon: 'meeting_room', label: 'Nueva Aula', color: '#1e3fae', action: 'nueva-aula' },
-    { icon: 'domain_add', label: 'Nueva Sede', color: '#059669', action: 'nueva-sede' },
-    { icon: 'category', label: 'Nueva Categoría', color: '#7c3aed', action: 'nueva-categoria' },
     { icon: 'person_add', label: 'Nuevo Usuario', color: '#ea580c', action: 'nuevo-usuario' },
+    { icon: 'category', label: 'Nueva Categoría', color: '#7c3aed', action: 'nueva-categoria' },
+    { icon: 'domain_add', label: 'Nueva Sede', color: '#059669', action: 'nueva-sede' },
+    { icon: 'meeting_room', label: 'Nueva Aula', color: '#16a34a', action: 'nueva-aula' },
+    { icon: 'event', label: 'Nuevo Evento', color: '#1e3fae', action: 'nuevo-evento' },
   ];
 
   get leftTabs(): NavTab[] {
