@@ -224,3 +224,59 @@
         background: #e8ecf7;
     }
 }
+
+// ──────────────── Responsive ────────────────
+
+// Tablet
+@media (min-width: 768px) {
+    .page-content {
+        padding-top: 0;
+    }
+
+    .main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 24px;
+        gap: 16px;
+    }
+
+    .action-buttons {
+        padding: 12px 0;
+        max-width: 500px;
+    }
+
+    .filter-pills {
+        padding: 6px 0;
+    }
+
+    .venue-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        padding: 0;
+    }
+}
+
+// Desktop
+@media (min-width: 1024px) {
+    .main {
+        max-width: 1280px;
+        padding: 16px 48px;
+    }
+
+    .action-buttons {
+        max-width: 600px;
+    }
+
+    .venue-list {
+        gap: 20px;
+    }
+
+    .venue-card {
+        border-radius: 16px;
+    }
+
+    .venue-header {
+        padding: 16px 20px;
+    }
+}

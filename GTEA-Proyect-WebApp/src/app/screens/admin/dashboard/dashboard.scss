@@ -471,3 +471,86 @@
     background: #fff7ed;
     color: #ea580c;
 }
+
+// ──────────────── Responsive ────────────────
+
+// Content Grid wrapper (chart + inscriptions + events)
+.content-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+// Tablet
+@media (min-width: 768px) {
+    .main {
+        padding: 24px;
+        max-width: 900px;
+        margin: 0 auto;
+        gap: 24px;
+    }
+
+    .stat-card {
+        padding: 20px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+    }
+
+    .chart-container {
+        height: 200px;
+    }
+}
+
+// Desktop
+@media (min-width: 1024px) {
+    .main {
+        padding: 32px 48px;
+        max-width: 1280px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    .stat-card {
+        padding: 24px;
+    }
+
+    .stat-value {
+        font-size: 32px;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        align-items: start;
+
+        // Chart card spans full left column
+        .card {
+            grid-column: 1;
+        }
+
+        // Inscriptions card spans full width below
+        .inscriptions-card {
+            grid-column: 1 / -1;
+        }
+
+        // Recent events on the right column
+        .recent-events {
+            grid-column: 2;
+            grid-row: 1;
+        }
+    }
+
+    .chart-container {
+        height: 240px;
+    }
+
+    .page-title h1 {
+        font-size: 24px;
+    }
+}

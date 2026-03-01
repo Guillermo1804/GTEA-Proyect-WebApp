@@ -299,3 +299,85 @@
     font-weight: 500;
     color: #64748b;
 }
+
+// ──────────────── Responsive ────────────────
+
+// Tablet
+@media (min-width: 768px) {
+    .page-content {
+        padding-top: 0;
+    }
+
+    .main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .page-header {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 16px 24px;
+
+        h1 {
+            font-size: 22px;
+        }
+    }
+
+    .search-section {
+        flex-direction: row;
+        align-items: center;
+        padding: 12px 0;
+    }
+
+    .search-bar {
+        flex: 1;
+        max-width: 400px;
+    }
+
+    .user-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 0;
+    }
+
+    .pagination {
+        max-width: 900px;
+        margin: 16px auto 0;
+    }
+}
+
+// Desktop
+@media (min-width: 1024px) {
+    .main {
+        max-width: 1280px;
+        padding: 0 48px;
+    }
+
+    .page-header {
+        max-width: 1280px;
+        padding: 20px 48px;
+
+        h1 {
+            font-size: 24px;
+        }
+    }
+
+    .search-section {
+        padding: 16px 0;
+    }
+
+    .user-list {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+    }
+
+    .user-card {
+        padding: 20px;
+    }
+
+    .pagination {
+        max-width: 1280px;
+    }
+}

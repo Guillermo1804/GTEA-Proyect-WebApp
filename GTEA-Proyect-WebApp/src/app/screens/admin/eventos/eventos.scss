@@ -50,9 +50,13 @@
     flex-shrink: 0;
     transition: background 0.2s ease;
 
-    &:hover { background: #1632a0; }
+    &:hover {
+        background: #1632a0;
+    }
 
-    .material-icons { font-size: 18px; }
+    .material-icons {
+        font-size: 18px;
+    }
 }
 
 // Alertas de feedback inline
@@ -66,7 +70,9 @@
     font-size: 13px;
     animation: fadeIn 0.3s ease;
 
-    .material-icons { font-size: 18px; }
+    .material-icons {
+        font-size: 18px;
+    }
 
     &.success {
         background: #ecfdf5;
@@ -82,8 +88,15 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 // Quick Stats
@@ -373,5 +386,73 @@
         font-family: 'Inter', sans-serif;
         font-size: 14px;
         margin: 0;
+    }
+}
+
+// ──────────────── Responsive ────────────────
+
+// Tablet
+@media (min-width: 768px) {
+    .main {
+        padding: 24px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .page-header h1 {
+        font-size: 22px;
+    }
+
+    .search-section {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .search-bar {
+        flex: 1;
+        max-width: 400px;
+    }
+
+    .event-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .quick-stats {
+        gap: 12px;
+    }
+
+    .qs-value {
+        font-size: 26px;
+    }
+}
+
+// Desktop
+@media (min-width: 1024px) {
+    .main {
+        padding: 32px 48px;
+        max-width: 1280px;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
+    }
+
+    .event-list {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .event-card {
+        padding: 20px;
+    }
+
+    .quick-stat {
+        padding: 16px;
+    }
+
+    .qs-value {
+        font-size: 28px;
     }
 }

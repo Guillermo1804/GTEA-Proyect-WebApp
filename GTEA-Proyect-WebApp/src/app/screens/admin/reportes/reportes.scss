@@ -375,3 +375,59 @@
         background: #f9fafb;
     }
 }
+
+// ──────────────── Responsive ────────────────
+
+// Tablet
+@media (min-width: 768px) {
+    .main {
+        padding: 24px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .page-header h1 {
+        font-size: 22px;
+    }
+
+    .chart-container {
+        height: 220px;
+    }
+
+    .export-section {
+        max-width: 400px;
+    }
+}
+
+// Desktop
+@media (min-width: 1024px) {
+    .main {
+        padding: 32px 48px;
+        max-width: 1280px;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    .kpi-card {
+        padding: 20px;
+    }
+
+    .kpi-value {
+        font-size: 28px;
+    }
+
+    .chart-container {
+        height: 260px;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
+    }
+
+    .export-section {
+        max-width: 500px;
+    }
+}
