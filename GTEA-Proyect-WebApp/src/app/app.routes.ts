@@ -63,5 +63,11 @@ export const routes: Routes = [
       },
     ],
   },
+{
+  path: 'alumno',
+  loadComponent: () =>
+    import('./screens/alumno-screen/alumno-screen')
+      .then(m => m.AlumnoScreen),
+},
   { path: '**', redirectTo: 'landing' },
 ];
