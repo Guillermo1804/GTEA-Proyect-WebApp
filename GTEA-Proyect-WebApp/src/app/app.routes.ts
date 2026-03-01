@@ -56,6 +56,12 @@ export const routes: Routes = [
             .then(m => m.Eventos),
       },
       {
+        path: 'eventos/:id',
+        loadComponent: () =>
+          import('./screens/admin/eventos/evento-detail/evento-detail')
+            .then(m => m.EventoDetail),
+      },
+      {
         path: 'reportes',
         loadComponent: () =>
           import('./screens/admin/reportes/reportes')
