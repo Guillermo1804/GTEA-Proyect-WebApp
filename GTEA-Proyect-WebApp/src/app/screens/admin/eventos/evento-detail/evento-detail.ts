@@ -44,7 +44,7 @@ export class EventoDetail implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private eventoService: EventoService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -146,7 +146,7 @@ export class EventoDetail implements OnInit {
   editarEvento(): void {
     // Emite hacia el padre o navega al wizard en modo edición
     // TODO: implementar apertura del wizard con datos prellenados
-    console.log('[EventoDetail] Editar evento id:', this.evento?.id);
+    // TODO: navegar al formulario de edición
     this.router.navigate(['/admin/eventos'], {
       queryParams: { edit: this.evento?.id },
     });
@@ -166,7 +166,7 @@ export class EventoDetail implements OnInit {
 
   verPerfil(): void {
     // TODO: navegar al perfil del organizador
-    console.log('[EventoDetail] Ver perfil del organizador');
+    // TODO: navegar al perfil del organizador
   }
 
   onImageError(): void {

@@ -54,12 +54,12 @@ export class BottomNav {
     },
     estudiante: {
       left: [
-        { icon: 'dashboard', label: 'Inicio', route: '/estudiante/dashboard' },
-        { icon: 'calendar_month', label: 'Eventos', route: '/estudiante/explorar' },
+        { icon: 'grid_view', label: 'Catálogo', route: '/alumno/catalogo' },
+        { icon: 'bookmark', label: 'Mis Eventos', route: '/alumno/mis-eventos' },
       ],
       right: [
-        { icon: 'history', label: 'Historial', route: '/estudiante/historial' },
-        { icon: 'person', label: 'Perfil', route: '/estudiante/perfil' },
+        { icon: 'history', label: 'Historial', route: '/alumno/historial' },
+        { icon: 'person', label: 'Perfil', route: '/alumno/perfil' },
       ],
     },
   };

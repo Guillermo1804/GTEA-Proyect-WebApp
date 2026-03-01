@@ -1,19 +1,11 @@
 .back-header {
-    background: #fff;
-    border-bottom: 0.8px solid #f3f4f6;
-}
-
-.header-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
-    min-height: 46px;
-}
-
-.left {
-    display: flex;
-    align-items: center;
+    padding: 10px 12px;
+    background: #fff;
+    border-bottom: 0.8px solid #f3f4f6;
+    min-height: 56px;
     gap: 12px;
 }
 
@@ -27,6 +19,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     padding: 8px;
     transition: background 0.2s ease;
 
@@ -40,18 +33,42 @@
     }
 }
 
-.title {
+.header-title {
+    flex: 1;
     font-family: 'Inter', sans-serif;
     font-size: 18px;
     font-weight: 700;
     color: #111318;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spacer {
+    // Only used when showAvatar is false — balances the back button
+    width: 40px;
+    flex-shrink: 0;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
 }
 
 .avatar-placeholder {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 9999px;
     background: #e5e7eb;
     border: 0.8px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .material-icons {
+        font-size: 20px;
+        color: #6b7280;
+    }
 }

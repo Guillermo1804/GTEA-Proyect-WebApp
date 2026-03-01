@@ -1,7 +1,8 @@
 .page-content {
     background: #f6f6f8;
     min-height: 100vh;
-    padding-bottom: 80px;
+    padding-top: 8px;
+    padding-bottom: 88px; // clears fixed bottom-nav
 }
 
 .page-header {
@@ -189,7 +190,7 @@
         color: #7c3aed;
     }
 
-    &.role-docente {
+    &.role-organizador {
         background: #dbeafe;
         color: #2563eb;
     }

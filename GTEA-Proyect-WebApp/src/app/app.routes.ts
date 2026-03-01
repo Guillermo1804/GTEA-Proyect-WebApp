@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'landing' },
@@ -20,9 +21,10 @@ export const routes: Routes = [
       import('./screens/registro-screen/registro-screen.component')
         .then(m => m.RegistroScreenComponent),
   },
-  // Admin routes
+  // ── Admin routes (protegidas) ──
   {
     path: 'admin',
+    canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       {
@@ -69,11 +71,25 @@ export const routes: Routes = [
       },
     ],
   },
-{
-  path: 'alumno',
-  loadComponent: () =>
-    import('./screens/alumno-screen/alumno-screen')
-      .then(m => m.AlumnoScreen),
-},
+  // ── Alumno routes (protegidas) ──
+  {
+    path: 'alumno',
+    canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'catalogo', pathMatch: 'full' },
+      {
+        path: 'catalogo',
+        loadComponent: () =>
+          import('./screens/alumno/catalogo/catalogo.component')
+            .then(m => m.CatalogoComponent),
+      },
+      {
+        path: 'evento/:id',
+        loadComponent: () =>
+          import('./screens/alumno/evento-detalle/evento-detalle.component')
+            .then(m => m.EventoDetalleComponent),
+      },
+    ],
+  },
   { path: '**', redirectTo: 'landing' },
 ];

@@ -17,7 +17,7 @@ export class NuevoUsuarioModal {
     selectedRole = '';
     sendInvite = true;
 
-    roles = ['Admin', 'Docente', 'Organizador', 'Alumno'];
+    roles = ['Admin', 'Organizador', 'Alumno'];
 
     onCancel(): void { this.close.emit(); }
 
