@@ -102,6 +102,13 @@ export class BottomNav {
 
   onFabAction(action: string): void {
     this.showFabMenu = false;
+    
+    // Si es "nuevo-evento", navegar directamente a /admin/eventos con query param
+    if (action === 'nuevo-evento') {
+      this.router.navigate(['/admin/eventos'], { queryParams: { new: 'true' } });
+      return;
+    }
+    
     this.fabAction.emit(action);
   }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
@@ -64,12 +64,29 @@ export class Eventos implements OnInit {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private eventoService: EventoService,
   ) {}
 
   ngOnInit(): void {
     // Cargar eventos desde el servicio (ahora retorna mocks centralizados)
     this.loadEvents();
+    
+    // Verificar si hay query param para abrir el modal de nuevo evento
+    this.route.queryParams.subscribe(params => {
+      if (params['new'] === 'true') {
+        // Limpiar el query param de la URL
+        this.router.navigate([], { 
+          relativeTo: this.route, 
+          queryParams: {}, 
+          replaceUrl: true 
+        });
+        // Abrir el modal de nuevo evento
+        this.editingEventId = null;
+        this.editingEventData = null;
+        this.activeModal = 'nuevo-evento';
+      }
+    });
   }
 
   // ── Carga desde API (usa mocks centralizados hasta que llegue el backend) ──
