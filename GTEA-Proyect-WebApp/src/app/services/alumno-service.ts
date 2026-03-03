@@ -106,51 +106,31 @@ export class AlumnoService {
   //Aquí van los servicios HTTP
   //Servicio para registrar un nuevo usuario
   public registrarAlumno(data: any): Observable<any> {
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.post<any>(`${environment.url_api}/alumnos/`,data, httpOptions);
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+    return this.http.post<any>(`${environment.url_api}/alumnos/detail/`, data, httpOptions);
   }
 
   public obtenerListaAlumnos(): Observable<any> {
-    // var token = this.facadeService.getSessionToken();
-    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.get<any>(`${environment.url_api}/lista-alumnos/`, {headers:headers});
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.get<any>(`${environment.url_api}/alumnos/`, { headers: headers });
   }
 
   //Obtener un solo usuario dependiendo su ID
   public getAlumnoByID(idUser: Number) {
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.get<any>(`${environment.url_api}/alumnos/?id=${idUser}`,httpOptions);
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of(null);
+    return this.http.get<any>(`${environment.url_api}/alumnos/detail/?id=${idUser}`, httpOptions);
   }
 
   //Servicio para actualizar un usuario
   public editarAlumno(data: any): Observable<any> {
-    // var token = this.facadeService .getSessionToken();
-    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.put<any>(`${environment.url_api}/alumnos-edit/`, data, {headers:headers});
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.put<any>(`${environment.url_api}/alumnos/edit/`, data, { headers: headers });
   }
 
   //Eliminar Alumno
   public eliminarAlumno(idUser: number): Observable<any> {
-    // var token = this.facadeService.getSessionToken();
-    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.delete<any>(`${environment.url_api}/alumnos-edit/?id=${idUser}`,{headers:headers});
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.delete<any>(`${environment.url_api}/alumnos/edit/?id=${idUser}`, { headers: headers });
   }
 }

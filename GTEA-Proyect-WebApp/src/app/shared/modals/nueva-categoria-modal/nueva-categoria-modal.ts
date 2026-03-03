@@ -1,5 +1,6 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CategoriaService } from '../../../services/categoria.service';
 
 @Component({
     selector: 'app-nueva-categoria-modal',
@@ -9,6 +10,8 @@ import { FormsModule } from '@angular/forms';
 })
 export class NuevaCategoriaModal {
     @Output() close = new EventEmitter<void>();
+
+    constructor(private categoriaService: CategoriaService) { }
 
     categoryName = '';
     description = '';
@@ -37,7 +40,17 @@ export class NuevaCategoriaModal {
     onCancel(): void { this.close.emit(); }
 
     onSave(): void {
-        // TODO: save category via API
-        this.close.emit();
+        if (!this.categoryName.trim()) return;
+        const data = {
+            nombre: this.categoryName,
+            descripcion: this.description,
+            icon: this.selectedIcon,
+            color: this.selectedColor,
+            activa: true,
+        };
+        this.categoriaService.crearCategoria(data).subscribe({
+            next: () => this.close.emit(),
+            error: (err: any) => console.error('Error creando categoría:', err),
+        });
     }
 }

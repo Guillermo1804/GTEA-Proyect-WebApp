@@ -41,7 +41,8 @@ export class Dashboard implements OnInit {
   ngOnInit(): void {
     this.adminService.getTotalUsuarios().subscribe({
       next: (data: any) => {
-        const total = Array.isArray(data) ? data.length : (data?.total || 0);
+        // Backend devuelve { admins: N, organizadores: N, alumnos: N }
+        const total = (data?.admins || 0) + (data?.organizadores || 0) + (data?.alumnos || 0);
         const usersStat = this.stats.find(s => s.label === 'Usuarios');
         if (usersStat) usersStat.value = total.toLocaleString();
       },

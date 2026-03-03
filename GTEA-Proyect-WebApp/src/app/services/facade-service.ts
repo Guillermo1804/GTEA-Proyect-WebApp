@@ -69,38 +69,22 @@ export class FacadeService {
       password: password
     }
 
-    // TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.post<any>(`${environment.url_api}/token/`, data);
-
-    // ── MVP BYPASS: Simular login exitoso sin backend ──
-    localStorage.setItem('userRole', 'alumno');
-    localStorage.setItem('gtea-proyecto-token', 'mock-token-123');
-    return of({ success: true, role: 'alumno' });
+    return this.http.post<any>(`${environment.url_api}/auth/login/`, data);
   }
 
   //Cerrar sesión
   logout(): Observable<any> {
-    // var headers: any;
-    // var token = this.getSessionToken();
-    // headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.get<any>(`${environment.url_api}/logout/`, { headers: headers });
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of({ success: true });
+    var token = this.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.get<any>(`${environment.url_api}/auth/logout/`, { headers: headers });
   }
 
   //Funciones para las cookies y almacenar datos de inicio de sesión
   //Funciones para utilizar las cookies en web
   retrieveSignedUser() {
-    // var headers: any;
-    // var token = this.getSessionToken();
-    // headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.get<any>(`${environment.url_api}/me/`, { headers: headers });
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of(null);
+    var token = this.getSessionToken();
+    var headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
+    return this.http.get<any>(`${environment.url_api}/auth/login/`, { headers: headers });
   }
 
   getCookieValue(key: string) {

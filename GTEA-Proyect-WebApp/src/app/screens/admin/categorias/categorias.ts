@@ -5,15 +5,7 @@ import { NuevaAulaModal } from '../sedes/nueva-aula-modal/nueva-aula-modal';
 import { NuevaSedeModal } from '../../../shared/modals/nueva-sede-modal/nueva-sede-modal';
 import { NuevaCategoriaModal } from '../../../shared/modals/nueva-categoria-modal/nueva-categoria-modal';
 import { NuevoUsuarioModal } from '../../../shared/modals/nuevo-usuario-modal/nuevo-usuario-modal';
-
-interface Category {
-  id: number;
-  name: string;
-  icon: string;
-  eventCount: number;
-  active: boolean;
-  color: string;
-}
+import { CategoriaService, Categoria } from '../../../services/categoria.service';
 
 @Component({
   selector: 'app-admin-categorias',
@@ -25,25 +17,55 @@ export class Categorias implements OnInit {
   readonly form: any;
   errorMessage: string = '';
   successMessage: string = '';
-  ngOnInit(): void {
 
+  constructor(private categoriaService: CategoriaService) { }
+
+  ngOnInit(): void {
+    this.loadCategorias();
   }
+
   activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | null = null;
 
-  categories: Category[] = [
-    { id: 1, name: 'Talleres', icon: 'build', eventCount: 45, active: true, color: '#1e3fae' },
-    { id: 2, name: 'Conferencias', icon: 'mic', eventCount: 30, active: true, color: '#7c3aed' },
-    { id: 3, name: 'Seminarios', icon: 'school', eventCount: 25, active: true, color: '#f97316' },
-    { id: 4, name: 'Deportes', icon: 'fitness_center', eventCount: 12, active: false, color: '#059669' },
-    { id: 5, name: 'Culturales', icon: 'palette', eventCount: 18, active: true, color: '#e11d48' },
-    { id: 6, name: 'Académicos', icon: 'menu_book', eventCount: 22, active: true, color: '#0891b2' },
-  ];
+  categories: any[] = [];
 
-  toggleCategory(cat: Category): void { cat.active = !cat.active; }
-  editCategory(cat: Category): void { /* TODO */ }
-  deleteCategory(cat: Category): void { /* TODO */ }
+  loadCategorias(): void {
+    this.categoriaService.obtenerCategorias().subscribe({
+      next: (data) => {
+        this.categories = data.map((c: any) => ({
+          id: c.id,
+          name: c.nombre,
+          icon: c.icon || 'category',
+          eventCount: 0,
+          active: c.activa,
+          color: c.color || '#1e3fae',
+        }));
+      },
+      error: (err) => {
+        console.error('Error cargando categorías:', err);
+        this.errorMessage = 'Error al cargar categorías';
+      },
+    });
+  }
+
+  toggleCategory(cat: any): void {
+    const newState = !cat.active;
+    this.categoriaService.editarCategoria(cat.id, { nombre: cat.name, descripcion: '', icon: cat.icon, color: cat.color }).subscribe({
+      next: () => { cat.active = newState; },
+      error: (err) => console.error('Error toggling categoría:', err),
+    });
+  }
+
+  editCategory(cat: any): void { /* TODO: abrir modal de edición */ }
+
+  deleteCategory(cat: any): void {
+    if (!confirm(`¿Eliminar la categoría "${cat.name}"?`)) return;
+    this.categoriaService.eliminarCategoria(cat.id).subscribe({
+      next: () => { this.loadCategorias(); this.successMessage = 'Categoría eliminada'; },
+      error: (err) => { console.error('Error eliminando categoría:', err); this.errorMessage = 'Error al eliminar'; },
+    });
+  }
 
   addCategory(): void { this.activeModal = 'nueva-categoria'; }
   onFabAction(action: string): void { this.activeModal = action as any; }
-  closeModal(): void { this.activeModal = null; }
+  closeModal(): void { this.activeModal = null; this.loadCategorias(); }
 }

@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
 import { NuevaAulaModal } from '../sedes/nueva-aula-modal/nueva-aula-modal';
 import { NuevaSedeModal } from '../../../shared/modals/nueva-sede-modal/nueva-sede-modal';
 import { NuevaCategoriaModal } from '../../../shared/modals/nueva-categoria-modal/nueva-categoria-modal';
 import { NuevoUsuarioModal } from '../../../shared/modals/nuevo-usuario-modal/nuevo-usuario-modal';
+import { FacadeService } from '../../../services/facade-service';
+import { environment } from '../../../../environments/environment';
 
 interface ReportStat {
     icon: string;
@@ -42,9 +45,16 @@ export class Reportes implements OnInit {
     readonly form: any;
     errorMessage: string = '';
     successMessage: string = '';
-    ngOnInit(): void {
 
+    constructor(
+        private http: HttpClient,
+        private facadeService: FacadeService,
+    ) { }
+
+    ngOnInit(): void {
+        this.loadReportes();
     }
+
     activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | null = null;
 
     activePeriod = 'Mensual';
@@ -53,53 +63,75 @@ export class Reportes implements OnInit {
     stats: ReportStat[] = [
         {
             icon: 'event', iconColor: '#1e3fae', iconBg: '#eff6ff',
-            label: 'Total Eventos', value: '324',
-            change: '+18%', changeColor: '#059669', changeIcon: 'trending_up'
+            label: 'Total Eventos', value: '0',
+            change: '', changeColor: '#059669', changeIcon: 'trending_up'
         },
         {
             icon: 'group', iconColor: '#7c3aed', iconBg: '#f5f3ff',
-            label: 'Inscripciones', value: '12,430',
-            change: '+24%', changeColor: '#059669', changeIcon: 'trending_up'
+            label: 'Inscripciones', value: '0',
+            change: '', changeColor: '#059669', changeIcon: 'trending_up'
         },
         {
             icon: 'percent', iconColor: '#ea580c', iconBg: '#fff7ed',
-            label: 'Tasa Ocupación', value: '78%',
-            change: '+5%', changeColor: '#059669', changeIcon: 'trending_up'
+            label: 'Tasa Ocupación', value: '0%',
+            change: '', changeColor: '#059669', changeIcon: 'trending_up'
         },
         {
             icon: 'star', iconColor: '#eab308', iconBg: '#fefce8',
-            label: 'Satisfacción', value: '4.6',
-            change: '-0.2', changeColor: '#dc2626', changeIcon: 'trending_down'
+            label: 'Categorías', value: '0',
+            change: '', changeColor: '#9ca3af', changeIcon: 'trending_up'
         },
     ];
 
-    monthlyData: MonthlyData[] = [
-        { label: 'Sep', events: 28, inscriptions: 1200 },
-        { label: 'Oct', events: 35, inscriptions: 1500 },
-        { label: 'Nov', events: 42, inscriptions: 1800 },
-        { label: 'Dic', events: 15, inscriptions: 600 },
-        { label: 'Ene', events: 38, inscriptions: 1650 },
-        { label: 'Feb', events: 45, inscriptions: 1900 },
-    ];
+    monthlyData: MonthlyData[] = [];
 
-    categoryBreakdown = [
-        { name: 'Talleres', count: 89, percentage: 27, color: '#1e3fae' },
-        { name: 'Conferencias', count: 65, percentage: 20, color: '#7c3aed' },
-        { name: 'Seminarios', count: 52, percentage: 16, color: '#f97316' },
-        { name: 'Deportivos', count: 48, percentage: 15, color: '#059669' },
-        { name: 'Culturales', count: 42, percentage: 13, color: '#e11d48' },
-        { name: 'Otros', count: 28, percentage: 9, color: '#6b7280' },
-    ];
+    categoryBreakdown: any[] = [];
 
-    topEvents: TopEvent[] = [
-        { rank: 1, title: 'Hackathon GTEA 2026', category: 'Talleres', categoryColor: '#1e3fae', enrolled: 120, capacity: 120 },
-        { rank: 2, title: 'Conferencia AI', category: 'Conferencias', categoryColor: '#7c3aed', enrolled: 195, capacity: 200 },
-        { rank: 3, title: 'Torneo de Ajedrez', category: 'Deportes', categoryColor: '#059669', enrolled: 50, capacity: 50 },
-        { rank: 4, title: 'Taller de Python', category: 'Talleres', categoryColor: '#1e3fae', enrolled: 38, capacity: 40 },
-        { rank: 5, title: 'Expo Arte Digital', category: 'Culturales', categoryColor: '#e11d48', enrolled: 95, capacity: 100 },
-    ];
+    topEvents: TopEvent[] = [];
 
-    get maxEvents(): number { return Math.max(...this.monthlyData.map(d => d.events)); }
+    get maxEvents(): number { return Math.max(1, ...this.monthlyData.map(d => d.events)); }
+
+    loadReportes(): void {
+        const token = this.facadeService.getSessionToken();
+        const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+        this.http.get<any>(`${environment.url_api}/reportes/resumen/`, { headers }).subscribe({
+            next: (data) => {
+                const t = data.totales || {};
+                this.stats[0].value = (t.eventos || 0).toLocaleString();
+                this.stats[1].value = (t.inscripciones || 0).toLocaleString();
+                this.stats[3].value = (t.categorias || 0).toLocaleString();
+
+                // Tasa de ocupación promedio
+                const topEvts = data.top_eventos || [];
+                if (topEvts.length > 0) {
+                    const avgOcc = topEvts.reduce((s: number, e: any) => s + (e.cupo_maximo > 0 ? (e.total_inscritos / e.cupo_maximo) * 100 : 0), 0) / topEvts.length;
+                    this.stats[2].value = Math.round(avgOcc) + '%';
+                }
+
+                // Categorías breakdown
+                const cats = data.por_categoria || [];
+                const totalEvsByCat = cats.reduce((s: number, c: any) => s + (c.total_eventos || 0), 0) || 1;
+                const colors = ['#1e3fae', '#7c3aed', '#f97316', '#059669', '#e11d48', '#6b7280'];
+                this.categoryBreakdown = cats.map((c: any, i: number) => ({
+                    name: c.nombre,
+                    count: c.total_inscritos || 0,
+                    percentage: Math.round(((c.total_eventos || 0) / totalEvsByCat) * 100),
+                    color: colors[i % colors.length],
+                }));
+
+                // Top eventos
+                this.topEvents = topEvts.slice(0, 5).map((e: any, i: number) => ({
+                    rank: i + 1,
+                    title: e.titulo,
+                    category: '',
+                    categoryColor: '#1e3fae',
+                    enrolled: e.total_inscritos || 0,
+                    capacity: e.cupo_maximo || 1,
+                }));
+            },
+            error: (err) => console.error('Error cargando reportes:', err),
+        });
+    }
 
     setPeriod(period: string): void { this.activePeriod = period; }
 
