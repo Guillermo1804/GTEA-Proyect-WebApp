@@ -81,7 +81,7 @@ export class RegistroScreenComponent implements OnInit {
       next: (response) => {
         this.isSubmitting = false;
         this.successMessage = '¡Registro exitoso! Redirigiendo al login...';
-        console.log('Registro exitoso:', response);
+        // Registro exitoso — navegar al login
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 2000);

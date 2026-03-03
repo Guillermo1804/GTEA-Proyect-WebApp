@@ -57,16 +57,29 @@ export class LoginScreenComponent implements OnInit {
     // Llamar al endpoint de login
     this.facadeService.login(emailValue, passwordValue).subscribe({
       next: (response) => {
-        // Guardar datos de sesión
-        this.facadeService.saveUserData(response);
+        // Guardar datos de sesión (solo si el backend devuelve datos reales)
+        if (response.token) {
+          this.facadeService.saveUserData(response);
+        }
         this.successMessage = '¡Inicio de sesión exitoso!';
 
-        // Navegar según rol
-        const rol = response.rol || this.facadeService.getUserGroup();
-        if (rol === 'administrador') {
-          this.router.navigate(['/admin/dashboard']);
-        } else {
-          this.router.navigate(['/landing-screen']);
+        // ── Routing por dominio de email ──
+        const domain = emailValue.match(/@([a-z]+)\.com$/i)?.[1]?.toLowerCase() || '';
+
+        switch (domain) {
+          case 'admin':
+            localStorage.setItem('userRole', 'administrador');
+            this.router.navigate(['/admin/dashboard']);
+            break;
+          case 'organizador':
+            localStorage.setItem('userRole', 'organizador');
+            this.router.navigate(['/organizador']);
+            break;
+          case 'alumno':
+          default:
+            localStorage.setItem('userRole', 'alumno');
+            this.router.navigate(['/alumno/catalogo']);
+            break;
         }
       },
       error: (error) => {

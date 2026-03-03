@@ -15,7 +15,7 @@ interface User {
   id: number;
   name: string;
   email: string;
-  role: 'Admin' | 'Docente' | 'Alumno';
+  role: 'Admin' | 'Organizador' | 'Alumno';
   roleBadgeClass: string;
   status: 'Activo' | 'Inactivo';
   avatarInitials: string;
@@ -35,7 +35,7 @@ export class Usuarios implements OnInit {
 
   searchQuery = '';
   activeFilter = 'Todos';
-  filters = ['Todos', 'Admin', 'Docente', 'Alumno'];
+  filters = ['Todos', 'Admin', 'Organizador', 'Alumno'];
   currentPage = 1;
   totalPages = 1;
 
@@ -99,7 +99,7 @@ export class Usuarios implements OnInit {
     this.organizadorService.obtenerListaOrgs().subscribe({
       next: (data: any[]) => {
         data.forEach((u: any) => {
-          allUsers.push(this.mapUser(u, 'Docente', 'role-docente', 'organizador'));
+          allUsers.push(this.mapUser(u, 'Organizador', 'role-organizador', 'organizador'));
         });
         done();
       },
@@ -110,7 +110,7 @@ export class Usuarios implements OnInit {
     });
   }
 
-  private mapUser(u: any, role: 'Admin' | 'Docente' | 'Alumno', badgeClass: string, source: 'admin' | 'alumno' | 'organizador'): User {
+  private mapUser(u: any, role: 'Admin' | 'Organizador' | 'Alumno', badgeClass: string, source: 'admin' | 'alumno' | 'organizador'): User {
     const firstName = u.first_name || u.user?.first_name || '';
     const lastName = u.last_name || u.user?.last_name || '';
     const email = u.email || u.user?.email || '';

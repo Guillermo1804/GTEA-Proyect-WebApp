@@ -1,7 +1,7 @@
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Injectable, Inject, Injector } from '@angular/core';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ErrorsService } from './tools/errors-service';
 import { ValidatorService } from './tools/validator-service';
@@ -42,7 +42,7 @@ export class FacadeService {
       "username": username,
       "password": password
     }
-    console.log("Validando login... ", data);
+    // Validación eliminada de console.log para producción
     let error: any = [];
 
     if (!this.validatorService.required(data["username"])) {
@@ -68,24 +68,39 @@ export class FacadeService {
       username: username,
       password: password
     }
-    return this.http.post<any>(`${environment.url_api}/token/`, data);
+
+    // TODO: UNCOMMENT WHEN BACKEND FIXES CORS
+    // return this.http.post<any>(`${environment.url_api}/token/`, data);
+
+    // ── MVP BYPASS: Simular login exitoso sin backend ──
+    localStorage.setItem('userRole', 'alumno');
+    localStorage.setItem('gtea-proyecto-token', 'mock-token-123');
+    return of({ success: true, role: 'alumno' });
   }
 
   //Cerrar sesión
   logout(): Observable<any> {
-    var headers: any;
-    var token = this.getSessionToken();
-    headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
-    return this.http.get<any>(`${environment.url_api}/logout/`, { headers: headers });
+    // var headers: any;
+    // var token = this.getSessionToken();
+    // headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
+    // return this.http.get<any>(`${environment.url_api}/logout/`, { headers: headers });
+
+    // TODO: REMOVE - TEMPORARY FOR COMPILATION
+    return of({ success: true });
   }
 
   //Funciones para las cookies y almacenar datos de inicio de sesión
   //Funciones para utilizar las cookies en web
   retrieveSignedUser() {
-    var headers: any;
-    var token = this.getSessionToken();
-    headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
-    return this.http.get<any>(`${environment.url_api}/me/`, { headers: headers });
+    // var headers: any;
+    // var token = this.getSessionToken();
+    // headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
+    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
+    // return this.http.get<any>(`${environment.url_api}/me/`, { headers: headers });
+
+    // TODO: REMOVE - TEMPORARY FOR COMPILATION
+    return of(null);
   }
 
   getCookieValue(key: string) {

@@ -28,7 +28,7 @@ $shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
   min-height: 100vh;
   background-color: $neutral-light;
   padding-top: 20px;
-  padding-bottom: 40px;
+  padding-bottom: 96px; // clears fixed bottom-nav
 }
 
 .content-wrapper {
@@ -324,7 +324,7 @@ $shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
       color: $white;
 
       &:hover {
-        background-color: darken($primary-blue, 10%);
+        background-color: #3f3cd9; // darken($primary-blue, 10%) equivalent
       }
     }
 
@@ -346,7 +346,7 @@ $shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
       color: $white;
 
       &:hover {
-        background-color: darken($warning-orange, 10%);
+        background-color: #e68a00; // darken($warning-orange, 10%) equivalent
       }
     }
 

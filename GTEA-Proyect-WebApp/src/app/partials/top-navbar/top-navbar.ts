@@ -14,7 +14,7 @@ export class TopNavbar {
   @Input() ctaLabel: string = '';
   @Input() ctaRoute: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   navigate(path: string): void {
     this.router.navigate([path]);
@@ -26,5 +26,15 @@ export class TopNavbar {
 
   onSettings(): void {
     // TODO: open settings
+  }
+
+  logout(): void {
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('gtea-proyecto-token');
+    localStorage.removeItem('gtea-proyecto-email');
+    localStorage.removeItem('gtea-proyecto-user_id');
+    localStorage.removeItem('gtea-proyecto-user_complete_name');
+    localStorage.removeItem('gtea-proyecto-group_name');
+    this.router.navigate(['/']);
   }
 }

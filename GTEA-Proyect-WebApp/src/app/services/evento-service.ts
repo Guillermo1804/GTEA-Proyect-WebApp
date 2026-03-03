@@ -53,7 +53,7 @@ export class EventoService {
   // ════════════════════════════════════════════════
   // 🔧 MOCKS CENTRALIZADOS — Se eliminan cuando llegue el backend
   // ════════════════════════════════════════════════
-  
+
   private readonly MOCK_CATEGORIAS = [
     { id: 1, nombre: 'Talleres' },
     { id: 2, nombre: 'Conferencias' },
@@ -208,7 +208,7 @@ export class EventoService {
     private facadeService: FacadeService,
     private validatorService: ValidatorService,
     private errorService: ErrorsService,
-  ) {}
+  ) { }
 
   // ─────────────────────────────────────────────
   // Esquema vacío de Evento (objeto por defecto)
@@ -352,7 +352,6 @@ export class EventoService {
     // return this.http.post<any>(`${environment.url_api}/eventos/`, data, { headers });
 
     // 🔧 Mock temporal hasta que el backend esté listo:
-    console.log('[EventoService] crearEvento() — mock', data);
     return of({ success: true, message: 'Evento creado (mock)', data });
   }
 
@@ -371,7 +370,6 @@ export class EventoService {
     // return this.http.get<Evento[]>(`${environment.url_api}/eventos/`, { headers });
 
     // 🔧 Mock temporal — retornar lista centralizada:
-    console.log('[EventoService] obtenerEventos() — mock');
     return of([...this.MOCK_EVENTOS]);
   }
 
@@ -390,7 +388,6 @@ export class EventoService {
     // return this.http.get<Evento>(`${environment.url_api}/eventos/detail/?id=${idEvento}`, { headers });
 
     // 🔧 Mock temporal — buscar en la lista centralizada:
-    console.log('[EventoService] getEventoByID() — mock', idEvento);
     const evento = this.MOCK_EVENTOS.find(e => e.id === idEvento);
     return of(evento || null);
   }
@@ -410,7 +407,6 @@ export class EventoService {
     // return this.http.put<any>(`${environment.url_api}/eventos/edit/?id=${idEvento}`, data, { headers });
 
     // 🔧 Mock temporal:
-    console.log('[EventoService] editarEvento() — mock', idEvento, data);
     return of({ success: true, message: 'Evento actualizado (mock)', data });
   }
 
@@ -429,7 +425,6 @@ export class EventoService {
     // return this.http.delete<any>(`${environment.url_api}/eventos/edit/?id=${idEvento}`, { headers });
 
     // 🔧 Mock temporal:
-    console.log('[EventoService] eliminarEvento() — mock', idEvento);
     return of({ success: true, message: 'Evento eliminado (mock)' });
   }
 
@@ -492,7 +487,7 @@ export class EventoService {
   // Métodos públicos para obtener nombres desde IDs
   // (usados por evento-detail y otros componentes)
   // ════════════════════════════════════════════════
-  
+
   public getCategoriaNombre(id: string | number): string {
     const cat = this.MOCK_CATEGORIAS.find(c => c.id === Number(id));
     return cat?.nombre || 'Desconocida';

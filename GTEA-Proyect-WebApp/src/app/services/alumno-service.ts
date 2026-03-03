@@ -1,6 +1,6 @@
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ErrorsService } from './tools/errors-service';
 import { ValidatorService } from './tools/validator-service';
@@ -15,16 +15,16 @@ const httpOptions = {
   providedIn: 'root',
 })
 export class AlumnoService {
-   constructor(
+  constructor(
     private http: HttpClient,
     private validatorService: ValidatorService,
     private errorService: ErrorsService,
     private facadeService: FacadeService,
   ) { }
 
-  public esquemaAlumno(){
+  public esquemaAlumno() {
     return {
-      'rol':'',
+      'rol': '',
       'matricula': '',
       'first_name': '',
       'last_name': '',
@@ -34,69 +34,68 @@ export class AlumnoService {
     }
   }
 
-    //Validación para el formulario
-  public validarAlumno(data: any, editar: boolean){
-    console.log("Validando alumno... ", data);
+  //Validación para el formulario
+  public validarAlumno(data: any, editar: boolean) {
     let error: any = [];
 
-    if(!this.validatorService.required(data["matricula"])){
+    if (!this.validatorService.required(data["matricula"])) {
       error["matricula"] = this.errorService.required;
     }
 
-    if(!this.validatorService.required(data["first_name"])){
+    if (!this.validatorService.required(data["first_name"])) {
       error["first_name"] = this.errorService.required;
     }
 
-    if(!this.validatorService.required(data["last_name"])){
+    if (!this.validatorService.required(data["last_name"])) {
       error["last_name"] = this.errorService.required;
     }
 
-    if(!this.validatorService.required(data["email"])){
+    if (!this.validatorService.required(data["email"])) {
       error["email"] = this.errorService.required;
-    }else if(!this.validatorService.max(data["email"], 40)){
+    } else if (!this.validatorService.max(data["email"], 40)) {
       error["email"] = this.errorService.max(40);
-    }else if (!this.validatorService.email(data['email'])) {
+    } else if (!this.validatorService.email(data['email'])) {
       error['email'] = this.errorService.email;
     }
 
-    if(!editar){
-      if(!this.validatorService.required(data["password"])){
+    if (!editar) {
+      if (!this.validatorService.required(data["password"])) {
         error["password"] = this.errorService.required;
       }
 
-      if(!this.validatorService.required(data["confirmar_password"])){
+      if (!this.validatorService.required(data["confirmar_password"])) {
         error["confirmar_password"] = this.errorService.required;
       }
     }
-    if(!this.validatorService.required(data["fecha_nacimiento"])){
+    if (!this.validatorService.required(data["fecha_nacimiento"])) {
       error["fecha_nacimiento"] = this.errorService.required;
     }
 
-    if(!this.validatorService.required(data["curp"])){
+    if (!this.validatorService.required(data["curp"])) {
       error["curp"] = this.errorService.required;
     }
 
-    if(!this.validatorService.required(data["rfc"])){
+    if (!this.validatorService.required(data["rfc"])) {
       error["rfc"] = this.errorService.required;
-    }else if(!this.validatorService.min(data["rfc"], 12)){
+    } else if (!this.validatorService.min(data["rfc"], 12)) {
       error["rfc"] = this.errorService.min(12);
       alert("La longitud de caracteres deL RFC es menor, deben ser 12");
-    }else if(!this.validatorService.max(data["rfc"], 13)){
+    } else if (!this.validatorService.max(data["rfc"], 13)) {
       error["rfc"] = this.errorService.max(13);
       alert("La longitud de caracteres deL RFC es mayor, deben ser 13");
     }
 
-    if(!this.validatorService.required(data["edad"])){
+    if (!this.validatorService.required(data["edad"])) {
       error["edad"] = this.errorService.required;
-    }else if(!this.validatorService.numeric(data["edad"])){
+    } else if (!this.validatorService.numeric(data["edad"])) {
       alert("El formato es solo números");
     }
 
-    if(!this.validatorService.required(data["telefono"])){
+    if (!this.validatorService.required(data["telefono"])) {
       error["telefono"] = this.errorService.required;
     }
 
-    if(!this.validatorService.required(data["ocupacion"])){
+    if (!this.validatorService.required(data["ocupacion"])) {
       error["ocupacion"] = this.errorService.required;
     }
 
@@ -106,32 +105,52 @@ export class AlumnoService {
 
   //Aquí van los servicios HTTP
   //Servicio para registrar un nuevo usuario
-  public registrarAlumno (data: any): Observable <any>{
-    return this.http.post<any>(`${environment.url_api}/alumnos/`,data, httpOptions);
+  public registrarAlumno(data: any): Observable<any> {
+    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
+    // return this.http.post<any>(`${environment.url_api}/alumnos/`,data, httpOptions);
+
+    // TODO: REMOVE - TEMPORARY FOR COMPILATION
+    return of([]);
   }
 
-  public obtenerListaAlumnos (): Observable <any>{
-    var token = this.facadeService.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    return this.http.get<any>(`${environment.url_api}/lista-alumnos/`, {headers:headers});
+  public obtenerListaAlumnos(): Observable<any> {
+    // var token = this.facadeService.getSessionToken();
+    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
+    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
+    // return this.http.get<any>(`${environment.url_api}/lista-alumnos/`, {headers:headers});
+
+    // TODO: REMOVE - TEMPORARY FOR COMPILATION
+    return of([]);
   }
 
-    //Obtener un solo usuario dependiendo su ID
-  public getAlumnoByID(idUser: Number){
-    return this.http.get<any>(`${environment.url_api}/alumnos/?id=${idUser}`,httpOptions);
+  //Obtener un solo usuario dependiendo su ID
+  public getAlumnoByID(idUser: Number) {
+    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
+    // return this.http.get<any>(`${environment.url_api}/alumnos/?id=${idUser}`,httpOptions);
+
+    // TODO: REMOVE - TEMPORARY FOR COMPILATION
+    return of(null);
   }
 
-    //Servicio para actualizar un usuario
-  public editarAlumno (data: any): Observable <any>{
-    var token = this.facadeService .getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    return this.http.put<any>(`${environment.url_api}/alumnos-edit/`, data, {headers:headers});
+  //Servicio para actualizar un usuario
+  public editarAlumno(data: any): Observable<any> {
+    // var token = this.facadeService .getSessionToken();
+    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
+    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
+    // return this.http.put<any>(`${environment.url_api}/alumnos-edit/`, data, {headers:headers});
+
+    // TODO: REMOVE - TEMPORARY FOR COMPILATION
+    return of([]);
   }
 
-    //Eliminar Alumno
-    public eliminarAlumno(idUser: number): Observable <any>{
-      var token = this.facadeService.getSessionToken();
-      var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-      return this.http.delete<any>(`${environment.url_api}/alumnos-edit/?id=${idUser}`,{headers:headers});
+  //Eliminar Alumno
+  public eliminarAlumno(idUser: number): Observable<any> {
+    // var token = this.facadeService.getSessionToken();
+    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
+    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
+    // return this.http.delete<any>(`${environment.url_api}/alumnos-edit/?id=${idUser}`,{headers:headers});
+
+    // TODO: REMOVE - TEMPORARY FOR COMPILATION
+    return of([]);
   }
 }

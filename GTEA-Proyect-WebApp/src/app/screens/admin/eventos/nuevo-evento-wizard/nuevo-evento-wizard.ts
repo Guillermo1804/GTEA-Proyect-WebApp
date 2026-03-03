@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -9,6 +9,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { EventoService, Evento } from '../../../../services/evento-service';
+import { Subject, takeUntil } from 'rxjs';
 
 // ─────────────────────────────────────────────
 // Validador cruzado: fecha/hora de fin > inicio
@@ -34,7 +35,8 @@ function fechaFinValidator(group: AbstractControl): ValidationErrors | null {
   templateUrl: './nuevo-evento-wizard.html',
   styleUrl: './nuevo-evento-wizard.scss',
 })
-export class NuevoEventoWizard implements OnInit {
+export class NuevoEventoWizard implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   // ── Modo edición: si se pasan estos inputs, el wizard actúa como editor ──
   @Input() editId: number | null = null;
   @Input() editData: Evento | null = null;
@@ -74,7 +76,7 @@ export class NuevoEventoWizard implements OnInit {
   constructor(
     private fb: FormBuilder,
     private eventoService: EventoService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this._buildForms();
@@ -91,9 +93,9 @@ export class NuevoEventoWizard implements OnInit {
   // ─────────────────────────────────────────────
   private _prefillForms(data: Evento): void {
     this.step1Form.patchValue({
-      titulo:       data.titulo,
-      categoriaId:  data.categoriaId,
-      descripcion:  data.descripcion,
+      titulo: data.titulo,
+      categoriaId: data.categoriaId,
+      descripcion: data.descripcion,
       imagenPortada: null,  // No se puede pre-rellenar un File; se muestra la URL existente
     });
 
@@ -106,26 +108,26 @@ export class NuevoEventoWizard implements OnInit {
     const aulaIdToRestore = data.aulaId ?? '';
 
     this.step2Form.patchValue({
-      fechaInicio:  data.fechaInicio,
-      horaInicio:   data.horaInicio,
-      fechaFin:     data.fechaFin,
-      horaFin:      data.horaFin,
-      modalidad:    data.modalidad,
-      cupoMaximo:   data.cupoMaximo,
+      fechaInicio: data.fechaInicio,
+      horaInicio: data.horaInicio,
+      fechaFin: data.fechaFin,
+      horaFin: data.horaFin,
+      modalidad: data.modalidad,
+      cupoMaximo: data.cupoMaximo,
       costoEntrada: data.costoEntrada,
-      listaEspera:  data.listaEspera,
+      listaEspera: data.listaEspera,
     }, { emitEvent: false }); // No disparar listeners para evitar que se limpie aulaId
 
     this.step3Form.patchValue({
       publicarInmediatamente: data.publicarInmediatamente,
-      esOrganizador:          data.esOrganizador,
+      esOrganizador: data.esOrganizador,
     });
 
     // Disparar carga de aulas si hay sede seleccionada
     if (data.sedeId) {
       // Establecer sedeId sin disparar el listener
       this.step2Form.get('sedeId')?.setValue(data.sedeId, { emitEvent: false });
-      
+
       // Cargar aulas y restaurar aulaId después
       this.eventoService.obtenerAulasPorSede(Number(data.sedeId)).subscribe({
         next: (aulas) => {
@@ -176,12 +178,12 @@ export class NuevoEventoWizard implements OnInit {
     );
 
     // Aplicar validadores condicionales al cambiar modalidad
-    this.step2Form.get('modalidad')?.valueChanges.subscribe((modalidad) => {
+    this.step2Form.get('modalidad')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((modalidad) => {
       this._togglePresencialValidators(modalidad);
     });
 
     // Cargar aulas cuando cambia sede
-    this.step2Form.get('sedeId')?.valueChanges.subscribe((sedeId) => {
+    this.step2Form.get('sedeId')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((sedeId) => {
       if (sedeId) {
         this.step2Form.get('aulaId')?.setValue('');
         this.eventoService.obtenerAulasPorSede(sedeId).subscribe({
@@ -440,5 +442,10 @@ export class NuevoEventoWizard implements OnInit {
 
   onClose(): void {
     this.close.emit();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
