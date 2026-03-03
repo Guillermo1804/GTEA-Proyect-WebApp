@@ -66,7 +66,7 @@ export class LoginScreenComponent implements OnInit {
         if (rol === 'administrador') {
           this.router.navigate(['/admin/dashboard']);
         } else {
-          this.router.navigate(['/home']);
+          this.router.navigate(['/landing-screen']);
         }
       },
       error: (error) => {
