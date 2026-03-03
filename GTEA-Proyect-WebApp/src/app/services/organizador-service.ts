@@ -109,7 +109,8 @@ export class OrganizadorService {
     return this.http.get<any>(`${environment.url_api}/admins/edit/`, { headers: headers });
   }
 
-    registrarOrganizador(userData: any): any {
-      throw new Error('Method not implemented.');
+  // Alias usado por el modal de nuevo usuario
+  public registrarOrganizador(userData: any): Observable<any> {
+    return this.registrarOrg(userData);
   }
 }
