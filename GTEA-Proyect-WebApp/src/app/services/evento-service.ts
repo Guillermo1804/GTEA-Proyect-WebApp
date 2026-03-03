@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { FacadeService } from './facade-service';
 import { ValidatorService } from './tools/validator-service';
@@ -43,7 +44,11 @@ export interface Evento {
   id?: number;
   status?: 'Activo' | 'Borrador' | 'Finalizado' | 'Cancelado';
   organizador?: string;
+  organizadorNombre?: string;   // Nombre completo del organizador (desde backend)
   inscritos?: number;
+  categoriaNombre?: string;     // Nombre de categoría (desde backend)
+  sedeNombre?: string;          // Nombre de sede (desde backend)
+  aulaNombre?: string;          // Nombre de aula (desde backend)
 }
 
 @Injectable({
@@ -330,6 +335,42 @@ export class EventoService {
   }
 
   // ─────────────────────────────────────────────
+  // Mapeo: API (snake_case) → Frontend (camelCase)
+  // ─────────────────────────────────────────────
+  /**
+   * Transforma la respuesta del backend (snake_case) al formato frontend (camelCase).
+   * Mapea campos de la API a la interfaz Evento y agrega campos de display.
+   */
+  private _mapApiResponse(raw: any): Evento {
+    return {
+      id: raw.id,
+      titulo: raw.titulo,
+      categoriaId: raw.categoria,
+      categoriaNombre: raw.categoria_nombre || '',
+      descripcion: raw.descripcion,
+      imagenPortada: raw.imagen_portada || null,
+      fechaInicio: raw.fecha_inicio,
+      horaInicio: raw.hora_inicio,
+      fechaFin: raw.fecha_fin,
+      horaFin: raw.hora_fin,
+      modalidad: raw.modalidad,
+      sedeId: raw.sede,
+      sedeNombre: raw.sede_nombre || '',
+      aulaId: raw.aula,
+      aulaNombre: raw.aula_nombre || '',
+      cupoMaximo: raw.cupo_maximo,
+      costoEntrada: raw.costo_entrada,
+      listaEspera: raw.lista_espera,
+      publicarInmediatamente: raw.publicar_inmediatamente,
+      esOrganizador: raw.es_organizador,
+      status: raw.status,
+      organizador: raw.organizador,
+      organizadorNombre: raw.organizador_nombre || '',
+      inscritos: raw.inscritos || 0,
+    };
+  }
+
+  // ─────────────────────────────────────────────
   // CRUD — Peticiones HTTP
   // NOTA PARA EL EQUIPO BACKEND:
   // Descomentar los bloques `return this.http.*` y
@@ -362,7 +403,9 @@ export class EventoService {
       'Authorization': 'Token ' + token,
     });
 
-    return this.http.get<Evento[]>(`${environment.url_api}/eventos/`, { headers });
+    return this.http.get<any[]>(`${environment.url_api}/eventos/`, { headers }).pipe(
+      map((eventos: any[]) => eventos.map(e => this._mapApiResponse(e)))
+    );
   }
 
   /**
@@ -376,7 +419,9 @@ export class EventoService {
       'Authorization': 'Token ' + token,
     });
 
-    return this.http.get<Evento>(`${environment.url_api}/eventos/detail/?id=${idEvento}`, { headers });
+    return this.http.get<any>(`${environment.url_api}/eventos/detail/?id=${idEvento}`, { headers }).pipe(
+      map(data => data ? this._mapApiResponse(data) : null)
+    );
   }
 
   /**

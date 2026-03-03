@@ -25,6 +25,7 @@ export class Categorias implements OnInit {
   }
 
   activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | null = null;
+  editingCategory: any = null;
 
   categories: any[] = [];
 
@@ -56,7 +57,10 @@ export class Categorias implements OnInit {
     });
   }
 
-  editCategory(cat: any): void { /* TODO: abrir modal de edición */ }
+  editCategory(cat: any): void {
+    this.editingCategory = cat;
+    this.activeModal = 'nueva-categoria';
+  }
 
   deleteCategory(cat: any): void {
     if (!confirm(`¿Eliminar la categoría "${cat.name}"?`)) return;
@@ -66,7 +70,14 @@ export class Categorias implements OnInit {
     });
   }
 
-  addCategory(): void { this.activeModal = 'nueva-categoria'; }
+  addCategory(): void {
+    this.editingCategory = null;
+    this.activeModal = 'nueva-categoria';
+  }
   onFabAction(action: string): void { this.activeModal = action as any; }
-  closeModal(): void { this.activeModal = null; this.loadCategorias(); }
+  closeModal(): void {
+    this.activeModal = null;
+    this.editingCategory = null;
+    this.loadCategorias();
+  }
 }

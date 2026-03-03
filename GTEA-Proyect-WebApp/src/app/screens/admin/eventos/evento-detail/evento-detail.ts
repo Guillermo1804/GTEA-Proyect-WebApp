@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { EventoService, Evento } from '../../../../services/evento-service';
@@ -44,6 +44,7 @@ export class EventoDetail implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private eventoService: EventoService,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -63,33 +64,35 @@ export class EventoDetail implements OnInit {
           this.evento = {
             id: data.id ?? id,
             titulo: data.titulo,
-            categoria: this.eventoService.getCategoriaNombre(data.categoriaId),
+            categoria: data.categoriaNombre || `Categoría #${data.categoriaId}`,
             categoriaColor: '#1e3fae', // Color por defecto
             imagenPortada: typeof data.imagenPortada === 'string' ? data.imagenPortada : '',
             fechaInicio: this._formatFecha(data.fechaInicio),
             horaInicio: this._formatHora(data.horaInicio),
             horaFin: this._formatHora(data.horaFin),
-            sede: this.eventoService.getSedeNombre(data.sedeId),
-            aula: this.eventoService.getAulaNombre(data.aulaId, data.sedeId),
+            sede: data.sedeNombre || 'Virtual',
+            aula: data.aulaNombre || '—',
             modalidad: data.modalidad,
-            organizadorNombre: 'Organizador', // TODO: obtener del backend
+            organizadorNombre: data.organizadorNombre || 'Organizador',
             organizadorAvatar: '',
             descripcion: data.descripcion,
             cupoMaximo: data.cupoMaximo,
-            inscritos: 0, // TODO: obtener del backend
+            inscritos: data.inscritos ?? 0,
             costoEntrada: data.costoEntrada,
-            status: data.publicarInmediatamente ? 'Activo' : 'Borrador',
+            status: data.status || 'Borrador',
             listaEspera: data.listaEspera,
           };
         } else {
           this.errorMessage = 'Evento no encontrado.';
         }
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error cargando evento:', err);
         this.errorMessage = 'No se pudo cargar el evento.';
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -115,7 +118,7 @@ export class EventoDetail implements OnInit {
 
   // ── Helpers ──
   get ocupacionPct(): number {
-    if (!this.evento) return 0;
+    if (!this.evento || !this.evento.cupoMaximo || this.evento.cupoMaximo === 0) return 0;
     return Math.round((this.evento.inscritos / this.evento.cupoMaximo) * 100);
   }
 
