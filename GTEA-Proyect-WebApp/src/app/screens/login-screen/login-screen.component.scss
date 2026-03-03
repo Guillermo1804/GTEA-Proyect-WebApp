@@ -173,7 +173,9 @@ button.primary-register {
   cursor: pointer;
   transition: transform 0.05s ease, filter 0.2s ease;
 }
-
+.primary-register {
+  cursor: pointer !important;
+}
 button.primary:hover {
   filter: brightness(0.95);
 }
