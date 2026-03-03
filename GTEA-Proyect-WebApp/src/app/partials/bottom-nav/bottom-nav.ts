@@ -54,21 +54,22 @@ export class BottomNav {
     },
     estudiante: {
       left: [
-        { icon: 'dashboard', label: 'Inicio', route: '/estudiante/dashboard' },
-        { icon: 'calendar_month', label: 'Eventos', route: '/estudiante/explorar' },
+        { icon: 'grid_view', label: 'Catálogo', route: '/alumno/catalogo' },
+        { icon: 'bookmark', label: 'Mis Eventos', route: '/alumno/mis-eventos' },
       ],
       right: [
-        { icon: 'history', label: 'Historial', route: '/estudiante/historial' },
-        { icon: 'person', label: 'Perfil', route: '/estudiante/perfil' },
+        { icon: 'history', label: 'Historial', route: '/alumno/historial' },
+        { icon: 'person', label: 'Perfil', route: '/alumno/perfil' },
       ],
     },
   };
 
   fabActions: FabAction[] = [
-    { icon: 'meeting_room', label: 'Nueva Aula', color: '#1e3fae', action: 'nueva-aula' },
-    { icon: 'domain_add', label: 'Nueva Sede', color: '#059669', action: 'nueva-sede' },
-    { icon: 'category', label: 'Nueva Categoría', color: '#7c3aed', action: 'nueva-categoria' },
     { icon: 'person_add', label: 'Nuevo Usuario', color: '#ea580c', action: 'nuevo-usuario' },
+    { icon: 'category', label: 'Nueva Categoría', color: '#7c3aed', action: 'nueva-categoria' },
+    { icon: 'domain_add', label: 'Nueva Sede', color: '#059669', action: 'nueva-sede' },
+    { icon: 'meeting_room', label: 'Nueva Aula', color: '#16a34a', action: 'nueva-aula' },
+    { icon: 'event', label: 'Nuevo Evento', color: '#1e3fae', action: 'nuevo-evento' },
   ];
 
   get leftTabs(): NavTab[] {
@@ -101,6 +102,13 @@ export class BottomNav {
 
   onFabAction(action: string): void {
     this.showFabMenu = false;
+    
+    // Si es "nuevo-evento", navegar directamente a /admin/eventos con query param
+    if (action === 'nuevo-evento') {
+      this.router.navigate(['/admin/eventos'], { queryParams: { new: 'true' } });
+      return;
+    }
+    
     this.fabAction.emit(action);
   }
 }

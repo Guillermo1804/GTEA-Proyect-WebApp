@@ -8,14 +8,17 @@
         </div>
         <div class="actions">
             @if (mode === 'auth') {
-                <button class="icon-btn" (click)="onNotifications()" aria-label="Notificaciones">
-                    <span class="material-icons">notifications</span>
-                </button>
-                <button class="icon-btn" (click)="onSettings()" aria-label="Configuración">
-                    <span class="material-icons">settings</span>
-                </button>
+            <button class="icon-btn" (click)="onNotifications()" aria-label="Notificaciones">
+                <span class="material-icons">notifications</span>
+            </button>
+            <button class="icon-btn" (click)="onSettings()" aria-label="Configuración">
+                <span class="material-icons">settings</span>
+            </button>
+            <button class="icon-btn" (click)="logout()" aria-label="Cerrar Sesión">
+                <span class="material-icons">logout</span>
+            </button>
             } @else {
-                <button class="cta-btn" (click)="navigate(ctaRoute)">{{ ctaLabel }}</button>
+            <button class="cta-btn" (click)="navigate(ctaRoute)">{{ ctaLabel }}</button>
             }
         </div>
     </div>
