@@ -79,7 +79,7 @@ export class OrganizadorService {
 
   public obtenerListaOrgs(): Observable<any> {
     var token = this.facadeService.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
     return this.http.get<any>(`${environment.url_api}/organizadores/`, { headers: headers });
   }
 
@@ -91,21 +91,21 @@ export class OrganizadorService {
   //Servicio para actualizar un usuario
   public editarOrg(data: any): Observable<any> {
     var token = this.facadeService.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
     return this.http.put<any>(`${environment.url_api}/organizadores/edit/`, data, { headers: headers });
   }
 
   //Eliminar Organizador
   public eliminarOrg(idUser: number): Observable<any> {
     var token = this.facadeService.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
     return this.http.delete<any>(`${environment.url_api}/organizadores/edit/?id=${idUser}`, { headers: headers });
   }
 
   //Obtener el total de cada uno de los usuarios
   public getTotalUsuarios() {
     var token = this.facadeService.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
     return this.http.get<any>(`${environment.url_api}/admins/edit/`, { headers: headers });
   }
 

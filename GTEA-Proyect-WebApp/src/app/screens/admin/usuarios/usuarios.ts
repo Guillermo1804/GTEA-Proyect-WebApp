@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
@@ -47,6 +47,7 @@ export class Usuarios implements OnInit {
     private adminService: AdminServiceService,
     private alumnoService: AlumnoService,
     private organizadorService: OrganizadorService,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -64,6 +65,7 @@ export class Usuarios implements OnInit {
       if (pending === 0) {
         this.users = allUsers;
         this.isLoading = false;
+        this.cdr.markForCheck();
       }
     };
 
@@ -174,5 +176,5 @@ export class Usuarios implements OnInit {
 
   addUser(): void { this.activeModal = 'nuevo-usuario'; }
   onFabAction(action: string): void { this.activeModal = action as any; }
-  closeModal(): void { this.activeModal = null; }
+  closeModal(): void { this.activeModal = null; this.loadUsers(); }
 }

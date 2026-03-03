@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
 import { NuevaAulaModal } from '../sedes/nueva-aula-modal/nueva-aula-modal';
@@ -18,7 +18,7 @@ export class Categorias implements OnInit {
   errorMessage: string = '';
   successMessage: string = '';
 
-  constructor(private categoriaService: CategoriaService) { }
+  constructor(private categoriaService: CategoriaService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.loadCategorias();
@@ -39,6 +39,7 @@ export class Categorias implements OnInit {
           active: c.activa,
           color: c.color || '#1e3fae',
         }));
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error cargando categorías:', err);

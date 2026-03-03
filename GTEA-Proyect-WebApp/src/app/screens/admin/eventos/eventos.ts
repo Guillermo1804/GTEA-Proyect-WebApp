@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -66,6 +66,7 @@ export class Eventos implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private eventoService: EventoService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -109,6 +110,7 @@ export class Eventos implements OnInit {
           status: e.publicarInmediatamente ? 'Activo' : 'Borrador',
         }));
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error cargando eventos:', err);

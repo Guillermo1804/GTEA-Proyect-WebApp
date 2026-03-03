@@ -75,7 +75,7 @@ export class FacadeService {
   //Cerrar sesión
   logout(): Observable<any> {
     var token = this.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
     return this.http.get<any>(`${environment.url_api}/auth/logout/`, { headers: headers });
   }
 
@@ -83,7 +83,7 @@ export class FacadeService {
   //Funciones para utilizar las cookies en web
   retrieveSignedUser() {
     var token = this.getSessionToken();
-    var headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Authorization': 'Token ' + token });
     return this.http.get<any>(`${environment.url_api}/auth/login/`, { headers: headers });
   }
 

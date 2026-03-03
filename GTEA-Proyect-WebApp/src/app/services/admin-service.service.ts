@@ -104,7 +104,7 @@ export class AdminServiceService {
 
   public obtenerListaAdmins(): Observable<any> {
     var token = this.facadeService.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
     return this.http.get<any>(`${environment.url_api}/admins/`, { headers: headers });
   }
 
@@ -116,21 +116,21 @@ export class AdminServiceService {
   //Servicio para actualizar un usuario
   public editarAdmin(data: any): Observable<any> {
     var token = this.facadeService.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
     return this.http.put<any>(`${environment.url_api}/admins/edit/`, data, { headers: headers });
   }
 
   //Eliminar Admin
   public eliminarAdmin(idUser: number): Observable<any> {
     var token = this.facadeService.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
     return this.http.delete<any>(`${environment.url_api}/admins/edit/?id=${idUser}`, { headers: headers });
   }
 
   //Obtener el total de cada uno de los usuarios
   public getTotalUsuarios() {
     var token = this.facadeService.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
     return this.http.get<any>(`${environment.url_api}/admins/edit/`, { headers: headers });
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
@@ -49,6 +49,7 @@ export class Reportes implements OnInit {
     constructor(
         private http: HttpClient,
         private facadeService: FacadeService,
+        private cdr: ChangeDetectorRef,
     ) { }
 
     ngOnInit(): void {
@@ -93,7 +94,7 @@ export class Reportes implements OnInit {
 
     loadReportes(): void {
         const token = this.facadeService.getSessionToken();
-        const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+        const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
         this.http.get<any>(`${environment.url_api}/reportes/resumen/`, { headers }).subscribe({
             next: (data) => {
                 const t = data.totales || {};
@@ -128,6 +129,7 @@ export class Reportes implements OnInit {
                     enrolled: e.total_inscritos || 0,
                     capacity: e.cupo_maximo || 1,
                 }));
+                this.cdr.markForCheck();
             },
             error: (err) => console.error('Error cargando reportes:', err),
         });

@@ -345,7 +345,7 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
     return this.http.post<any>(`${environment.url_api}/eventos/`, data, { headers });
@@ -359,7 +359,7 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
     return this.http.get<Evento[]>(`${environment.url_api}/eventos/`, { headers });
@@ -373,7 +373,7 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
     return this.http.get<Evento>(`${environment.url_api}/eventos/detail/?id=${idEvento}`, { headers });
@@ -387,7 +387,7 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
     return this.http.put<any>(`${environment.url_api}/eventos/edit/?id=${idEvento}`, { ...data, id: idEvento }, { headers });
@@ -401,7 +401,7 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
     return this.http.delete<any>(`${environment.url_api}/eventos/edit/?id=${idEvento}`, { headers });
@@ -415,7 +415,7 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
     return this.http.get<any[]>(`${environment.url_api}/categorias/`, { headers });
@@ -429,7 +429,7 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
     return this.http.get<any[]>(`${environment.url_api}/sedes/`, { headers });
@@ -443,7 +443,7 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
     return this.http.get<any[]>(`${environment.url_api}/aulas/?sede_id=${sedeId}`, { headers });

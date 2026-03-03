@@ -111,7 +111,7 @@ export class AlumnoService {
 
   public obtenerListaAlumnos(): Observable<any> {
     var token = this.facadeService.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
     return this.http.get<any>(`${environment.url_api}/alumnos/`, { headers: headers });
   }
 
@@ -123,14 +123,14 @@ export class AlumnoService {
   //Servicio para actualizar un usuario
   public editarAlumno(data: any): Observable<any> {
     var token = this.facadeService.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
     return this.http.put<any>(`${environment.url_api}/alumnos/edit/`, data, { headers: headers });
   }
 
   //Eliminar Alumno
   public eliminarAlumno(idUser: number): Observable<any> {
     var token = this.facadeService.getSessionToken();
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
     return this.http.delete<any>(`${environment.url_api}/alumnos/edit/?id=${idUser}`, { headers: headers });
   }
 }

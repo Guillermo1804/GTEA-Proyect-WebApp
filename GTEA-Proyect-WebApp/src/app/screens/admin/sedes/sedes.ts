@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
 import { BackHeader } from '../../../partials/back-header/back-header';
@@ -36,7 +36,7 @@ export class Sedes implements OnInit {
   errorMessage: string = '';
   successMessage: string = '';
 
-  constructor(private sedeService: SedeService) { }
+  constructor(private sedeService: SedeService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.loadSedes();
@@ -58,6 +58,7 @@ export class Sedes implements OnInit {
           expanded: false,
           classrooms: [],
         }));
+        this.cdr.markForCheck();
         // Cargar aulas para cada sede
         this.venues.forEach((v) => {
           this.sedeService.obtenerAulasPorSede(v.id).subscribe({
@@ -70,6 +71,7 @@ export class Sedes implements OnInit {
               }));
               v.classroomCount = v.classrooms.length;
               v.totalCapacity = v.classrooms.reduce((sum, c) => sum + c.capacity, 0);
+              this.cdr.markForCheck();
             },
           });
         });
