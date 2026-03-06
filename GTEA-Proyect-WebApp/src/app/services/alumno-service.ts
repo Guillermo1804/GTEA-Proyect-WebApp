@@ -67,37 +67,6 @@ export class AlumnoService {
         error["confirmar_password"] = this.errorService.required;
       }
     }
-    if (!this.validatorService.required(data["fecha_nacimiento"])) {
-      error["fecha_nacimiento"] = this.errorService.required;
-    }
-
-    if (!this.validatorService.required(data["curp"])) {
-      error["curp"] = this.errorService.required;
-    }
-
-    if (!this.validatorService.required(data["rfc"])) {
-      error["rfc"] = this.errorService.required;
-    } else if (!this.validatorService.min(data["rfc"], 12)) {
-      error["rfc"] = this.errorService.min(12);
-      alert("La longitud de caracteres deL RFC es menor, deben ser 12");
-    } else if (!this.validatorService.max(data["rfc"], 13)) {
-      error["rfc"] = this.errorService.max(13);
-      alert("La longitud de caracteres deL RFC es mayor, deben ser 13");
-    }
-
-    if (!this.validatorService.required(data["edad"])) {
-      error["edad"] = this.errorService.required;
-    } else if (!this.validatorService.numeric(data["edad"])) {
-      alert("El formato es solo números");
-    }
-
-    if (!this.validatorService.required(data["telefono"])) {
-      error["telefono"] = this.errorService.required;
-    }
-
-    if (!this.validatorService.required(data["ocupacion"])) {
-      error["ocupacion"] = this.errorService.required;
-    }
 
     //Return arreglo
     return error;
@@ -106,51 +75,31 @@ export class AlumnoService {
   //Aquí van los servicios HTTP
   //Servicio para registrar un nuevo usuario
   public registrarAlumno(data: any): Observable<any> {
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.post<any>(`${environment.url_api}/alumnos/`,data, httpOptions);
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+    return this.http.post<any>(`${environment.url_api}/alumnos/detail/`, data, httpOptions);
   }
 
   public obtenerListaAlumnos(): Observable<any> {
-    // var token = this.facadeService.getSessionToken();
-    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.get<any>(`${environment.url_api}/lista-alumnos/`, {headers:headers});
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
+    return this.http.get<any>(`${environment.url_api}/alumnos/`, { headers: headers });
   }
 
   //Obtener un solo usuario dependiendo su ID
   public getAlumnoByID(idUser: Number) {
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.get<any>(`${environment.url_api}/alumnos/?id=${idUser}`,httpOptions);
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of(null);
+    return this.http.get<any>(`${environment.url_api}/alumnos/detail/?id=${idUser}`, httpOptions);
   }
 
   //Servicio para actualizar un usuario
   public editarAlumno(data: any): Observable<any> {
-    // var token = this.facadeService .getSessionToken();
-    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.put<any>(`${environment.url_api}/alumnos-edit/`, data, {headers:headers});
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
+    return this.http.put<any>(`${environment.url_api}/alumnos/edit/`, data, { headers: headers });
   }
 
   //Eliminar Alumno
   public eliminarAlumno(idUser: number): Observable<any> {
-    // var token = this.facadeService.getSessionToken();
-    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.delete<any>(`${environment.url_api}/alumnos-edit/?id=${idUser}`,{headers:headers});
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
+    return this.http.delete<any>(`${environment.url_api}/alumnos/edit/?id=${idUser}`, { headers: headers });
   }
 }

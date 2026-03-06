@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AdminServiceService } from '../../../services/admin-service.service';
+import { EventoService, Evento } from '../../../services/evento-service';
+import { CategoriaService } from '../../../services/categoria.service';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
 import { NuevaAulaModal } from '../sedes/nueva-aula-modal/nueva-aula-modal';
@@ -38,17 +40,99 @@ export class Dashboard implements OnInit {
   readonly form: any;
   errorMessage: string = '';
   successMessage: string = '';
+
+  constructor(
+    private router: Router,
+    private adminService: AdminServiceService,
+    private eventoService: EventoService,
+    private categoriaService: CategoriaService,
+    private cdr: ChangeDetectorRef,
+  ) { }
+
   ngOnInit(): void {
+    // Cargar total de usuarios
     this.adminService.getTotalUsuarios().subscribe({
       next: (data: any) => {
-        const total = Array.isArray(data) ? data.length : (data?.total || 0);
+        const total = (data?.admins || 0) + (data?.organizadores || 0) + (data?.alumnos || 0);
         const usersStat = this.stats.find(s => s.label === 'Usuarios');
         if (usersStat) usersStat.value = total.toLocaleString();
+        this.cdr.markForCheck();
       },
-      error: (err: any) => console.error('Error cargando stats:', err),
+      error: (err: any) => console.error('Error cargando stats usuarios:', err),
+    });
+
+    // Cargar eventos reales
+    this.eventoService.obtenerEventos().subscribe({
+      next: (eventos: Evento[]) => {
+        // Total de eventos
+        const eventosStat = this.stats.find(s => s.label === 'Eventos');
+        if (eventosStat) eventosStat.value = eventos.length.toLocaleString();
+
+        // Eventos de esta semana
+        const now = new Date();
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 7);
+        const thisWeek = eventos.filter(e => {
+          const d = new Date(e.fechaInicio);
+          return d >= startOfWeek && d < endOfWeek;
+        });
+        const weekStat = this.stats.find(s => s.label === 'Esta Semana');
+        if (weekStat) weekStat.value = thisWeek.length.toString();
+
+        // Ocupación promedio
+        const withCap = eventos.filter(e => e.cupoMaximo > 0);
+        if (withCap.length > 0) {
+          const avgOcc = withCap.reduce((sum, e) =>
+            sum + ((e.inscritos || 0) / e.cupoMaximo) * 100, 0) / withCap.length;
+          const occStat = this.stats.find(s => s.label === 'Ocupación Prom.');
+          if (occStat) {
+            occStat.value = Math.round(avgOcc) + '%';
+            occStat.sublabel = avgOcc >= 70 ? 'Alta demanda' : 'Demanda normal';
+          }
+        }
+
+        // Eventos recientes (últimos 3)
+        const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        const sorted = [...eventos].sort((a, b) =>
+          new Date(b.fechaInicio).getTime() - new Date(a.fechaInicio).getTime()
+        );
+        this.recentEvents = sorted.slice(0, 3).map(e => {
+          const date = new Date(e.fechaInicio);
+          return {
+            month: months[date.getMonth()],
+            day: date.getDate(),
+            title: e.titulo,
+            location: e.modalidad === 'Virtual' ? 'Virtual' : 'Presencial',
+            status: e.publicarInmediatamente ? 'Abierto' as const : 'Pocos lugares' as const,
+            statusClass: e.publicarInmediatamente ? 'status-open' : 'status-few',
+          };
+        });
+        this.cdr.markForCheck();
+      },
+      error: (err: any) => console.error('Error cargando eventos:', err),
+    });
+
+    // Cargar categorías reales
+    this.categoriaService.obtenerCategorias().subscribe({
+      next: (cats: any[]) => {
+        const defaultColors = ['#1e3fae', '#a855f7', '#f97316', '#059669', '#e11d48', '#6b7280'];
+        this.categoryData = cats.map((c: any, i: number) => {
+          const color = c.color || defaultColors[i % defaultColors.length];
+          return {
+            label: (c.nombre || '').substring(0, 5) + '.',
+            value: 1,
+            color: color,
+            bgColor: color + '33',
+          };
+        });
+        this.cdr.markForCheck();
+      },
+      error: (err: any) => console.error('Error cargando categorías:', err),
     });
   }
-  constructor(private router: Router, private adminService: AdminServiceService) { }
 
   // Modal state
   activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | null = null;
@@ -56,31 +140,27 @@ export class Dashboard implements OnInit {
   stats: StatCard[] = [
     {
       icon: 'event', iconColor: '#1e3fae', iconBg: '#eff6ff',
-      label: 'Eventos', value: '124',
-      sublabel: '+12%', sublabelColor: '#059669', sublabelIcon: 'trending_up'
+      label: 'Eventos', value: '0',
+      sublabel: 'Total', sublabelColor: '#9ca3af'
     },
     {
       icon: 'group', iconColor: '#4f46e5', iconBg: '#eef2ff',
-      label: 'Usuarios', value: '3,450',
-      sublabel: 'Activos hoy', sublabelColor: '#9ca3af'
+      label: 'Usuarios', value: '0',
+      sublabel: 'Registrados', sublabelColor: '#9ca3af'
     },
     {
       icon: '', iconColor: '', iconBg: '',
-      label: 'Ocupación Prom.', value: '85%',
-      sublabel: 'Alta demanda', sublabelColor: '#059669'
+      label: 'Ocupación Prom.', value: '0%',
+      sublabel: '', sublabelColor: '#9ca3af'
     },
     {
       icon: 'calendar_today', iconColor: '#ea580c', iconBg: '#fff7ed',
-      label: 'Esta Semana', value: '8',
+      label: 'Esta Semana', value: '0',
       sublabel: 'Eventos programados', sublabelColor: '#9ca3af'
     },
   ];
 
-  categoryData = [
-    { label: 'Acad.', value: 137, color: '#1e3fae', bgColor: '#d2d9ef' },
-    { label: 'Cult.', value: 72, color: '#a855f7', bgColor: '#f3e8ff' },
-    { label: 'Dep.', value: 61, color: '#f97316', bgColor: '#ffedd5' },
-  ];
+  categoryData: any[] = [];
 
   inscriptionsExpanded = false;
   totalInscriptions = '8,450';
@@ -95,26 +175,7 @@ export class Dashboard implements OnInit {
     { label: 'Jun', value: 1350 },
   ];
 
-  recentEvents: RecentEvent[] = [
-    {
-      month: 'Mar', day: 12,
-      title: 'Taller de Python',
-      location: 'Lab. de Sistemas #3',
-      status: 'Abierto', statusClass: 'status-open'
-    },
-    {
-      month: 'Mar', day: 15,
-      title: 'Conferencia AI',
-      location: 'Auditorio Principal',
-      status: 'Pocos lugares', statusClass: 'status-few'
-    },
-    {
-      month: 'Mar', day: 20,
-      title: 'Torneo Ajedrez',
-      location: 'Sala de Usos Múltiples',
-      status: 'Lleno', statusClass: 'status-full'
-    },
-  ];
+  recentEvents: RecentEvent[] = [];
 
   get maxCategoryValue(): number {
     return Math.max(...this.categoryData.map(c => c.value));

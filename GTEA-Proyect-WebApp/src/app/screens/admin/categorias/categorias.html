@@ -50,7 +50,7 @@
 <app-nueva-sede-modal (close)="closeModal()"></app-nueva-sede-modal>
 }
 @if (activeModal === 'nueva-categoria') {
-<app-nueva-categoria-modal (close)="closeModal()"></app-nueva-categoria-modal>
+<app-nueva-categoria-modal [categoria]="editingCategory" (close)="closeModal()"></app-nueva-categoria-modal>
 }
 @if (activeModal === 'nuevo-usuario') {
 <app-nuevo-usuario-modal (close)="closeModal()"></app-nuevo-usuario-modal>

@@ -2,7 +2,7 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
         <!-- Header -->
         <div class="modal-header">
-            <h2>Nueva Categoría</h2>
+            <h2>{{ isEditMode ? 'Editar Categoría' : 'Nueva Categoría' }}</h2>
             <button class="close-btn" (click)="onCancel()">
                 <span class="material-icons">close</span>
             </button>
@@ -10,15 +10,25 @@
 
         <!-- Form -->
         <div class="modal-body">
+            @if (formError) {
+            <div class="error-message">{{ formError }}</div>
+            }
+
             <div class="form-group">
                 <label class="form-label">Nombre</label>
                 <input class="form-input" type="text" placeholder="Ej: Seminarios" [(ngModel)]="categoryName">
+                @if (hasError('categoryName')) {
+                <small class="error-message">{{ getFieldError('categoryName') }}</small>
+                }
             </div>
 
             <div class="form-group">
                 <label class="form-label">Descripción</label>
                 <textarea class="form-textarea" rows="2" placeholder="Descripción de la categoría..."
                     [(ngModel)]="description"></textarea>
+                @if (hasError('description')) {
+                <small class="error-message">{{ getFieldError('description') }}</small>
+                }
             </div>
 
             <!-- Color Picker -->
@@ -57,7 +67,7 @@
         <!-- Footer -->
         <div class="modal-footer">
             <button class="btn-cancel" (click)="onCancel()">Cancelar</button>
-            <button class="btn-save" (click)="onSave()" [style.background]="selectedColor">Guardar</button>
+            <button class="btn-save" (click)="onSave()" [style.background]="selectedColor">{{ isEditMode ? 'Actualizar' : 'Guardar' }}</button>
         </div>
     </div>
 </div>

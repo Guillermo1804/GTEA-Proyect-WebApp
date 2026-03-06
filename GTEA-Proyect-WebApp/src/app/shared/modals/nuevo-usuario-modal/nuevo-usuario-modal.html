@@ -10,10 +10,17 @@
 
         <!-- Form -->
         <div class="modal-body">
+            @if (formError) {
+            <div class="error-message">{{ formError }}</div>
+            }
+
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label">Nombre</label>
                     <input class="form-input" type="text" placeholder="Nombre" [(ngModel)]="firstName">
+                    @if (hasError('firstName')) {
+                    <small class="error-message">{{ getFieldError('firstName') }}</small>
+                    }
                 </div>
                 <div class="form-group">
                     <label class="form-label">Apellido</label>
@@ -24,11 +31,17 @@
             <div class="form-group">
                 <label class="form-label">Correo electrónico</label>
                 <input class="form-input" type="email" placeholder="usuario@universidad.edu" [(ngModel)]="email">
+                @if (hasError('email')) {
+                <small class="error-message">{{ getFieldError('email') }}</small>
+                }
             </div>
 
             <div class="form-group">
                 <label class="form-label">Teléfono</label>
                 <input class="form-input" type="tel" placeholder="(000) 000-0000" [(ngModel)]="phone">
+                @if (hasError('phone')) {
+                <small class="error-message">{{ getFieldError('phone') }}</small>
+                }
             </div>
 
             <!-- Role Selector -->
@@ -41,6 +54,9 @@
                     </button>
                     }
                 </div>
+                @if (hasError('selectedRole')) {
+                <small class="error-message">{{ getFieldError('selectedRole') }}</small>
+                }
             </div>
 
             <!-- Send Invite Toggle -->

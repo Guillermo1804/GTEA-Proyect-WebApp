@@ -10,9 +10,16 @@
 
         <!-- Form -->
         <div class="modal-body">
+            @if (formError) {
+            <div class="error-message">{{ formError }}</div>
+            }
+
             <div class="form-group">
                 <label class="form-label">Nombre de la Sede</label>
                 <input class="form-input" type="text" placeholder="Ej: Edificio D - Deportes" [(ngModel)]="sedeName">
+                @if (hasError('sedeName')) {
+                <small class="error-message">{{ getFieldError('sedeName') }}</small>
+                }
             </div>
 
             <div class="form-group">
@@ -28,6 +35,9 @@
                 <div class="form-group">
                     <label class="form-label">Correo</label>
                     <input class="form-input" type="email" placeholder="sede@universidad.edu" [(ngModel)]="email">
+                    @if (hasError('email')) {
+                    <small class="error-message">{{ getFieldError('email') }}</small>
+                    }
                 </div>
             </div>
 
@@ -42,6 +52,9 @@
                         <span class="material-icons">add</span>
                     </button>
                 </div>
+                @if (hasError('floors')) {
+                <small class="error-message">{{ getFieldError('floors') }}</small>
+                }
             </div>
 
             <div class="form-group">

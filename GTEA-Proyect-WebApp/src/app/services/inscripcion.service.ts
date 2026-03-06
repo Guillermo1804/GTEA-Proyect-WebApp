@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { FacadeService } from './facade-service';
 import { RespuestaInscripcion } from '../models/inscripcion.model';
@@ -24,7 +24,7 @@ export class InscripcionService {
 
     // ─────────────────────────────────────────────
     // [POST] Inscribir alumno a un evento
-    // Endpoint esperado: POST /inscripciones/
+    // Endpoint: POST /inscripciones/
     // ─────────────────────────────────────────────
     public inscribirEvento(eventoId: number, alumnoId: number): Observable<RespuestaInscripcion> {
         const payload = {
@@ -32,20 +32,16 @@ export class InscripcionService {
             alumno_id: alumnoId,
         };
 
-        // ⚙️ Descomentar cuando el backend esté listo:
-        // return this.http.post<RespuestaInscripcion>(
-        //   `${environment.url_api}/inscripciones/`,
-        //   payload,
-        //   httpOptions
-        // );
-
-        // TODO: REMOVE - TEMPORARY FOR COMPILATION
-        return new Subject<RespuestaInscripcion>();
+        return this.http.post<RespuestaInscripcion>(
+          `${environment.url_api}/inscripciones/`,
+          payload,
+          httpOptions
+        );
     }
 
     // ─────────────────────────────────────────────
     // [POST] Inscribir alumno a la lista de espera
-    // Endpoint esperado: POST /inscripciones/lista-espera/
+    // Endpoint: POST /inscripciones/lista-espera/
     // ─────────────────────────────────────────────
     public inscribirListaEspera(eventoId: number, alumnoId: number): Observable<RespuestaInscripcion> {
         const payload = {
@@ -53,29 +49,21 @@ export class InscripcionService {
             alumno_id: alumnoId,
         };
 
-        // ⚙️ Descomentar cuando el backend esté listo:
-        // return this.http.post<RespuestaInscripcion>(
-        //   `${environment.url_api}/inscripciones/lista-espera/`,
-        //   payload,
-        //   httpOptions
-        // );
-
-        // TODO: REMOVE - TEMPORARY FOR COMPILATION
-        return new Subject<RespuestaInscripcion>();
+        return this.http.post<RespuestaInscripcion>(
+          `${environment.url_api}/inscripciones/lista-espera/`,
+          payload,
+          httpOptions
+        );
     }
 
     // ─────────────────────────────────────────────
     // [DELETE] Cancelar inscripción / lista de espera
-    // Endpoint esperado: DELETE /inscripciones/cancel/?evento_id={id}&alumno_id={id}
+    // Endpoint: DELETE /inscripciones/cancel/?evento_id={id}&alumno_id={id}
     // ─────────────────────────────────────────────
     public cancelarInscripcion(eventoId: number, alumnoId: number): Observable<RespuestaInscripcion> {
-        // ⚙️ Descomentar cuando el backend esté listo:
-        // return this.http.delete<RespuestaInscripcion>(
-        //   `${environment.url_api}/inscripciones/cancel/?evento_id=${eventoId}&alumno_id=${alumnoId}`,
-        //   httpOptions
-        // );
-
-        // TODO: REMOVE - TEMPORARY FOR COMPILATION
-        return new Subject<RespuestaInscripcion>();
+        return this.http.delete<RespuestaInscripcion>(
+          `${environment.url_api}/inscripciones/cancel/?evento_id=${eventoId}&alumno_id=${alumnoId}`,
+          httpOptions
+        );
     }
 }
