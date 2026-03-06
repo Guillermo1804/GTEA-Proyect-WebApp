@@ -33,7 +33,7 @@ export class AdminServiceService {
       'confirmar_password': '',
     }
   }
-
+//Fin sprint 2
   //Validación para el formulario
   public validarAdmin(data: any, editar: boolean) {
     let error: any = [];
