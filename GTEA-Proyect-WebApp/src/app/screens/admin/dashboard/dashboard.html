@@ -45,7 +45,7 @@
                 </div>
                 <div class="chart-container">
                     <div class="bar-chart">
-                        @for (cat of categoryData; track cat.label) {
+                        @for (cat of categoryData; track $index) {
                         <div class="bar-group">
                             <div class="bar-wrapper" [style.height.%]="(cat.value / maxCategoryValue) * 100">
                                 <div class="bar-bg" [style.background]="cat.bgColor"></div>

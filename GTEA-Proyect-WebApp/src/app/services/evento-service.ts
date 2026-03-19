@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { FacadeService } from './facade-service';
 import { ValidatorService } from './tools/validator-service';
@@ -43,7 +44,11 @@ export interface Evento {
   id?: number;
   status?: 'Activo' | 'Borrador' | 'Finalizado' | 'Cancelado';
   organizador?: string;
+  organizadorNombre?: string;   // Nombre completo del organizador (desde backend)
   inscritos?: number;
+  categoriaNombre?: string;     // Nombre de categoría (desde backend)
+  sedeNombre?: string;          // Nombre de sede (desde backend)
+  aulaNombre?: string;          // Nombre de aula (desde backend)
 }
 
 @Injectable({
@@ -330,6 +335,42 @@ export class EventoService {
   }
 
   // ─────────────────────────────────────────────
+  // Mapeo: API (snake_case) → Frontend (camelCase)
+  // ─────────────────────────────────────────────
+  /**
+   * Transforma la respuesta del backend (snake_case) al formato frontend (camelCase).
+   * Mapea campos de la API a la interfaz Evento y agrega campos de display.
+   */
+  private _mapApiResponse(raw: any): Evento {
+    return {
+      id: raw.id,
+      titulo: raw.titulo,
+      categoriaId: raw.categoria,
+      categoriaNombre: raw.categoria_nombre || '',
+      descripcion: raw.descripcion,
+      imagenPortada: raw.imagen_portada || null,
+      fechaInicio: raw.fecha_inicio,
+      horaInicio: raw.hora_inicio,
+      fechaFin: raw.fecha_fin,
+      horaFin: raw.hora_fin,
+      modalidad: raw.modalidad,
+      sedeId: raw.sede,
+      sedeNombre: raw.sede_nombre || '',
+      aulaId: raw.aula,
+      aulaNombre: raw.aula_nombre || '',
+      cupoMaximo: raw.cupo_maximo,
+      costoEntrada: raw.costo_entrada,
+      listaEspera: raw.lista_espera,
+      publicarInmediatamente: raw.publicar_inmediatamente,
+      esOrganizador: raw.es_organizador,
+      status: raw.status,
+      organizador: raw.organizador,
+      organizadorNombre: raw.organizador_nombre || '',
+      inscritos: raw.inscritos || 0,
+    };
+  }
+
+  // ─────────────────────────────────────────────
   // CRUD — Peticiones HTTP
   // NOTA PARA EL EQUIPO BACKEND:
   // Descomentar los bloques `return this.http.*` y
@@ -345,14 +386,10 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
-    // ⚙️ Descomentar cuando el backend esté listo:
-    // return this.http.post<any>(`${environment.url_api}/eventos/`, data, { headers });
-
-    // 🔧 Mock temporal hasta que el backend esté listo:
-    return of({ success: true, message: 'Evento creado (mock)', data });
+    return this.http.post<any>(`${environment.url_api}/eventos/`, data, { headers });
   }
 
   /**
@@ -363,14 +400,12 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
-    // ⚙️ Descomentar cuando el backend esté listo:
-    // return this.http.get<Evento[]>(`${environment.url_api}/eventos/`, { headers });
-
-    // 🔧 Mock temporal — retornar lista centralizada:
-    return of([...this.MOCK_EVENTOS]);
+    return this.http.get<any[]>(`${environment.url_api}/eventos/`, { headers }).pipe(
+      map((eventos: any[]) => eventos.map(e => this._mapApiResponse(e)))
+    );
   }
 
   /**
@@ -381,15 +416,12 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
-    // ⚙️ Descomentar cuando el backend esté listo:
-    // return this.http.get<Evento>(`${environment.url_api}/eventos/detail/?id=${idEvento}`, { headers });
-
-    // 🔧 Mock temporal — buscar en la lista centralizada:
-    const evento = this.MOCK_EVENTOS.find(e => e.id === idEvento);
-    return of(evento || null);
+    return this.http.get<any>(`${environment.url_api}/eventos/detail/?id=${idEvento}`, { headers }).pipe(
+      map(data => data ? this._mapApiResponse(data) : null)
+    );
   }
 
   /**
@@ -400,14 +432,10 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
-    // ⚙️ Descomentar cuando el backend esté listo:
-    // return this.http.put<any>(`${environment.url_api}/eventos/edit/?id=${idEvento}`, data, { headers });
-
-    // 🔧 Mock temporal:
-    return of({ success: true, message: 'Evento actualizado (mock)', data });
+    return this.http.put<any>(`${environment.url_api}/eventos/edit/?id=${idEvento}`, { ...data, id: idEvento }, { headers });
   }
 
   /**
@@ -418,14 +446,10 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
-    // ⚙️ Descomentar cuando el backend esté listo:
-    // return this.http.delete<any>(`${environment.url_api}/eventos/edit/?id=${idEvento}`, { headers });
-
-    // 🔧 Mock temporal:
-    return of({ success: true, message: 'Evento eliminado (mock)' });
+    return this.http.delete<any>(`${environment.url_api}/eventos/edit/?id=${idEvento}`, { headers });
   }
 
   /**
@@ -436,14 +460,10 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
-    // ⚙️ Descomentar cuando el backend esté listo:
-    // return this.http.get<any[]>(`${environment.url_api}/categorias/`, { headers });
-
-    // 🔧 Mock temporal — usar lista centralizada:
-    return of([...this.MOCK_CATEGORIAS]);
+    return this.http.get<any[]>(`${environment.url_api}/categorias/`, { headers });
   }
 
   /**
@@ -454,14 +474,10 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
-    // ⚙️ Descomentar cuando el backend esté listo:
-    // return this.http.get<any[]>(`${environment.url_api}/sedes/`, { headers });
-
-    // 🔧 Mock temporal — usar lista centralizada:
-    return of([...this.MOCK_SEDES]);
+    return this.http.get<any[]>(`${environment.url_api}/sedes/`, { headers });
   }
 
   /**
@@ -472,37 +488,30 @@ export class EventoService {
     const token = this.facadeService.getSessionToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Token ' + token,
     });
 
-    // ⚙️ Descomentar cuando el backend esté listo:
-    // return this.http.get<any[]>(`${environment.url_api}/aulas/?sede_id=${sedeId}`, { headers });
-
-    // 🔧 Mock temporal — usar diccionario centralizado:
-    const aulas = this.MOCK_AULAS[Number(sedeId)] || [];
-    return of([...aulas]);
+    return this.http.get<any[]>(`${environment.url_api}/aulas/?sede_id=${sedeId}`, { headers });
   }
 
   // ════════════════════════════════════════════════
   // Métodos públicos para obtener nombres desde IDs
-  // (usados por evento-detail y otros componentes)
+  // Ahora usan HTTP. Para uso sincrónico en templates,
+  // los componentes deben pre-cargar los catálogos.
   // ════════════════════════════════════════════════
 
   public getCategoriaNombre(id: string | number): string {
-    const cat = this.MOCK_CATEGORIAS.find(c => c.id === Number(id));
-    return cat?.nombre || 'Desconocida';
+    // Fallback sincrónico — los componentes deben cachear las listas
+    return `Categoría #${id}`;
   }
 
   public getSedeNombre(id?: string | number): string {
     if (!id) return 'Virtual';
-    const sede = this.MOCK_SEDES.find(s => s.id === Number(id));
-    return sede?.nombre || 'Sede desconocida';
+    return `Sede #${id}`;
   }
 
   public getAulaNombre(id?: string | number, sedeId?: string | number): string {
     if (!id || !sedeId) return '—';
-    const aulas = this.MOCK_AULAS[Number(sedeId)] || [];
-    const aula = aulas.find(a => a.id === Number(id));
-    return aula?.nombre || 'Aula desconocida';
+    return `Aula #${id}`;
   }
 }

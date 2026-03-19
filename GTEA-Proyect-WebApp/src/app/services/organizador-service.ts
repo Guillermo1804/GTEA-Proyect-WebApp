@@ -14,6 +14,7 @@ const httpOptions = {
   providedIn: 'root',
 })
 export class OrganizadorService {
+
   constructor(
     private http: HttpClient,
     private validatorService: ValidatorService,
@@ -73,62 +74,43 @@ export class OrganizadorService {
   //Aquí van los servicios HTTP
   //Servicio para registrar un nuevo usuario
   public registrarOrg(data: any): Observable<any> {
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.post<any>(`${environment.url_api}/organizadores/`,data, httpOptions);
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+    return this.http.post<any>(`${environment.url_api}/organizadores/detail/`, data, httpOptions);
   }
 
   public obtenerListaOrgs(): Observable<any> {
-    // var token = this.facadeService.getSessionToken();
-    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.get<any>(`${environment.url_api}/lista-org/`, {headers:headers});
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
+    return this.http.get<any>(`${environment.url_api}/organizadores/`, { headers: headers });
   }
 
   //Obtener un solo usuario dependiendo su ID
   public getOrgByID(idUser: Number) {
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.get<any>(`${environment.url_api}/organizadores/?id=${idUser}`,httpOptions);
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of(null);
+    return this.http.get<any>(`${environment.url_api}/organizadores/detail/?id=${idUser}`, httpOptions);
   }
 
   //Servicio para actualizar un usuario
   public editarOrg(data: any): Observable<any> {
-    // var token = this.facadeService.getSessionToken();
-    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.put<any>(`${environment.url_api}/organizadores-edit/`, data, {headers:headers});
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
+    return this.http.put<any>(`${environment.url_api}/organizadores/edit/`, data, { headers: headers });
   }
 
   //Eliminar Organizador
   public eliminarOrg(idUser: number): Observable<any> {
-    // var token = this.facadeService.getSessionToken();
-    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.delete<any>(`${environment.url_api}/organizadores-edit/?id=${idUser}`,{headers:headers});
-
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
+    return this.http.delete<any>(`${environment.url_api}/organizadores/edit/?id=${idUser}`, { headers: headers });
   }
 
   //Obtener el total de cada uno de los usuarios
   public getTotalUsuarios() {
-    // var token = this.facadeService.getSessionToken();
-    // var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
-    // ⚙️ TODO: UNCOMMENT WHEN BACKEND FIXES CORS
-    // return this.http.get<any>(`${environment.url_api}/organizadores-edit/`, {headers:headers});
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
+    return this.http.get<any>(`${environment.url_api}/admins/edit/`, { headers: headers });
+  }
 
-    // TODO: REMOVE - TEMPORARY FOR COMPILATION
-    return of([]);
+  // Alias usado por el modal de nuevo usuario
+  public registrarOrganizador(userData: any): Observable<any> {
+    return this.registrarOrg(userData);
   }
 }

@@ -57,17 +57,17 @@ export class LoginScreenComponent implements OnInit {
     // Llamar al endpoint de login
     this.facadeService.login(emailValue, passwordValue).subscribe({
       next: (response) => {
-        // Guardar datos de sesión (solo si el backend devuelve datos reales)
+        // Guardar datos de sesión
         if (response.token) {
           this.facadeService.saveUserData(response);
         }
         this.successMessage = '¡Inicio de sesión exitoso!';
 
-        // ── Routing por dominio de email ──
-        const domain = emailValue.match(/@([a-z]+)\.com$/i)?.[1]?.toLowerCase() || '';
+        // ── Routing por rol devuelto por el backend ──
+        const rol = response.rol || '';
 
-        switch (domain) {
-          case 'admin':
+        switch (rol) {
+          case 'administrador':
             localStorage.setItem('userRole', 'administrador');
             this.router.navigate(['/admin/dashboard']);
             break;

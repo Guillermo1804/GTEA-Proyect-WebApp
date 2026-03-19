@@ -9,6 +9,8 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { EventoService, Evento } from '../../../../services/evento-service';
+import { ValidatorService } from '../../../../services/tools/validator-service';
+import { ErrorsService } from '../../../../services/tools/errors-service';
 import { Subject, takeUntil } from 'rxjs';
 
 // ─────────────────────────────────────────────
@@ -76,6 +78,8 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private eventoService: EventoService,
+    private validatorService: ValidatorService,
+    private errorsService: ErrorsService,
   ) { }
 
   ngOnInit(): void {
@@ -372,10 +376,10 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
   getFieldError(form: FormGroup, field: string): string {
     const ctrl = form.get(field);
     if (!ctrl || !ctrl.errors || !ctrl.touched) return '';
-    if (ctrl.errors['required']) return 'Campo requerido';
-    if (ctrl.errors['maxlength']) return `Máximo ${ctrl.errors['maxlength'].requiredLength} caracteres`;
-    if (ctrl.errors['min']) return `El valor mínimo es ${ctrl.errors['min'].min}`;
-    return 'Valor inválido';
+    if (ctrl.errors['required']) return this.errorsService.required;
+    if (ctrl.errors['maxlength']) return this.errorsService.max(ctrl.errors['maxlength'].requiredLength);
+    if (ctrl.errors['min']) return this.errorsService.min(ctrl.errors['min'].min);
+    return this.errorsService.generic;
   }
 
   get isFechaFinInvalida(): boolean {
@@ -391,7 +395,9 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
   // ─────────────────────────────────────────────
   onSubmit(): void {
     this.step3Form.markAllAsTouched();
-    if (this.step1Form.invalid || this.step2Form.invalid) {
+    const titulo = this.step1Form.get('titulo')?.value;
+
+    if (!this.validatorService.required(titulo) || this.step1Form.invalid || this.step2Form.invalid) {
       this.errorMessage = 'Por favor completa todos los pasos correctamente.';
       return;
     }
@@ -406,6 +412,11 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
       ...this.step3Form.value,
     };
 
+    // Sanitizar imagenPortada: el backend espera una URL string, no null ni File
+    if (payload.imagenPortada == null || payload.imagenPortada instanceof File) {
+      payload.imagenPortada = '';
+    }
+
     // ── Modo edición ──
     if (this.isEditMode && this.editId !== null) {
       this.eventoService.editarEvento(this.editId, payload).subscribe({
@@ -417,8 +428,7 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.isSubmitting = false;
-          this.errorMessage =
-            err?.error?.message || err?.error?.detail || 'Error al actualizar el evento.';
+          this.errorMessage = this._parseDRFError(err) || 'Error al actualizar el evento.';
         },
       });
       return;
@@ -434,10 +444,26 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.isSubmitting = false;
-        this.errorMessage =
-          err?.error?.message || err?.error?.detail || 'Error al crear el evento. Intenta de nuevo.';
+        this.errorMessage = this._parseDRFError(err) || 'Error al crear el evento. Intenta de nuevo.';
       },
     });
+  }
+
+  /**
+   * Parsea errores de validación de DRF ({ campo: [mensajes] }) a un string legible.
+   */
+  private _parseDRFError(err: any): string {
+    if (err?.error?.message) return err.error.message;
+    if (err?.error?.detail) return err.error.detail;
+    if (err?.error && typeof err.error === 'object') {
+      const msgs: string[] = [];
+      for (const [field, errors] of Object.entries(err.error)) {
+        const errorList = Array.isArray(errors) ? errors.join(', ') : String(errors);
+        msgs.push(`${field}: ${errorList}`);
+      }
+      if (msgs.length) return msgs.join(' | ');
+    }
+    return '';
   }
 
   onClose(): void {

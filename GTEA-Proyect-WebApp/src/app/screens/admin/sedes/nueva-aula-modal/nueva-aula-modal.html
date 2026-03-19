@@ -10,21 +10,31 @@
 
         <!-- Form -->
         <div class="modal-body">
+            @if (formError) {
+            <div class="error-message">{{ formError }}</div>
+            }
+
             <!-- Sede Select -->
             <div class="form-group">
                 <label class="form-label">Sede</label>
                 <select class="form-select" [(ngModel)]="selectedSede">
                     <option value="" disabled>Seleccionar sede</option>
-                    @for (sede of sedes; track sede) {
-                    <option [value]="sede">{{ sede }}</option>
+                    @for (sede of sedes; track sede.id) {
+                    <option [value]="sede.id">{{ sede.nombre }}</option>
                     }
                 </select>
+                @if (hasError('selectedSede')) {
+                <small class="error-message">{{ getFieldError('selectedSede') }}</small>
+                }
             </div>
 
             <!-- Name Input -->
             <div class="form-group">
                 <label class="form-label">Nombre del Aula</label>
                 <input class="form-input" type="text" placeholder="Ej: Lab. Sistemas #3" [(ngModel)]="className">
+                @if (hasError('className')) {
+                <small class="error-message">{{ getFieldError('className') }}</small>
+                }
             </div>
 
             <!-- Capacity Counter -->
@@ -39,6 +49,9 @@
                         <span class="material-icons">add</span>
                     </button>
                 </div>
+                @if (hasError('capacity')) {
+                <small class="error-message">{{ getFieldError('capacity') }}</small>
+                }
             </div>
 
             <!-- Equipment Toggles -->

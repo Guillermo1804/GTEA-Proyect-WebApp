@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
 import { BackHeader } from '../../../partials/back-header/back-header';
@@ -6,14 +6,17 @@ import { NuevaAulaModal } from './nueva-aula-modal/nueva-aula-modal';
 import { NuevaSedeModal } from '../../../shared/modals/nueva-sede-modal/nueva-sede-modal';
 import { NuevaCategoriaModal } from '../../../shared/modals/nueva-categoria-modal/nueva-categoria-modal';
 import { NuevoUsuarioModal } from '../../../shared/modals/nuevo-usuario-modal/nuevo-usuario-modal';
+import { SedeService } from '../../../services/sede.service';
 
 interface Classroom {
+  id: number;
   name: string;
   capacity: number;
-  status: 'Disponible' | 'Ocupada' | 'Mantenimiento';
+  status: string;
 }
 
 interface Venue {
+  id: number;
   name: string;
   icon: string;
   classroomCount: number;
@@ -32,36 +35,53 @@ export class Sedes implements OnInit {
   readonly form: any;
   errorMessage: string = '';
   successMessage: string = '';
-  ngOnInit(): void {
 
+  constructor(private sedeService: SedeService, private cdr: ChangeDetectorRef) { }
+
+  ngOnInit(): void {
+    this.loadSedes();
   }
+
   activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | null = null;
 
-  venues: Venue[] = [
-    {
-      name: 'Edificio A - Ingeniería', icon: 'business',
-      classroomCount: 12, totalCapacity: 480, expanded: true,
-      classrooms: [
-        { name: 'Lab. Sistemas #1', capacity: 40, status: 'Disponible' },
-        { name: 'Lab. Sistemas #2', capacity: 40, status: 'Ocupada' },
-        { name: 'Aula Magna', capacity: 120, status: 'Disponible' },
-        { name: 'Sala Cómputo', capacity: 30, status: 'Mantenimiento' },
-      ]
-    },
-    {
-      name: 'Edificio B - Ciencias', icon: 'science',
-      classroomCount: 8, totalCapacity: 320, expanded: false,
-      classrooms: [
-        { name: 'Lab. Química', capacity: 35, status: 'Disponible' },
-        { name: 'Lab. Física', capacity: 35, status: 'Ocupada' },
-      ]
-    },
-    {
-      name: 'Edificio C - Humanidades', icon: 'menu_book',
-      classroomCount: 6, totalCapacity: 240, expanded: false,
-      classrooms: []
-    },
-  ];
+  venues: Venue[] = [];
+
+  loadSedes(): void {
+    this.sedeService.obtenerSedes().subscribe({
+      next: (sedes) => {
+        this.venues = sedes.map((s: any) => ({
+          id: s.id,
+          name: s.nombre,
+          icon: 'business',
+          classroomCount: 0,
+          totalCapacity: 0,
+          expanded: false,
+          classrooms: [],
+        }));
+        this.cdr.markForCheck();
+        // Cargar aulas para cada sede
+        this.venues.forEach((v) => {
+          this.sedeService.obtenerAulasPorSede(v.id).subscribe({
+            next: (aulas) => {
+              v.classrooms = aulas.map((a: any) => ({
+                id: a.id,
+                name: a.nombre,
+                capacity: a.capacidad,
+                status: a.estado === 'disponible' ? 'Disponible' : a.estado === 'en-uso' ? 'Ocupada' : 'Mantenimiento',
+              }));
+              v.classroomCount = v.classrooms.length;
+              v.totalCapacity = v.classrooms.reduce((sum, c) => sum + c.capacity, 0);
+              this.cdr.markForCheck();
+            },
+          });
+        });
+      },
+      error: (err) => {
+        console.error('Error cargando sedes:', err);
+        this.errorMessage = 'Error al cargar sedes';
+      },
+    });
+  }
 
   toggleVenue(venue: Venue): void { venue.expanded = !venue.expanded; }
 
@@ -75,7 +95,7 @@ export class Sedes implements OnInit {
   }
 
   onFabAction(action: string): void { this.activeModal = action as any; }
-  closeModal(): void { this.activeModal = null; }
+  closeModal(): void { this.activeModal = null; this.loadSedes(); }
 
   openNewAula(): void { this.activeModal = 'nueva-aula'; }
   openNewSede(): void { this.activeModal = 'nueva-sede'; }

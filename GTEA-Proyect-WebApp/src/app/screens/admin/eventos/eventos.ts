@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -66,13 +66,14 @@ export class Eventos implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private eventoService: EventoService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
     // Cargar eventos desde el servicio (ahora retorna mocks centralizados)
     this.loadEvents();
     
-    // Verificar si hay query param para abrir el modal de nuevo evento
+    // Verificar si hay query param para abrir el modal de nuevo evento o editar
     this.route.queryParams.subscribe(params => {
       if (params['new'] === 'true') {
         // Limpiar el query param de la URL
@@ -85,6 +86,33 @@ export class Eventos implements OnInit {
         this.editingEventId = null;
         this.editingEventData = null;
         this.activeModal = 'nuevo-evento';
+      } else if (params['edit']) {
+        // Modo edición desde la vista de detalle
+        const editId = Number(params['edit']);
+        // Limpiar el query param de la URL
+        this.router.navigate([], { 
+          relativeTo: this.route, 
+          queryParams: {}, 
+          replaceUrl: true 
+        });
+        // Cargar evento y abrir wizard en modo edición
+        this.eventoService.getEventoByID(editId).subscribe({
+          next: (data: Evento | null) => {
+            if (data) {
+              this.editingEventId = editId;
+              this.editingEventData = data;
+              this.activeModal = 'nuevo-evento';
+            } else {
+              this.errorMessage = 'No se pudo cargar el evento para editar.';
+              setTimeout(() => (this.errorMessage = ''), 4000);
+            }
+          },
+          error: (err) => {
+            console.error('Error cargando evento:', err);
+            this.errorMessage = 'Error al cargar el evento.';
+            setTimeout(() => (this.errorMessage = ''), 4000);
+          },
+        });
       }
     });
   }
@@ -98,17 +126,18 @@ export class Eventos implements OnInit {
         this.events = data.map(e => ({
           id: e.id ?? 0,
           title: e.titulo,
-          category: this.eventoService.getCategoriaNombre(e.categoriaId),
+          category: e.categoriaNombre || `Categoría #${e.categoriaId}`,
           categoryColor: this._getCategoryColor(e.categoriaId),
           date: this._formatDate(e.fechaInicio),
           time: `${e.horaInicio} - ${e.horaFin}`,
-          location: e.modalidad === 'Virtual' ? 'Virtual' : this.eventoService.getAulaNombre(e.aulaId, e.sedeId),
-          organizer: 'Organizador', // TODO: obtener del backend
-          capacity: e.cupoMaximo,
-          enrolled: 0, // TODO: obtener del backend
-          status: e.publicarInmediatamente ? 'Activo' : 'Borrador',
+          location: e.modalidad === 'Virtual' ? 'Virtual' : (e.aulaNombre || '—'),
+          organizer: e.organizadorNombre || 'Organizador',
+          capacity: e.cupoMaximo ?? 0,
+          enrolled: e.inscritos ?? 0,
+          status: e.status || 'Borrador',
         }));
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error cargando eventos:', err);
@@ -164,6 +193,7 @@ export class Eventos implements OnInit {
 
   // ── Cálculos de ocupación ──
   getOccupancy(event: EventItem): number {
+    if (!event.capacity || event.capacity === 0) return 0;
     return Math.round((event.enrolled / event.capacity) * 100);
   }
 
@@ -252,42 +282,13 @@ export class Eventos implements OnInit {
   // ── Callback: evento creado o actualizado desde el wizard ──
   onEventoCreado(evento: Evento): void {
     if (this.editingEventId !== null) {
-      // Modo edición — actualizar el item existente en la lista
-      const idx = this.events.findIndex((e) => e.id === this.editingEventId);
-      if (idx !== -1) {
-        this.events[idx] = {
-          ...this.events[idx],
-          title:    evento.titulo,
-          category: String(evento.categoriaId),
-          date:     evento.fechaInicio,
-          time:     `${evento.horaInicio} - ${evento.horaFin}`,
-          location: evento.modalidad === 'Virtual' ? 'Virtual' : String(evento.aulaId || '—'),
-          capacity: evento.cupoMaximo,
-          status:   evento.publicarInmediatamente ? 'Activo' : 'Borrador',
-        };
-        // Forzar re-render de la lista
-        this.events = [...this.events];
-      }
       this.successMessage = `Evento "${evento.titulo}" actualizado exitosamente.`;
     } else {
-      // Modo creación — agregar al inicio de la lista
-      const nuevo: EventItem = {
-        id:            evento.id ?? Date.now(),
-        title:         evento.titulo,
-        category:      String(evento.categoriaId),
-        categoryColor: '#1e3fae',
-        date:          evento.fechaInicio,
-        time:          `${evento.horaInicio} - ${evento.horaFin}`,
-        location:      evento.modalidad === 'Virtual' ? 'Virtual' : String(evento.aulaId || '—'),
-        organizer:     'Tú',
-        capacity:      evento.cupoMaximo,
-        enrolled:      0,
-        status:        evento.publicarInmediatamente ? 'Activo' : 'Borrador',
-      };
-      this.events.unshift(nuevo);
       this.successMessage = `Evento "${evento.titulo}" creado exitosamente.`;
     }
-
+    // Recargar la lista completa para garantizar datos frescos del backend
+    // (incluyendo categoria_nombre, inscritos, status, etc.)
+    this.loadEvents();
     setTimeout(() => (this.successMessage = ''), 4000);
   }
 
