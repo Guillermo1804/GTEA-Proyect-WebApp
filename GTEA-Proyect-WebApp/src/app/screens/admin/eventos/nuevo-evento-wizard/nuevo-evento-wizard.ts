@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, HostListener } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -12,6 +12,7 @@ import { EventoService, Evento } from '../../../../services/evento-service';
 import { ValidatorService } from '../../../../services/tools/validator-service';
 import { ErrorsService } from '../../../../services/tools/errors-service';
 import { Subject, takeUntil } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 
 // ─────────────────────────────────────────────
 // Validador cruzado: fecha/hora de fin > inicio
@@ -105,7 +106,8 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
 
     // Si la imagen es una URL (string), mostrar como preview
     if (data.imagenPortada && typeof data.imagenPortada === 'string') {
-      this.imagenPreviewUrl = data.imagenPortada;
+      const src = data.imagenPortada;
+      this.imagenPreviewUrl = src.startsWith('http') ? src : `${environment.url_api}${src}`;
     }
 
     // Guardar el aulaId antes de cambiar sedeId (para evitar que se limpie)
@@ -468,6 +470,11 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
 
   onClose(): void {
     this.close.emit();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.onClose();
   }
 
   ngOnDestroy(): void {

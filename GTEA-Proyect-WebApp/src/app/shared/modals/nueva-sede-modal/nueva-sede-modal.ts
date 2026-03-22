@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SedeService } from '../../../services/sede.service';
 import { ValidatorService } from '../../../services/tools/validator-service';
@@ -43,6 +43,11 @@ export class NuevaSedeModal implements OnInit {
     toggleFacility(item: any): void { item.enabled = !item.enabled; }
 
     onCancel(): void { this.close.emit(); }
+
+    @HostListener('document:keydown.escape')
+    onEscape() {
+        this.onCancel();
+    }
 
     hasError(field: 'sedeName' | 'email' | 'floors'): boolean {
         return this.submitted && this.getFieldError(field).length > 0;

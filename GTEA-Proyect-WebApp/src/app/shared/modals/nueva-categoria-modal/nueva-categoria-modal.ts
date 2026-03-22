@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, Output, EventEmitter, Input, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CategoriaService } from '../../../services/categoria.service';
 import { ValidatorService } from '../../../services/tools/validator-service';
@@ -60,6 +60,11 @@ export class NuevaCategoriaModal implements OnInit {
     selectIcon(icon: string): void { this.selectedIcon = icon; }
 
     onCancel(): void { this.close.emit(); }
+
+    @HostListener('document:keydown.escape')
+    onEscape() {
+        this.onCancel();
+    }
 
     hasError(field: 'categoryName' | 'description'): boolean {
         return this.submitted && this.getFieldError(field).length > 0;

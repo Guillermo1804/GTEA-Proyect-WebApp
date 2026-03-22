@@ -1,8 +1,8 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SedeService, Sede } from '../../../../services/sede.service';
-import { ValidatorService } from '../../../../services/tools/validator-service';
-import { ErrorsService } from '../../../../services/tools/errors-service';
+import { SedeService, Sede } from '../../../services/sede.service';
+import { ValidatorService } from '../../../services/tools/validator-service';
+import { ErrorsService } from '../../../services/tools/errors-service';
 
 interface Equipment {
   name: string;
@@ -64,6 +64,11 @@ export class NuevaAulaModal implements OnInit {
 
   onCancel(): void {
     this.close.emit();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.onCancel();
   }
 
   hasError(field: 'selectedSede' | 'className' | 'capacity' | 'piso'): boolean {

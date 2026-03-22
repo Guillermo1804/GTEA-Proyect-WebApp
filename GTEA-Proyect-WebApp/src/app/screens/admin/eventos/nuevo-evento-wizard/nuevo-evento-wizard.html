@@ -438,15 +438,6 @@
         <label
           class="publish-card"
           [class.selected]="step3Form.get('publicarInmediatamente')?.value === true">
-          <input
-            type="radio"
-            [value]="true"
-            formControlName="publicarInmediatamente"
-            class="visually-hidden"
-          />
-          <div class="publish-card-radio">
-            <span class="radio-dot" [class.active]="step3Form.get('publicarInmediatamente')?.value === true"></span>
-          </div>
           <div class="publish-card-info">
             <span class="material-icons publish-icon">rocket_launch</span>
             <div>
@@ -454,26 +445,32 @@
               <p>El evento será visible y las inscripciones se abrirán.</p>
             </div>
           </div>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              formControlName="publicarInmediatamente"
+            />
+            <span class="toggle-track"></span>
+          </div>
         </label>
 
         <!-- Soy el organizador -->
         <label
           class="publish-card"
           [class.selected]="step3Form.get('esOrganizador')?.value === true">
-          <input
-            type="checkbox"
-            formControlName="esOrganizador"
-            class="visually-hidden"
-          />
-          <div class="publish-card-radio">
-            <span class="radio-dot" [class.active]="step3Form.get('esOrganizador')?.value === true"></span>
-          </div>
           <div class="publish-card-info">
             <span class="material-icons publish-icon">person</span>
             <div>
               <strong>Soy el Organizador de este evento</strong>
               <p>Aparecerás como el organizador de este evento</p>
             </div>
+          </div>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              formControlName="esOrganizador"
+            />
+            <span class="toggle-track"></span>
           </div>
         </label>
       </div>

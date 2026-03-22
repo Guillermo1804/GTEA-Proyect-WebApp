@@ -1,11 +1,13 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
     z-index: 200;
     display: flex;
     align-items: flex-end;
     justify-content: center;
+    animation: fadeIn 0.2s ease;
 }
 
 .modal-content {
@@ -15,16 +17,27 @@
     max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
-    animation: slideUp 0.3s ease;
+    animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes slideUp {
-    from {
-        transform: translateY(100%);
-    }
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
 
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
     to {
-        transform: translateY(0);
+        opacity: 1;
+        transform: scale(1);
     }
 }
 
@@ -268,5 +281,18 @@
 
     &:hover {
         filter: brightness(0.9);
+    }
+}
+
+// Tablet / Desktop: Flotante centrado
+@media (min-width: 1024px) {
+    .modal-overlay {
+        align-items: center;
+    }
+    
+    .modal-content {
+        border-radius: 16px;
+        max-height: 88vh;
+        animation: scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 }
