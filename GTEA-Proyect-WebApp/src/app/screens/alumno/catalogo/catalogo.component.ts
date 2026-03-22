@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TopNavbar } from "../../../partials/top-navbar/top-navbar";
 import { BottomNav } from "../../../partials/bottom-nav/bottom-nav";
+import { EventoService, Evento } from '../../../services/evento-service';
 
 interface Taller {
     id: number;
@@ -26,73 +27,71 @@ interface Taller {
     styleUrl: './catalogo.component.scss',
 })
 export class CatalogoComponent implements OnInit {
-    talleres: Taller[] = [];
+    talleres = signal<Taller[]>([]);
 
-    constructor(private router: Router) { }
+    private router = inject(Router);
+    private eventoService = inject(EventoService);
 
     ngOnInit() {
         this.cargarTalleres();
     }
 
-    cargarTalleres() {
-        this.talleres = [
-            {
-                id: 1,
-                titulo: 'Introducción a Python para Análisis de Datos',
-                descripcion: 'Aprende los fundamentos de Python aplicados al análisis de datos con librerías como Pandas y NumPy.',
-                categoria: 'Tecnología',
-                fecha: 'Lun 12 Oct',
-                hora: '10:00 AM',
-                ubicacion: 'Campus Norte, Aula B-204',
-                imagen: 'assets/taller2.jpeg',
-                inscritos: 12,
-                totalCupos: 25,
-                disponibilidad: 'Lugares disponibles',
-                estado: 'disponible',
+    private cargarTalleres(): void {
+        this.eventoService.obtenerEventos().subscribe({
+            next: (eventos: Evento[]) => {
+                this.talleres.set(eventos.map(e => this._mapToTaller(e)));
             },
-            {
-                id: 2,
-                titulo: 'Taller de Liderazgo Estratégico',
-                descripcion: 'Desarrolla habilidades de liderazgo y aprende estrategias efectivas para gestionar equipos.',
-                categoria: 'Desarrollo Profesional',
-                fecha: 'Mar 15 Oct',
-                hora: '04:00 PM',
-                ubicacion: 'Online (Zoom)',
-                imagen: 'assets/taller2.jpeg',
-                inscritos: 15,
-                totalCupos: 20,
-                disponibilidad: 'Ya inscrito',
-                estado: 'inscrito',
-            },
-            {
-                id: 3,
-                titulo: 'Fotografía Digital: Composición',
-                descripcion: 'Domina las técnicas de composición fotográfica y aprende a capturar imágenes profesionales.',
-                categoria: 'Arte',
-                fecha: 'Jun 15 Oct',
-                hora: '11:00 AM',
-                ubicacion: 'Estudio A, Edificio de Artes',
-                imagen: 'assets/taller2.jpeg',
-                inscritos: 20,
-                totalCupos: 20,
-                disponibilidad: 'Cupo lleno',
-                estado: 'lista-espera',
-            },
-            {
-                id: 4,
-                titulo: 'Robótica Avanzada e IA',
-                descripcion: 'Explora la inteligencia artificial y la robótica avanzada con proyectos prácticos.',
-                categoria: 'Tecnología',
-                fecha: 'Vie 16 Oct',
-                hora: '09:00 AM',
-                ubicacion: 'Laboratorio de Ingeniería',
-                imagen: 'assets/taller2.jpeg',
-                inscritos: 30,
-                totalCupos: 30,
-                disponibilidad: 'Registro cerrado',
-                estado: 'agotado',
-            },
-        ];
+            error: (err) => {
+                console.error('Error al cargar eventos:', err);
+                this.talleres.set([]);
+            }
+        });
+    }
+
+    private _mapToTaller(evento: Evento): Taller {
+        const fecha = evento.fechaInicio
+            ? new Date(evento.fechaInicio).toLocaleDateString('es-MX', {
+                weekday: 'short', day: 'numeric', month: 'short'
+              })
+            : 'Fecha por confirmar';
+
+        const hora = evento.horaInicio
+            ? evento.horaInicio.substring(0, 5)
+            : 'Hora por confirmar';
+
+        const ubicacion = evento.modalidad === 'Virtual'
+            ? 'Virtual'
+            : [evento.sedeNombre, evento.aulaNombre]
+                .filter(Boolean)
+                .join(', ') || 'Por confirmar';
+
+        const inscritos = evento.inscritos ?? 0;
+        const totalCupos = evento.cupoMaximo ?? 0;
+
+        const estado: Taller['estado'] = evento.isFull
+            ? 'lista-espera'
+            : 'disponible';
+
+        const disponibilidad = evento.isFull
+            ? 'Lista de espera'
+            : `${totalCupos - inscritos} lugares disponibles`;
+
+        return {
+            id: evento.id ?? 0,
+            titulo: evento.titulo ?? '',
+            descripcion: evento.descripcion ?? '',
+            categoria: evento.categoriaNombre ?? 'Sin categoría',
+            fecha,
+            hora,
+            ubicacion,
+            imagen: typeof evento.imagenPortada === 'string'
+                ? evento.imagenPortada
+                : '',
+            inscritos,
+            totalCupos,
+            disponibilidad,
+            estado
+        };
     }
 
     abrirDetalles(taller: Taller) {

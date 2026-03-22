@@ -8,7 +8,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { InscripcionService } from '../../../services/inscripcion.service';
 import { EventoService, Evento } from '../../../services/evento-service';
 import { ToastService } from '../../../services/tools/toast.service';
-import { FacadeService } from '../../../services/facade-service';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
 
 @Component({
@@ -23,7 +22,6 @@ export class EventoDetalleComponent implements OnInit {
     private inscripcionService = inject(InscripcionService);
     private eventoService = inject(EventoService);
     private toastService = inject(ToastService);
-    private facadeService = inject(FacadeService);
 
     // ── Signals de estado ──
     isProcessing = signal(false);
@@ -56,8 +54,8 @@ export class EventoDetalleComponent implements OnInit {
                 this.aulaNombre = this.eventoService.getAulaNombre(evento.aulaId, evento.sedeId);
                 this.lugaresDisponibles = evento.cupoMaximo - (evento.inscritos ?? 0);
 
-                // Determinar si el cupo está lleno
-                if (this.lugaresDisponibles <= 0) {
+                // Determinar si el evento ya está en lista de espera
+                if (evento.isFull) {
                     this.cupoLleno.set(true);
                 }
             },
@@ -83,12 +81,9 @@ export class EventoDetalleComponent implements OnInit {
         this.isProcessing.set(true);
 
         const eventoId = this.evento?.id ?? 0;
-        const alumnoId = Number(this.facadeService.getUserId()) || 0;
 
-        // Seleccionar método según estado del cupo
-        const serviceCall = this.cupoLleno()
-            ? this.inscripcionService.inscribirListaEspera(eventoId, alumnoId)
-            : this.inscripcionService.inscribirEvento(eventoId, alumnoId);
+        // Mandar petición directa, el backend decide si asigna lugar o lista de espera
+        const serviceCall = this.inscripcionService.inscribirse(eventoId);
 
         serviceCall
             .pipe(
@@ -121,11 +116,10 @@ export class EventoDetalleComponent implements OnInit {
                             this.router.navigate(['/login']);
                             break;
 
-                        // ── Race condition: cupo se llenó durante la petición ──
                         case status === 409:
                             this.cupoLleno.set(true);
                             this.toastService.show(
-                                'El cupo se ha llenado. Ahora puedes unirte a la lista de espera.',
+                                'Cupo lleno. Fuiste añadido a la lista de espera.',
                                 'warning'
                             );
                             break;
@@ -156,6 +150,8 @@ export class EventoDetalleComponent implements OnInit {
             )
             .subscribe({
                 next: (respuesta) => {
+                    this.isProcessing.set(false);
+                    this.toastService.show('¡Inscripción exitosa!', 'success');
                     if (respuesta.success) {
                         if (respuesta.posicionListaEspera) {
                             this.toastService.show(

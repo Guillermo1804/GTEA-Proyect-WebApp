@@ -86,7 +86,7 @@
     <div class="price-info">
       <span class="price-label">{{ evento?.costoEntrada === 0 ? 'Gratuito' : '$' + evento?.costoEntrada }}</span>
     </div>
-    <button class="enrollment-btn" [class.waitlist]="cupoLleno()" [disabled]="isProcessing()"
+    <button class="enrollment-btn" [class.waitlist]="cupoLleno()" [disabled]="isProcessing() || cupoLleno()"
       (click)="inscribirEvento()">
       @if (isProcessing()) {
       <span class="spinner"></span>

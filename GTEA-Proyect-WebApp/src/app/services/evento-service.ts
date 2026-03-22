@@ -35,6 +35,7 @@ export interface Evento {
   cupoMaximo: number;          // Entero > 0
   costoEntrada: number;        // Numérico >= 0
   listaEspera: boolean;
+  isFull?: boolean;
 
   // Paso 3 — Publicación
   publicarInmediatamente: boolean;
@@ -361,6 +362,7 @@ export class EventoService {
       cupoMaximo: raw.cupo_maximo,
       costoEntrada: raw.costo_entrada,
       listaEspera: raw.lista_espera,
+      isFull: raw.is_full ?? false,
       publicarInmediatamente: raw.publicar_inmediatamente,
       esOrganizador: raw.es_organizador,
       status: raw.status,

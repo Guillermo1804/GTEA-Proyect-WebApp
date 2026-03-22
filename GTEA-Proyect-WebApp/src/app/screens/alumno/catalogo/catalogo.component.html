@@ -9,7 +9,7 @@
 
     <!-- Talleres List -->
     <div class="talleres-list">
-      @for (taller of talleres; track taller.id) {
+      @for (taller of talleres(); track taller.id) {
       <div class="taller-card" [ngClass]="'estado-' + taller.estado">
         <!-- Taller Image -->
         <div class="taller-image">
