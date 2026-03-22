@@ -1,0 +1,321 @@
+.page-content {
+    background: #f6f6f8;
+    min-height: 100vh;
+    padding-bottom: 88px;
+}
+
+.main {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+// Action Buttons
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    h1 {
+        font-family: 'Inter', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    p {
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        color: #6b7280;
+        margin: 2px 0 0;
+    }
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: #1346ec;
+    color: #fff;
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    &:hover {
+        background: #0f3ad4;
+    }
+
+    &.secondary {
+        background: #fff;
+        color: #1346ec;
+        border-color: #1346ec;
+
+        &:hover {
+            background: #f3f4f6;
+        }
+    }
+
+    .material-icons {
+        font-size: 18px;
+    }
+}
+
+// Filter Pills
+.filter-pills {
+    display: flex;
+    gap: 12px;
+    padding: 6px 16px;
+    overflow-x: auto;
+}
+
+.pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    border: 0.8px solid #e5e7eb;
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+
+    .material-icons {
+        font-size: 16px;
+    }
+
+    &.active {
+        background: #e8ecf7;
+        color: #1e3fae;
+        border-color: #d0dafb;
+    }
+
+    &:hover {
+        background: #f3f4f6;
+    }
+}
+
+// Venue List
+.venue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 16px;
+}
+
+.venue-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 0.8px solid #d0dafb;
+    overflow: hidden;
+}
+
+.venue-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    cursor: pointer;
+    gap: 12px;
+}
+
+.venue-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.venue-icon {
+    font-size: 24px;
+    color: #1e3fae;
+}
+
+.venue-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.venue-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.venue-meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.expand-icon {
+    font-size: 20px;
+    color: #9ca3af;
+}
+
+// Classrooms
+.classroom-list {
+    background: #f9fafb;
+    border-top: 0.8px solid #f3f4f6;
+    padding: 8px 16px;
+}
+
+.classroom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+
+    &:not(:last-child) {
+        border-bottom: 0.8px solid #f3f4f6;
+    }
+}
+
+.classroom-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.classroom-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #0f172a;
+}
+
+.classroom-capacity {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.status-badge {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 9999px;
+
+    &.status-available {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    &.status-inuse {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    &.status-maintenance {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+}
+
+.add-classroom-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 0;
+    background: #f9fafb;
+    border: none;
+    border-top: 0.8px solid #e5e7eb;
+    color: #1e3fae;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    .material-icons {
+        font-size: 16px;
+    }
+
+    &:hover {
+        background: #e8ecf7;
+    }
+}
+
+// ──────────────── Responsive ────────────────
+
+// Tablet
+@media (min-width: 768px) {
+    .page-content {
+        padding-top: 0;
+    }
+
+    .main {
+        padding: 24px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .page-header h1 {
+        font-size: 22px;
+    }
+
+    .action-buttons {
+        padding: 12px 0;
+        max-width: 500px;
+    }
+
+    .filter-pills {
+        padding: 6px 0;
+    }
+
+    .venue-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        padding: 0;
+    }
+}
+
+// Desktop
+@media (min-width: 1024px) {
+    .main {
+        padding: 32px 48px;
+        max-width: 1280px;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
+    }
+
+    .action-buttons {
+        max-width: 600px;
+    }
+
+    .venue-list {
+        gap: 20px;
+    }
+
+    .venue-card {
+        border-radius: 16px;
+    }
+
+    .venue-header {
+        padding: 16px 20px;
+    }
+}

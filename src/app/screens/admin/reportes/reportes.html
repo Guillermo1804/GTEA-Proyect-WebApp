@@ -1,0 +1,139 @@
+<app-top-navbar role="admin"></app-top-navbar>
+
+<div class="page-content">
+    <main class="main">
+        <!-- Header -->
+        <div class="page-header">
+            <div>
+                <h1>Reportes</h1>
+                <p>Análisis y métricas de la plataforma</p>
+            </div>
+        </div>
+
+        <!-- Period Selector -->
+        <div class="period-tabs">
+            @for (period of periods; track period) {
+            <button class="period-tab" [class.active]="activePeriod === period" (click)="setPeriod(period)">
+                {{ period }}
+            </button>
+            }
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="kpi-grid">
+            @for (stat of stats; track stat.label) {
+            <div class="kpi-card">
+                <div class="kpi-icon" [style.background]="stat.iconBg">
+                    <span class="material-icons" [style.color]="stat.iconColor">{{ stat.icon }}</span>
+                </div>
+                <span class="kpi-label">{{ stat.label }}</span>
+                <span class="kpi-value">{{ stat.value }}</span>
+                <div class="kpi-change" [style.color]="stat.changeColor">
+                    <span class="material-icons">{{ stat.changeIcon }}</span>
+                    <span>{{ stat.change }}</span>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Monthly Activity Chart -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Actividad Mensual</h2>
+                <p>Eventos realizados por mes</p>
+            </div>
+            <div class="chart-container">
+                <div class="bar-chart">
+                    @for (d of monthlyData; track d.label) {
+                    <div class="bar-group">
+                        <span class="bar-value">{{ d.events }}</span>
+                        <div class="bar-wrapper" [style.height.%]="(d.events / maxEvents) * 100">
+                            <div class="bar-fill"></div>
+                        </div>
+                        <span class="bar-label">{{ d.label }}</span>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Eventos por Categoría</h2>
+                <p>Distribución del periodo actual</p>
+            </div>
+            <div class="category-list">
+                @for (cat of categoryBreakdown; track cat.name) {
+                <div class="category-row">
+                    <div class="category-info">
+                        <div class="category-dot" [style.background]="cat.color"></div>
+                        <span class="category-name">{{ cat.name }}</span>
+                    </div>
+                    <div class="category-bar-wrap">
+                        <div class="category-bar">
+                            <div class="category-bar-fill" [style.width.%]="cat.percentage"
+                                [style.background]="cat.color"></div>
+                        </div>
+                    </div>
+                    <div class="category-stats">
+                        <span class="category-count">{{ cat.count }}</span>
+                        <span class="category-pct">{{ cat.percentage }}%</span>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Top Events -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Eventos Más Populares</h2>
+                <p>Top 5 por inscripciones</p>
+            </div>
+            <div class="ranking-list">
+                @for (event of topEvents; track event.rank) {
+                <div class="ranking-item">
+                    <span class="rank-number" [class]="'rank-' + event.rank">#{{ event.rank }}</span>
+                    <div class="ranking-info">
+                        <span class="ranking-title">{{ event.title }}</span>
+                        <span class="ranking-category" [style.color]="event.categoryColor">{{ event.category }}</span>
+                    </div>
+                    <div class="ranking-stats">
+                        <span class="ranking-enrolled">{{ event.enrolled }}/{{ event.capacity }}</span>
+                        <span class="ranking-pct">{{ getOccupancy(event) }}%</span>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Export Buttons -->
+        <div class="export-section">
+            <button class="export-btn">
+                <span class="material-icons">picture_as_pdf</span>
+                Exportar PDF
+            </button>
+            <button class="export-btn">
+                <span class="material-icons">table_chart</span>
+                Exportar Excel
+            </button>
+        </div>
+    </main>
+</div>
+
+<app-bottom-nav role="admin" activeTab="/admin/reportes" (fabAction)="onFabAction($event)"></app-bottom-nav>
+
+<!-- Modals -->
+@if (activeModal === 'nueva-aula') {
+<app-nueva-aula-modal (close)="closeModal()"></app-nueva-aula-modal>
+}
+@if (activeModal === 'nueva-sede') {
+<app-nueva-sede-modal (close)="closeModal()"></app-nueva-sede-modal>
+}
+@if (activeModal === 'nueva-categoria') {
+<app-nueva-categoria-modal (close)="closeModal()"></app-nueva-categoria-modal>
+}
+@if (activeModal === 'nuevo-usuario') {
+<app-nuevo-usuario-modal (close)="closeModal()"></app-nuevo-usuario-modal>
+}
