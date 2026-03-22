@@ -38,65 +38,6 @@ $shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 // ==================================================
-// HEADER SECTION
-// ==================================================
-.header-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 32px;
-  background-color: $white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: $shadow-sm;
-
-  .user-greeting {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-
-    .avatar {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, $primary-blue, #7c3aed);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: $white;
-      font-size: 24px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .greeting-text {
-      h1 {
-        margin: 0;
-        font-size: 20px;
-        font-weight: 700;
-        color: $text-primary;
-      }
-
-      p {
-        margin: 4px 0 0 0;
-        font-size: 13px;
-        color: $text-secondary;
-      }
-    }
-  }
-
-  .notification-bell {
-    font-size: 28px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-
-    &:hover {
-      transform: scale(1.15);
-    }
-  }
-}
-
-// ==================================================
 // TALLERES LIST
 // ==================================================
 .talleres-list {
