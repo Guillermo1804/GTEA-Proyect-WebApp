@@ -1,0 +1,402 @@
+// ==================================================
+// EVENTO DETALLE — SCSS
+// Matches Figma design node g58Pc
+// ==================================================
+
+$primary-blue: #1d3eaa;
+$warning-orange: #ea580c;
+$text-primary: #111827;
+$text-secondary: #4b5563;
+$text-muted: #9ca3af;
+$bg-surface: #f6f6f8;
+$bg-white: #ffffff;
+$border-light: #f3f4f6;
+$border-divider: #e5e7eb;
+
+// ==================================================
+// WRAPPER
+// ==================================================
+.evento-detalle-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: $bg-surface;
+  font-family: 'Inter', 'Roboto', sans-serif;
+}
+
+// ==================================================
+// HERO SECTION
+// ==================================================
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #374151, #1f2937);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .material-icons {
+    font-size: 64px;
+    color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.back-btn,
+.share-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
+
+  .material-icons {
+    font-size: 20px;
+    color: $text-primary;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+// ==================================================
+// CONTENT CARD
+// ==================================================
+.content-card {
+  flex: 1;
+  background: $bg-white;
+  border-radius: 24px 24px 0 0;
+  margin-top: -47px;
+  position: relative;
+  z-index: 1;
+  padding: 36px 24px 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba($primary-blue, 0.1);
+  color: $primary-blue;
+  width: fit-content;
+  margin-bottom: 12px;
+}
+
+.evento-titulo {
+  font-size: 24px;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+
+// ==================================================
+// METADATA
+// ==================================================
+.meta-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0 24px;
+  border-bottom: 0.8px solid $border-light;
+  margin-bottom: 16px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.meta-icon {
+  font-size: 20px;
+  color: $primary-blue;
+  flex-shrink: 0;
+}
+
+.meta-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta-label {
+  font-size: 12px;
+  color: $text-muted;
+  font-weight: 500;
+}
+
+.meta-value {
+  font-size: 14px;
+  color: $text-primary;
+  font-weight: 500;
+}
+
+// ==================================================
+// DESCRIPTION
+// ==================================================
+.description-section {
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 8px;
+  }
+
+  p {
+    font-size: 16px;
+    color: $text-secondary;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+// ==================================================
+// STICKY FOOTER
+// ==================================================
+.sticky-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $bg-white;
+  border-top: 0.8px solid $border-divider;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.capacity-warning,
+.capacity-full {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 0;
+  background: #f4f5fb;
+}
+
+.capacity-warning {
+  .warning-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: $warning-orange;
+    flex-shrink: 0;
+  }
+
+  .warning-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: $warning-orange;
+  }
+}
+
+.capacity-full {
+  background: #fff7ed;
+
+  .material-icons {
+    font-size: 16px;
+    color: $warning-orange;
+  }
+
+  .warning-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: $warning-orange;
+  }
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+}
+
+.price-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.price-label {
+  font-size: 20px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.enrollment-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  min-width: 218px;
+  border-radius: 12px;
+  border: none;
+  background: $primary-blue;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #172f88; // $primary-blue darkened 8%
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($primary-blue, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  // Estado lista de espera
+  &.waitlist {
+    background: $warning-orange;
+
+    &:hover:not(:disabled) {
+      background: #c4490a; // $warning-orange darkened 8%
+      box-shadow: 0 4px 12px rgba($warning-orange, 0.3);
+    }
+  }
+
+  .btn-icon {
+    font-size: 20px;
+  }
+}
+
+// ── Spinner ──
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ==================================================
+// RESPONSIVE
+// ==================================================
+@media (max-width: 480px) {
+  .hero-section {
+    height: 280px;
+  }
+
+  .content-card {
+    padding: 28px 16px 110px;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .evento-titulo {
+    font-size: 20px;
+  }
+
+  .enrollment-btn {
+    min-width: 180px;
+    height: 44px;
+    font-size: 14px;
+  }
+
+  .footer-actions {
+    padding: 12px 16px;
+  }
+}
+
+@media (min-width: 768px) {
+  .evento-detalle-wrapper {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}
+
+// ── Desktop: hero + content side-by-side ──
+@media (min-width: 1024px) {
+  .evento-detalle-wrapper {
+    max-width: 1100px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
+    min-height: 100vh;
+  }
+
+  .hero-section {
+    height: auto;
+    min-height: 100vh;
+    grid-row: 1 / -1;
+    border-radius: 0;
+  }
+
+  .content-card {
+    margin-top: 0;
+    border-radius: 0;
+    padding: 48px 40px 120px;
+    overflow-y: auto;
+  }
+
+  .sticky-footer {
+    position: sticky;
+    grid-column: 2;
+  }
+
+  .evento-titulo {
+    font-size: 28px;
+  }
+
+  .enrollment-btn {
+    min-width: 240px;
+    height: 52px;
+    font-size: 16px;
+  }
+}
