@@ -3,7 +3,7 @@
 <div class="fab-overlay" (click)="closeFabMenu()"></div>
 
 <div class="fab-menu">
-    @for (action of fabActions; track action.action) {
+    @for (action of visibleFabActions; track action.action) {
     <button class="fab-action-item" (click)="onFabAction(action.action)">
         <div class="fab-action-icon" [style.background]="action.color">
             <span class="material-icons">{{ action.icon }}</span>

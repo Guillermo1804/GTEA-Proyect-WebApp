@@ -13,7 +13,7 @@
         <div class="search-section">
             <div class="search-bar">
                 <span class="material-icons search-icon">search</span>
-                <input type="text" placeholder="Buscar usuarios..." [(ngModel)]="searchQuery">
+                <input type="text" placeholder="Buscar usuarios..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)">
             </div>
             <div class="filter-tabs">
                 @for (filter of filters; track filter) {
@@ -25,7 +25,7 @@
         </div>
 
         <div class="user-list">
-            @for (user of filteredUsers; track user.email) {
+            @for (user of paginatedUsers; track user.email) {
             <div class="user-card">
                 <div class="user-left">
                     <div class="user-avatar">{{ user.avatarInitials }}</div>
