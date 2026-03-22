@@ -88,21 +88,31 @@ export class FacadeService {
   }
 
   getCookieValue(key: string) {
-    return localStorage.getItem(key) || '';
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return localStorage.getItem(key) || '';
+    }
+    return '';
   }
 
   saveCookieValue(key: string, value: string) {
-    try {
-      localStorage.setItem(key, value);
-    } catch (e) {/* ignore */ }
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        localStorage.setItem(key, value);
+      } catch (e) {/* ignore */ }
+    }
   }
 
   getSessionToken() {
-    return localStorage.getItem(session_cookie_name) || '';
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return localStorage.getItem(session_cookie_name) || '';
+    }
+    return '';
   }
 
 
   saveUserData(user_data: any) {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+
     try {
       if (user_data.rol == "administrador") {
         localStorage.setItem(user_id_cookie_name, String(user_data.id));
@@ -119,6 +129,8 @@ export class FacadeService {
   }
 
   destroyUser() {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+
     try {
       localStorage.removeItem(user_id_cookie_name);
       localStorage.removeItem(user_email_cookie_name);
@@ -129,19 +141,31 @@ export class FacadeService {
   }
 
   getUserEmail() {
-    return localStorage.getItem(user_email_cookie_name) || '';
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return localStorage.getItem(user_email_cookie_name) || '';
+    }
+    return '';
   }
 
   getUserCompleteName() {
-    return localStorage.getItem(user_complete_name_cookie_name) || '';
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return localStorage.getItem(user_complete_name_cookie_name) || '';
+    }
+    return '';
   }
 
   getUserId() {
-    return localStorage.getItem(user_id_cookie_name) || '';
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return localStorage.getItem(user_id_cookie_name) || '';
+    }
+    return '';
   }
 
   getUserGroup() {
-    return localStorage.getItem(group_name_cookie_name) || '';
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return localStorage.getItem(group_name_cookie_name) || '';
+    }
+    return '';
   }
 
   // Método para registrar usuario con rol automático basado en dominio de email

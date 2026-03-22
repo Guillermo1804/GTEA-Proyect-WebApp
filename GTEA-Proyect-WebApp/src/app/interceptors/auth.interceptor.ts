@@ -25,7 +25,7 @@ function shouldSkipAuthHeader(req: { url: string; method: string }): boolean {
  * en peticiones HTTP salientes (misma clave que FacadeService).
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-    const token = localStorage.getItem('gtea-proyecto-token') || '';
+    const token = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('gtea-proyecto-token') || '' : '';
 
     if (!token || shouldSkipAuthHeader(req)) {
         return next(req);
