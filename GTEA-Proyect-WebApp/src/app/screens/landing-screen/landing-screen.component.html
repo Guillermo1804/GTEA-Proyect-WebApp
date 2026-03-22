@@ -49,7 +49,7 @@
               <div class="progress-fill" [style.width.%]="getOccupancy(event)"></div>
             </div>
           </div>
-          <button class="event-btn" (click)="navigate('/login')">Ver más detalles</button>
+          <button class="event-btn" (click)="goToEvent($index)">Ver más detalles</button>
         </div>
       </div>
       }

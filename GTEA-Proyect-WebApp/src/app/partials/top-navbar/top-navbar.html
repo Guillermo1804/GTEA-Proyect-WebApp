@@ -5,6 +5,9 @@
                 <span class="logo-text">GT</span>
             </div>
             <span class="brand-name">GTEA</span>
+            @if (mode === 'auth') {
+                <span class="user-greeting">¡Hola, {{ userName }}!</span>
+            }
         </div>
         <div class="actions">
             @if (mode === 'auth') {

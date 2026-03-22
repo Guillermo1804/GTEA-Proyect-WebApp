@@ -36,9 +36,10 @@
 .btn-add {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 8px 14px;
-    background: #1e3fae;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: #1346ec;
     color: #fff;
     border: none;
     border-radius: 9999px;
@@ -46,12 +47,11 @@
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
     transition: background 0.2s ease;
+    white-space: nowrap;
 
     &:hover {
-        background: #1632a0;
+        background: #0f3ad4;
     }
 
     .material-icons {

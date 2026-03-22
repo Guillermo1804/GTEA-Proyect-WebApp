@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
-import { NuevaAulaModal } from '../sedes/nueva-aula-modal/nueva-aula-modal';
+import { NuevaAulaModal } from '../../../shared/modals/nueva-aula-modal/nueva-aula-modal';
 import { NuevaSedeModal } from '../../../shared/modals/nueva-sede-modal/nueva-sede-modal';
 import { NuevaCategoriaModal } from '../../../shared/modals/nueva-categoria-modal/nueva-categoria-modal';
 import { NuevoUsuarioModal } from '../../../shared/modals/nuevo-usuario-modal/nuevo-usuario-modal';

@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
-import { NuevaAulaModal } from '../sedes/nueva-aula-modal/nueva-aula-modal';
+import { NuevaAulaModal } from '../../../shared/modals/nueva-aula-modal/nueva-aula-modal';
 import { NuevaSedeModal } from '../../../shared/modals/nueva-sede-modal/nueva-sede-modal';
 import { NuevaCategoriaModal } from '../../../shared/modals/nueva-categoria-modal/nueva-categoria-modal';
 import { NuevoUsuarioModal } from '../../../shared/modals/nuevo-usuario-modal/nuevo-usuario-modal';
@@ -138,6 +138,14 @@ export class Usuarios implements OnInit {
       filtered = filtered.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
     }
     return filtered;
+  }
+
+  isSelf(user: User): boolean {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return false;
+    }
+    const loggedInEmail = localStorage.getItem('gtea-proyecto-email') || '';
+    return user.email === loggedInEmail;
   }
 
   setFilter(filter: string): void { this.activeFilter = filter; }

@@ -73,6 +73,10 @@ export class LandingScreenComponent implements OnInit {
     this.router.navigate([path]);
   }
 
+  goToEvent(index: number): void {
+    this.router.navigate(['/login'], { queryParams: { returnUrl: `/alumno/evento/${index + 1}` } });
+  }
+
   getOccupancy(event: EventCard): number {
     return Math.round((event.enrolled / event.capacity) * 100);
   }

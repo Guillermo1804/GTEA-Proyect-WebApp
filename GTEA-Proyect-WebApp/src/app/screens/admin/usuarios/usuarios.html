@@ -1,15 +1,18 @@
 <app-top-navbar role="admin"></app-top-navbar>
 
 <div class="page-content">
-    <div class="page-header">
-        <h1>Gestión de Usuarios</h1>
-        <button class="btn-add" (click)="addUser()">
-            <span class="material-icons">add</span>
-            Nuevo
-        </button>
-    </div>
-
     <main class="main">
+        <div class="page-header">
+            <div>
+                <h1>Gestión de Usuarios</h1>
+                <p>Administra los usuarios de la plataforma</p>
+            </div>
+            <button class="btn-add" (click)="addUser()">
+                <span class="material-icons">add</span>
+                Nuevo Usuario
+            </button>
+        </div>
+
         <div class="search-section">
             <div class="search-bar">
                 <span class="material-icons search-icon">search</span>
@@ -43,7 +46,7 @@
                     <button class="action-btn" (click)="editUser(user)">
                         <span class="material-icons">edit</span>
                     </button>
-                    <button class="action-btn delete" (click)="deleteUser(user)">
+                    <button class="action-btn delete" [disabled]="isSelf(user)" [class.disabled]="isSelf(user)" (click)="deleteUser(user)">
                         <span class="material-icons">delete</span>
                     </button>
                 </div>

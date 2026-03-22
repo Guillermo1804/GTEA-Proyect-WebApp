@@ -1,18 +1,23 @@
 <app-top-navbar role="admin"></app-top-navbar>
-<app-back-header title="Gestión de Sedes y Aulas" [showAvatar]="true"></app-back-header>
 
 <div class="page-content">
     <main class="main">
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <button class="btn-primary" (click)="openNewSede()">
-                <span class="material-icons">add</span>
-                Nueva Sede
-            </button>
-            <button class="btn-primary" (click)="openNewAula()">
-                <span class="material-icons">add</span>
-                Nueva Aula
-            </button>
+        <!-- Header -->
+        <div class="page-header">
+            <div>
+                <h1>Gestión de Sedes y Aulas</h1>
+                <p>Configura las locaciones físicas y virtuales</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-add" (click)="openNewSede()">
+                    <span class="material-icons">add</span>
+                    Nueva Sede
+                </button>
+                <button class="btn-add secondary" (click)="openNewAula()">
+                    <span class="material-icons">add</span>
+                    Nueva Aula
+                </button>
+            </div>
         </div>
 
         <!-- Filter Pills -->

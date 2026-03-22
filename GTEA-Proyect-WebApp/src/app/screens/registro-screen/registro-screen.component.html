@@ -1,5 +1,22 @@
 <div class="screen-wrapper">
   <app-top-navbar mode="public" ctaLabel="Iniciar Sesión" ctaRoute="/login"></app-top-navbar>
+  
+  <!-- Toasts -->
+  <div class="toast-container">
+    @if (errorMessage) {
+      <div class="toast error-toast">
+        <span class="material-icons">error_outline</span>
+        <span>{{ errorMessage }}</span>
+      </div>
+    }
+    @if (successMessage) {
+      <div class="toast success-toast">
+        <span class="material-icons">check_circle</span>
+        <span>{{ successMessage }}</span>
+      </div>
+    }
+  </div>
+
   <div class="page">
     <div class="card">
         <div class="header">
@@ -142,8 +159,8 @@
                     }
                 </div>
                 <div>
-                    <label for="" class="terms">
-                        <input type="checkbox" formControlName="terms">
+                    <label for="termsCheckbox" class="terms" tabindex="0" (keydown.enter)="toggleTerms()">
+                        <input id="termsCheckbox" type="checkbox" formControlName="terms" tabindex="-1">
                         <span>Acepto los terminos y condiciones y la Politica de Privacidad</span>
                     </label>
                     @if (isInvalid('terms')) {
@@ -151,7 +168,14 @@
                     }
                 </div>
                 <button class="primary" type="submit" [disabled]="form.invalid || isSubmitting">
+                    @if (isSubmitting) {
+                    <svg class="spinner" viewBox="0 0 50 50">
+                        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                    </svg>
+                    Creando cuenta...
+                    } @else {
                     Crear mi cuenta
+                    }
                 </button>
             </form>
 

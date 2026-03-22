@@ -12,6 +12,11 @@
 }
 
 .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+
     h1 {
         font-family: 'Inter', sans-serif;
         font-size: 20px;

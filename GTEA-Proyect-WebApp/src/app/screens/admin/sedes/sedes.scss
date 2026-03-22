@@ -1,42 +1,74 @@
 .page-content {
     background: #f6f6f8;
     min-height: 100vh;
-    padding-top: 8px;
     padding-bottom: 88px;
 }
 
 .main {
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
 }
 
 // Action Buttons
-.action-buttons {
+.page-header {
     display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
     gap: 12px;
-    padding: 8px 16px;
+    flex-wrap: wrap;
+
+    h1 {
+        font-family: 'Inter', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    p {
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        color: #6b7280;
+        margin: 2px 0 0;
+    }
 }
 
-.btn-primary {
-    flex: 1;
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-add {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
+    padding: 10px 16px;
     background: #1346ec;
     color: #fff;
-    border: none;
-    border-radius: 12px;
-    padding: 14px 16px;
+    border: 1px solid transparent;
+    border-radius: 9999px;
     font-family: 'Inter', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 
     &:hover {
         background: #0f3ad4;
+    }
+
+    &.secondary {
+        background: #fff;
+        color: #1346ec;
+        border-color: #1346ec;
+
+        &:hover {
+            background: #f3f4f6;
+        }
     }
 
     .material-icons {
@@ -234,10 +266,13 @@
     }
 
     .main {
+        padding: 24px;
         max-width: 900px;
         margin: 0 auto;
-        padding: 0 24px;
-        gap: 16px;
+    }
+
+    .page-header h1 {
+        font-size: 22px;
     }
 
     .action-buttons {
@@ -260,8 +295,12 @@
 // Desktop
 @media (min-width: 1024px) {
     .main {
+        padding: 32px 48px;
         max-width: 1280px;
-        padding: 16px 48px;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
     }
 
     .action-buttons {

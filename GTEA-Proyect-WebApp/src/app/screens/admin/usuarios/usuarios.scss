@@ -1,42 +1,51 @@
 .page-content {
     background: #f6f6f8;
     min-height: 100vh;
-    padding-top: 8px;
     padding-bottom: 88px; // clears fixed bottom-nav
 }
 
 .page-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    padding: 12px 16px;
-    background: #fff;
+    gap: 12px;
+    flex-wrap: wrap;
 
     h1 {
         font-family: 'Inter', sans-serif;
-        font-size: 18px;
+        font-size: 20px;
         font-weight: 700;
         color: #0f172a;
         margin: 0;
+    }
+
+    p {
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        color: #6b7280;
+        margin: 2px 0 0;
     }
 }
 
 .btn-add {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
-    background: #e8ecf7;
-    color: #1e3fae;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: #1346ec;
+    color: #fff;
     border: none;
     border-radius: 9999px;
     font-family: 'Inter', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
     transition: background 0.2s ease;
+    white-space: nowrap;
 
     &:hover {
-        background: #d0dafb;
+        background: #0f3ad4;
     }
 
     .material-icons {
@@ -45,9 +54,10 @@
 }
 
 .main {
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 16px;
 }
 
 // Search Section
@@ -90,6 +100,11 @@
 .filter-tabs {
     display: flex;
     gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none; // Firefox
+    &::-webkit-scrollbar {
+        display: none; // Chrome/Safari
+    }
 }
 
 .filter-tab {
@@ -135,6 +150,8 @@
 .user-left {
     display: flex;
     gap: 12px;
+    min-width: 0;
+    flex: 1;
 }
 
 .user-avatar {
@@ -156,6 +173,7 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 0;
 }
 
 .user-name {
@@ -163,12 +181,18 @@
     font-size: 14px;
     font-weight: 600;
     color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .user-email {
     font-family: 'Inter', sans-serif;
     font-size: 12px;
     color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .user-tags {
@@ -176,6 +200,7 @@
     align-items: center;
     gap: 8px;
     margin-top: 4px;
+    flex-wrap: wrap; // Allows tags to wrap if needed on tight screens
 }
 
 .role-badge {
@@ -244,12 +269,17 @@
         background: #f3f4f6;
     }
 
-    &.delete:hover {
+    &.delete:not(:disabled):not(.disabled):hover {
         background: #fee2e2;
 
         .material-icons {
             color: #ef4444;
         }
+    }
+
+    &:disabled, &.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 }
 
@@ -309,19 +339,13 @@
     }
 
     .main {
+        padding: 24px;
         max-width: 900px;
         margin: 0 auto;
-        padding: 0 24px;
     }
 
-    .page-header {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 16px 24px;
-
-        h1 {
-            font-size: 22px;
-        }
+    .page-header h1 {
+        font-size: 22px;
     }
 
     .search-section {
@@ -351,17 +375,12 @@
 // Desktop
 @media (min-width: 1024px) {
     .main {
+        padding: 32px 48px;
         max-width: 1280px;
-        padding: 0 48px;
     }
 
-    .page-header {
-        max-width: 1280px;
-        padding: 20px 48px;
-
-        h1 {
-            font-size: 24px;
-        }
+    .page-header h1 {
+        font-size: 24px;
     }
 
     .search-section {

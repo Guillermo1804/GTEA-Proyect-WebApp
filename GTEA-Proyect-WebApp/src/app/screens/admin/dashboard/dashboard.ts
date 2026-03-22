@@ -5,7 +5,7 @@ import { EventoService, Evento } from '../../../services/evento-service';
 import { CategoriaService } from '../../../services/categoria.service';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
-import { NuevaAulaModal } from '../sedes/nueva-aula-modal/nueva-aula-modal';
+import { NuevaAulaModal } from '../../../shared/modals/nueva-aula-modal/nueva-aula-modal';
 import { NuevaSedeModal } from '../../../shared/modals/nueva-sede-modal/nueva-sede-modal';
 import { NuevaCategoriaModal } from '../../../shared/modals/nueva-categoria-modal/nueva-categoria-modal';
 import { NuevoUsuarioModal } from '../../../shared/modals/nuevo-usuario-modal/nuevo-usuario-modal';
@@ -82,6 +82,11 @@ export class Dashboard implements OnInit {
         const weekStat = this.stats.find(s => s.label === 'Esta Semana');
         if (weekStat) weekStat.value = thisWeek.length.toString();
 
+        // Total Inscripciones
+        const totalInscritos = eventos.reduce((sum, e) => sum + (e.inscritos || 0), 0);
+        this.totalInscriptions = totalInscritos.toLocaleString();
+        this.inscriptionsTrend = ''; // No historical data
+
         // Ocupación promedio
         const withCap = eventos.filter(e => e.cupoMaximo > 0);
         if (withCap.length > 0) {
@@ -110,6 +115,27 @@ export class Dashboard implements OnInit {
             statusClass: e.publicarInmediatamente ? 'status-open' : 'status-few',
           };
         });
+
+        // Inscripciones por mes (últimos 6 meses)
+        const today = new Date();
+        const monthlyMap = new Map<string, number>();
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+          const key = `${d.getFullYear()}-${d.getMonth()}`;
+          monthlyMap.set(key, 0);
+        }
+        for (const e of eventos) {
+          const d = new Date(e.fechaInicio);
+          const key = `${d.getFullYear()}-${d.getMonth()}`;
+          if (monthlyMap.has(key)) {
+            monthlyMap.set(key, monthlyMap.get(key)! + (e.inscritos || 0));
+          }
+        }
+        this.monthlyData = Array.from(monthlyMap.entries()).map(([key, val]) => {
+          const parts = key.split('-');
+          return { label: months[Number(parts[1])], value: val };
+        });
+
         this.cdr.markForCheck();
       },
       error: (err: any) => console.error('Error cargando eventos:', err),

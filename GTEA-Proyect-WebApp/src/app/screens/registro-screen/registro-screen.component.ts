@@ -68,9 +68,16 @@ export class RegistroScreenComponent implements OnInit {
     return !!password.value && !!confirmPassword.value && password.value === confirmPassword.value;
   }
 
+  toggleTerms(): void {
+    const termsControl = this.form.controls.terms;
+    termsControl.setValue(!termsControl.value);
+    termsControl.markAsTouched();
+  }
+
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      return;
     }
 
     this.isSubmitting = true;
