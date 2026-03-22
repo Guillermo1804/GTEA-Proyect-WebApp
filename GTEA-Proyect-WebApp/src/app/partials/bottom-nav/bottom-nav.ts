@@ -29,6 +29,14 @@ export class BottomNav {
 
   constructor(private router: Router) { }
 
+  private get effectiveRole(): 'admin' | 'organizador' | 'estudiante' {
+    const storedRole = localStorage.getItem('userRole');
+    if (storedRole === 'administrador') return 'admin';
+    if (storedRole === 'organizador') return 'organizador';
+    if (storedRole === 'alumno') return 'estudiante';
+    return this.role;
+  }
+
   private tabConfigs: Record<string, { left: NavTab[]; right: NavTab[] }> = {
     admin: {
       left: [
@@ -72,16 +80,24 @@ export class BottomNav {
     { icon: 'event', label: 'Nuevo Evento', color: '#1e3fae', action: 'nuevo-evento' },
   ];
 
+  get visibleFabActions(): FabAction[] {
+    if (this.effectiveRole === 'organizador') {
+      return this.fabActions.filter(action => action.action === 'nuevo-evento');
+    }
+    // admin y estudiante (si se habilita) pueden ver todo lo definido
+    return this.fabActions;
+  }
+
   get leftTabs(): NavTab[] {
-    return this.tabConfigs[this.role]?.left ?? [];
+    return this.tabConfigs[this.effectiveRole]?.left ?? [];
   }
 
   get rightTabs(): NavTab[] {
-    return this.tabConfigs[this.role]?.right ?? [];
+    return this.tabConfigs[this.effectiveRole]?.right ?? [];
   }
 
   get hasFab(): boolean {
-    return this.role === 'admin' || this.role === 'organizador';
+    return this.effectiveRole === 'admin' || this.effectiveRole === 'organizador';
   }
 
   isActive(route: string): boolean {

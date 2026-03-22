@@ -91,5 +91,39 @@ export const routes: Routes = [
       },
     ],
   },
+
+    // ── Organizador routes (protegidas) ──
+  {
+    path: 'organizador',
+    canActivate: [authGuard],
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./screens/admin/dashboard/dashboard')
+            .then(m => m.Dashboard),
+      },
+      {
+        path: 'eventos',
+        loadComponent: () =>
+          import('./screens/admin/eventos/eventos')
+            .then(m => m.Eventos),
+      },
+      {
+        path: 'eventos/:id',
+        loadComponent: () =>
+          import('./screens/admin/eventos/evento-detail/evento-detail')
+            .then(m => m.EventoDetail),
+      },
+      {
+        path: 'reportes',
+        loadComponent: () =>
+          import('./screens/admin/reportes/reportes')
+            .then(m => m.Reportes),
+      },
+    ],
+  },
+
   { path: '**', redirectTo: 'landing' },
 ];

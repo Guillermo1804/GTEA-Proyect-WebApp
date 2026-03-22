@@ -37,7 +37,7 @@ export class Usuarios implements OnInit {
   activeFilter = 'Todos';
   filters = ['Todos', 'Admin', 'Organizador', 'Alumno'];
   currentPage = 1;
-  totalPages = 1;
+  readonly pageSize = 9;
 
   activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | null = null;
   users: User[] = [];
@@ -64,6 +64,7 @@ export class Usuarios implements OnInit {
       pending--;
       if (pending === 0) {
         this.users = allUsers;
+        this.ensureCurrentPageValid();
         this.isLoading = false;
         this.cdr.markForCheck();
       }
@@ -140,9 +141,27 @@ export class Usuarios implements OnInit {
     return filtered;
   }
 
-  setFilter(filter: string): void { this.activeFilter = filter; }
+  setFilter(filter: string): void {
+    this.activeFilter = filter;
+    this.currentPage = 1;
+  }
+
+  onSearchChange(value: string): void {
+    this.searchQuery = value;
+    this.currentPage = 1;
+  }
+
   prevPage(): void { if (this.currentPage > 1) this.currentPage--; }
   nextPage(): void { if (this.currentPage < this.totalPages) this.currentPage++; }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.filteredUsers.length / this.pageSize));
+  }
+
+  get paginatedUsers(): User[] {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    return this.filteredUsers.slice(startIndex, startIndex + this.pageSize);
+  }
 
   editUser(user: User): void { /* TODO */ }
 
@@ -176,5 +195,14 @@ export class Usuarios implements OnInit {
 
   addUser(): void { this.activeModal = 'nuevo-usuario'; }
   onFabAction(action: string): void { this.activeModal = action as any; }
+  ensureCurrentPageValid(): void {
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
+    if (this.currentPage < 1) {
+      this.currentPage = 1;
+    }
+  }
+
   closeModal(): void { this.activeModal = null; this.loadUsers(); }
 }
