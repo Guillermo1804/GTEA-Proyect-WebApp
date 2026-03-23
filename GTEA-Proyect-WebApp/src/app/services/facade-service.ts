@@ -68,6 +68,10 @@ export class FacadeService {
       username: username,
       password: password
     }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     return this.http.post<any>(`${environment.url_api}/token/`, data);
   }
 
@@ -75,17 +79,28 @@ export class FacadeService {
   logout(): Observable<any> {
     var headers: any;
     var token = this.getSessionToken();
+<<<<<<< Updated upstream
     headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+=======
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+>>>>>>> Stashed changes
     return this.http.get<any>(`${environment.url_api}/logout/`, { headers: headers });
   }
 
   //Funciones para las cookies y almacenar datos de inicio de sesión
   //Funciones para utilizar las cookies en web
   retrieveSignedUser() {
+<<<<<<< Updated upstream
     var headers: any;
     var token = this.getSessionToken();
     headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
     return this.http.get<any>(`${environment.url_api}/me/`, { headers: headers });
+=======
+    // El backend actual no expone un endpoint tipo "me" (antes se usaba /auth/login/ GET).
+    // Este método no se usa en el proyecto, así que devolvemos un observable vacío para evitar
+    // llamadas a endpoints inexistentes si alguien lo invoca accidentalmente.
+    return of(null);
+>>>>>>> Stashed changes
   }
 
   getCookieValue(key: string) {

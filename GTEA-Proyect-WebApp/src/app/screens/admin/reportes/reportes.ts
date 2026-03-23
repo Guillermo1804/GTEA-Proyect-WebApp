@@ -99,7 +99,54 @@ export class Reportes implements OnInit {
         { rank: 5, title: 'Expo Arte Digital', category: 'Culturales', categoryColor: '#e11d48', enrolled: 95, capacity: 100 },
     ];
 
+<<<<<<< Updated upstream
     get maxEvents(): number { return Math.max(...this.monthlyData.map(d => d.events)); }
+=======
+    get maxEvents(): number { return Math.max(1, ...this.monthlyData.map(d => d.events)); }
+
+    loadReportes(): void {
+        const token = this.facadeService.getSessionToken();
+        const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+        this.http.get<any>(`${environment.url_api}/reportes-resumen/`, { headers }).subscribe({
+            next: (data) => {
+                const t = data.totales || {};
+                this.stats[0].value = (t.eventos || 0).toLocaleString();
+                this.stats[1].value = (t.inscripciones || 0).toLocaleString();
+                this.stats[3].value = (t.categorias || 0).toLocaleString();
+
+                // Tasa de ocupación promedio
+                const topEvts = data.top_eventos || [];
+                if (topEvts.length > 0) {
+                    const avgOcc = topEvts.reduce((s: number, e: any) => s + (e.cupo_maximo > 0 ? (e.total_inscritos / e.cupo_maximo) * 100 : 0), 0) / topEvts.length;
+                    this.stats[2].value = Math.round(avgOcc) + '%';
+                }
+
+                // Categorías breakdown
+                const cats = data.por_categoria || [];
+                const totalEvsByCat = cats.reduce((s: number, c: any) => s + (c.total_eventos || 0), 0) || 1;
+                const colors = ['#1e3fae', '#7c3aed', '#f97316', '#059669', '#e11d48', '#6b7280'];
+                this.categoryBreakdown = cats.map((c: any, i: number) => ({
+                    name: c.nombre,
+                    count: c.total_inscritos || 0,
+                    percentage: Math.round(((c.total_eventos || 0) / totalEvsByCat) * 100),
+                    color: colors[i % colors.length],
+                }));
+
+                // Top eventos
+                this.topEvents = topEvts.slice(0, 5).map((e: any, i: number) => ({
+                    rank: i + 1,
+                    title: e.titulo,
+                    category: '',
+                    categoryColor: '#1e3fae',
+                    enrolled: e.total_inscritos || 0,
+                    capacity: e.cupo_maximo || 1,
+                }));
+                this.cdr.markForCheck();
+            },
+            error: (err) => console.error('Error cargando reportes:', err),
+        });
+    }
+>>>>>>> Stashed changes
 
     setPeriod(period: string): void { this.activePeriod = period; }
 

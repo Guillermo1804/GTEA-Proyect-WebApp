@@ -99,12 +99,18 @@ public validarAdmin(data: any, editar: boolean){
 
   //Aquí van los servicios HTTP
   //Servicio para registrar un nuevo usuario
+<<<<<<< Updated upstream
   public registrarAdmin (data: any): Observable <any>{
     return this.http.post<any>(`${environment.url_api}/admins/detail/`,data, httpOptions);
+=======
+  public registrarAdmin(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.url_api}/admin/`, data, httpOptions);
+>>>>>>> Stashed changes
   }
 
   public obtenerListaAdmins (): Observable <any>{
     var token = this.facadeService.getSessionToken();
+<<<<<<< Updated upstream
     var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
     return this.http.get<any>(`${environment.url_api}/admins/`, {headers:headers});
   }
@@ -113,6 +119,16 @@ public validarAdmin(data: any, editar: boolean){
     public getAdminByID(idUser: Number){
       return this.http.get<any>(`${environment.url_api}/admins/detail/?id=${idUser}`,httpOptions);
     }
+=======
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.get<any>(`${environment.url_api}/lista-admins/`, { headers: headers });
+  }
+
+  //Obtener un solo usuario dependiendo su ID
+  public getAdminByID(idUser: Number) {
+    return this.http.get<any>(`${environment.url_api}/admin/?id=${idUser}`, httpOptions);
+  }
+>>>>>>> Stashed changes
 
     //Servicio para actualizar un usuario
     public editarAdmin (data: any): Observable <any>{
@@ -124,6 +140,7 @@ public validarAdmin(data: any, editar: boolean){
     //Eliminar Admin
   public eliminarAdmin(idUser: number): Observable <any>{
     var token = this.facadeService.getSessionToken();
+<<<<<<< Updated upstream
     var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
     return this.http.delete<any>(`${environment.url_api}/admins/edit/?id=${idUser}`,{headers:headers});
   }
@@ -134,4 +151,23 @@ public validarAdmin(data: any, editar: boolean){
       var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
       return this.http.get<any>(`${environment.url_api}/admins/edit/`, {headers:headers});
     }
+=======
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.put<any>(`${environment.url_api}/admins-edit/`, data, { headers: headers });
+  }
+
+  //Eliminar Admin
+  public eliminarAdmin(idUser: number): Observable<any> {
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.delete<any>(`${environment.url_api}/admins-edit/?id=${idUser}`, { headers: headers });
+  }
+
+  //Obtener el total de cada uno de los usuarios
+  public getTotalUsuarios() {
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.get<any>(`${environment.url_api}/reportes-resumen/`, { headers: headers });
+  }
+>>>>>>> Stashed changes
 }

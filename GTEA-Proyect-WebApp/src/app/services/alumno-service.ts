@@ -106,12 +106,18 @@ export class AlumnoService {
 
   //Aquí van los servicios HTTP
   //Servicio para registrar un nuevo usuario
+<<<<<<< Updated upstream
   public registrarAlumno (data: any): Observable <any>{
     return this.http.post<any>(`${environment.url_api}/alumnos/`,data, httpOptions);
+=======
+  public registrarAlumno(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.url_api}/alumnos/`, data, httpOptions);
+>>>>>>> Stashed changes
   }
 
   public obtenerListaAlumnos (): Observable <any>{
     var token = this.facadeService.getSessionToken();
+<<<<<<< Updated upstream
     var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
     return this.http.get<any>(`${environment.url_api}/lista-alumnos/`, {headers:headers});
   }
@@ -133,5 +139,28 @@ export class AlumnoService {
       var token = this.facadeService.getSessionToken();
       var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
       return this.http.delete<any>(`${environment.url_api}/alumnos-edit/?id=${idUser}`,{headers:headers});
+=======
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.get<any>(`${environment.url_api}/lista-alumnos/`, { headers: headers });
+  }
+
+  //Obtener un solo usuario dependiendo su ID
+  public getAlumnoByID(idUser: Number) {
+    return this.http.get<any>(`${environment.url_api}/alumnos/?id=${idUser}`, httpOptions);
+  }
+
+  //Servicio para actualizar un usuario
+  public editarAlumno(data: any): Observable<any> {
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.put<any>(`${environment.url_api}/alumnos-edit/`, data, { headers: headers });
+  }
+
+  //Eliminar Alumno
+  public eliminarAlumno(idUser: number): Observable<any> {
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.delete<any>(`${environment.url_api}/alumnos-edit/?id=${idUser}`, { headers: headers });
+>>>>>>> Stashed changes
   }
 }

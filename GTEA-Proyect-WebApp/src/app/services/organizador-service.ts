@@ -73,12 +73,18 @@ public validarOrga(data: any, editar: boolean){
 
   //Aquí van los servicios HTTP
   //Servicio para registrar un nuevo usuario
+<<<<<<< Updated upstream
   public registrarOrg (data: any): Observable <any>{
     return this.http.post<any>(`${environment.url_api}/organizadores/`,data, httpOptions);
+=======
+  public registrarOrg(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.url_api}/organizadores/`, data, httpOptions);
+>>>>>>> Stashed changes
   }
 
   public obtenerListaOrgs (): Observable <any>{
     var token = this.facadeService.getSessionToken();
+<<<<<<< Updated upstream
     var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
     return this.http.get<any>(`${environment.url_api}/lista-org/`, {headers:headers});
   }
@@ -87,6 +93,16 @@ public validarOrga(data: any, editar: boolean){
     public getOrgByID(idUser: Number){
       return this.http.get<any>(`${environment.url_api}/organizadores/?id=${idUser}`,httpOptions);
     }
+=======
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.get<any>(`${environment.url_api}/lista-organizadores/`, { headers: headers });
+  }
+
+  //Obtener un solo usuario dependiendo su ID
+  public getOrgByID(idUser: Number) {
+    return this.http.get<any>(`${environment.url_api}/organizadores/?id=${idUser}`, httpOptions);
+  }
+>>>>>>> Stashed changes
 
     //Servicio para actualizar un usuario
     public editarOrg (data: any): Observable <any>{
@@ -98,6 +114,7 @@ public validarOrga(data: any, editar: boolean){
     //Eliminar Admin
   public eliminarOrg(idUser: number): Observable <any>{
     var token = this.facadeService.getSessionToken();
+<<<<<<< Updated upstream
     var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
     return this.http.delete<any>(`${environment.url_api}/organizadores-edit/?id=${idUser}`,{headers:headers});
   }
@@ -108,4 +125,28 @@ public validarOrga(data: any, editar: boolean){
       var headers = new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': 'Bearer '+token});
       return this.http.get<any>(`${environment.url_api}/organizadores-edit/`, {headers:headers});
     }
+=======
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.put<any>(`${environment.url_api}/organizadores-edit/`, data, { headers: headers });
+  }
+
+  //Eliminar Organizador
+  public eliminarOrg(idUser: number): Observable<any> {
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.delete<any>(`${environment.url_api}/organizadores-edit/?id=${idUser}`, { headers: headers });
+  }
+
+  //Obtener el total de cada uno de los usuarios
+  public getTotalUsuarios() {
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.get<any>(`${environment.url_api}/reportes-resumen/`, { headers: headers });
+  }
+
+  // Alias usado por el modal de nuevo usuario
+  public registrarOrganizador(userData: any): Observable<any> {
+    return this.registrarOrg(userData);
+  }
+>>>>>>> Stashed changes
 }
