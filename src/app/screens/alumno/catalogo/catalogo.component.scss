@@ -1,530 +1,358 @@
-// ==================================================
-// COLOR PALETTE
-// ==================================================
-$primary-blue: #5350ff;
-$secondary-blue: #2196f3;
-$success-green: #4caf50;
-$warning-orange: #ff9800;
-$error-red: #f44336;
-$neutral-light: #f5f5f5;
-$neutral-border: #e0e0e0;
-$dark-bg: #1a1a1a;
-$text-primary: #333333;
-$text-secondary: #666666;
-$text-light: #999999;
-$white: #ffffff;
+// ─── Variables ────────────────────────────────────────────
+$primary: #2563eb;
+$text-dark: #1a1a2e;
+$text-muted: #6b7280;
+$border-radius-card: 14px;
+$badge-radius: 6px;
 
-// ==================================================
-// SHADOWS
-// ==================================================
-$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
-$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
-$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
-
-// ==================================================
-// CONTAINER & LAYOUT
-// ==================================================
+// ─── Contenedor principal ─────────────────────────────────
 .alumno-screen-container {
+  background-color: #f5f6fa;
   min-height: 100vh;
-  background-color: $neutral-light;
-  padding-top: 20px;
-  padding-bottom: 96px; // clears fixed bottom-nav
+  padding-bottom: 80px;
+  width: 100%;
 }
 
 .content-wrapper {
-  max-width: 900px;
+  padding: 16px;
+  width: 100%;
+  max-width: 480px;
   margin: 0 auto;
-  padding: 0 16px;
+  box-sizing: border-box;
+
+  @media (min-width: 768px) {
+    max-width: 900px;      // antes 720px → más ancho
+    padding: 16px 32px;   // antes 24px arriba → menos espacio top
+  }
+
+  @media (min-width: 1024px) {
+    max-width: 1200px;     // antes 960px → casi full width
+    padding: 16px 48px;   // compacto arriba, generoso a los lados
+  }
+
+  @media (min-width: 1440px) {
+    max-width: 1400px;
+  }
 }
 
-// ==================================================
-// TALLERES LIST
-// ==================================================
+
+// ─── Header / Saludo ──────────────────────────────────────
+.header-section {
+  padding: 8px 0 4px;    // antes 16px 0 8px → más compacto
+
+  @media (min-width: 768px) {
+    padding: 4px 0 4px;  // en desktop casi sin padding top
+  }
+}
+
+
+.user-greeting {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .avatar img {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .greeting-text {
+    flex: 1;
+
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: $text-dark;
+      margin: 0;
+    }
+
+    .carrera {
+      font-size: 0.78rem;
+      color: $text-muted;
+    }
+  }
+
+  .notification-bell {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  @media (min-width: 768px) {
+    .greeting-text h2 {
+      font-size: 1.4rem;
+    }
+
+    .greeting-text .carrera {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// ─── Banner de Alerta ─────────────────────────────────────
+.alert-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #f97316;
+  color: #fff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 12px 0;
+
+  .alert-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  p {
+    flex: 1;
+    font-size: 0.88rem;
+    font-weight: 500;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .alert-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    opacity: 0.85;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  @media (min-width: 768px) {
+    padding: 16px 24px;
+    border-radius: 14px;
+  }
+}
+
+// ─── Resumen Académico ────────────────────────────────────
+.resumen-section {
+  margin: 4px 0 20px;
+}
+
+.resumen-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+
+  @media (min-width: 768px) {
+    gap: 20px;
+  }
+}
+
+.resumen-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  gap: 4px;
+
+  .resumen-icon {
+    font-size: 1.4rem;
+  }
+
+  .resumen-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $text-dark;
+  }
+
+  .resumen-label {
+    font-size: 0.75rem;
+    color: $text-muted;
+    text-align: center;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 24px 16px;
+  }
+}
+
+// ─── Sección título ───────────────────────────────────────
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: $text-dark;
+  margin: 12px 0 16px;
+}
+
+// ─── Lista de Talleres ────────────────────────────────────
 .talleres-list {
   display: flex;
   flex-direction: column;
   gap: 20px;
+
+  @media (min-width: 768px) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);  // 3 columnas en desktop
+    gap: 28px;
+  }
+
+  @media (min-width: 1440px) {
+    grid-template-columns: repeat(4, 1fr);  // 4 columnas en pantallas grandes
+  }
 }
 
+
+// ─── Tarjeta ──────────────────────────────────────────────
 .taller-card {
-  background-color: $white;
-  border-radius: 12px;
+  background: #ffffff;
+  border-radius: $border-radius-card;
   overflow: hidden;
-  box-shadow: $shadow-md;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-  display: flex;
-  flex-direction: column;
-
-  &:hover:not(.estado-agotado) {
-    transform: translateY(-4px);
-    box-shadow: $shadow-lg;
-  }
-
-  // Estado clases
-  &.estado-disponible {
-    border-color: transparent;
-  }
-
-  &.estado-inscrito {
-    border-color: $secondary-blue;
-  }
-
-  &.estado-lista-espera {
-    border-color: $warning-orange;
-  }
-
-  &.estado-agotado {
-    opacity: 0.7;
-    border-color: $text-light;
-
-    .taller-image {
-      opacity: 0.6;
-    }
-  }
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
 }
 
-// ==================================================
-// TALLER IMAGE
-// ==================================================
-.taller-image {
-  width: 100%;
-  height: 280px;
-  background: linear-gradient(135deg, #2c3e50, #34495e);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+// ─── Imagen + Badge ───────────────────────────────────────
+.taller-image-wrapper {
   position: relative;
-  border-radius: 12px 12px 0 0;
+  width: 100%;
+  height: 180px;
+  background: #1e3a5f;
 
-  img {
+  img.taller-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-
-  &::before {
-    content: '🖼️';
-    position: absolute;
-    font-size: 48px;
-    opacity: 0.3;
-    z-index: 1;
+    display: block;
   }
 }
 
-// ==================================================
-// TALLER CONTENT
-// ==================================================
-.taller-content {
-  padding: 20px;
-}
-
-// ==================================================
-// CATEGORY BADGE
-// ==================================================
 .category-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 12px;
+  border-radius: $badge-radius;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+  background: #6b7280;
+  color: #fff;
 
-  &.categoria-tecnología {
-    background-color: rgba($primary-blue, 0.15);
-    color: $primary-blue;
-  }
-
-  &.categoria-arte {
-    background-color: rgba(#e91e63, 0.15);
-    color: #e91e63;
-  }
-
-  &.categoria-desarrollo {
-    background-color: rgba($success-green, 0.15);
-    color: $success-green;
-  }
-
-  &.categoria-desarrollo-profesional {
-    background-color: rgba($success-green, 0.15);
-    color: $success-green;
-  }
-
-  &.categoria-negocios {
-    background-color: rgba($secondary-blue, 0.15);
-    color: $secondary-blue;
-  }
+  &.categoria-negocios    { background: #f97316; color: #fff; }
+  &.categoria-finanzas    { background: #8b5cf6; color: #fff; }
+  &.categoria-tecnología  { background: #2563eb; color: #fff; }
+  &.categoria-programacion { background: #2563eb; color: #fff; }
+  &.categoria-liderazgo   { background: #10b981; color: #fff; }
 }
 
-// ==================================================
-// TALLER TITULO
-// ==================================================
+// ─── Contenido de tarjeta ─────────────────────────────────
+.taller-content {
+  padding: 14px 16px 16px;
+}
+
 .taller-titulo {
-  margin: 0 0 16px 0;
-  font-size: 20px;
+  font-size: 1rem;
   font-weight: 700;
-  color: $text-primary;
-  line-height: 1.4;
+  color: $text-dark;
+  margin: 0 0 6px;
 }
 
-// ==================================================
-// TALLER DETAILS
-// ==================================================
-.taller-details {
+.taller-descripcion {
+  font-size: 0.85rem;
+  color: $text-muted;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.detail-item {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: $text-muted;
+  margin-bottom: 4px;
 
-  .detail-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: $text-secondary;
-
-    .detail-icon {
-      font-size: 16px;
-    }
+  .detail-icon {
+    font-size: 0.85rem;
   }
 }
 
-// ==================================================
-// DISPONIBILIDAD SECTION
-// ==================================================
 .disponibilidad-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
-  background-color: $neutral-light;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  margin: 10px 0 12px;
+  font-size: 0.8rem;
 
   .disponibilidad-text {
-    font-size: 13px;
+    color: #10b981;
     font-weight: 600;
-    color: $text-primary;
   }
 
   .inscritos-count {
-    font-size: 12px;
-    color: $text-secondary;
-    font-weight: 500;
+    color: $text-muted;
   }
 }
 
-// ==================================================
-// TALLER ACTIONS
-// ==================================================
+// ─── Botones ──────────────────────────────────────────────
 .taller-actions {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 8px;
+}
 
-  .btn {
-    flex: 1;
-    min-width: 150px;
-    padding: 14px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.btn {
+  flex: 1;
+  padding: 9px 0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
 
-    &:hover:not(.btn-disabled) {
-      transform: translateY(-2px);
-      box-shadow: $shadow-md;
-    }
-
-    &:active:not(.btn-disabled) {
-      transform: translateY(0);
-    }
-
-    // Primary Button (Ver Detalles)
-    &.btn-primary {
-      background-color: transparent;
-      border: 2px solid $primary-blue;
-      color: $primary-blue;
-
-      &:hover {
-        background-color: $primary-blue;
-        color: $white;
-      }
-    }
-
-    // Inscribir Button
-    &.btn-inscribir {
-      background-color: $primary-blue;
-      color: $white;
-
-      &:hover {
-        background-color: #3f3cd9; // darken($primary-blue, 10%) equivalent
-      }
-    }
-
-    // Secondary Button (Ya inscrito)
-    &.btn-secondary {
-      background-color: transparent;
-      border: 2px solid $secondary-blue;
-      color: $secondary-blue;
-
-      &:hover {
-        background-color: $secondary-blue;
-        color: $white;
-      }
-    }
-
-    // Warning Button (Lista de Espera)
-    &.btn-warning {
-      background-color: $warning-orange;
-      color: $white;
-
-      &:hover {
-        background-color: #e68a00; // darken($warning-orange, 10%) equivalent
-      }
-    }
-
-    // Disabled Button (Agotado)
-    &.btn-disabled {
-      background-color: #d0d0d0;
-      color: $text-light;
-      cursor: not-allowed;
-
-      &:hover {
-        transform: none;
-        box-shadow: none;
-      }
-    }
+  &:active {
+    opacity: 0.8;
   }
 }
 
-// ==================================================
-// DESKTOP LAYOUT (>= 1024px) - 2 COLUMN GRID
-// ==================================================
-@media (min-width: 1024px) {
-  .content-wrapper {
-    max-width: 1400px;
-  }
-
-  .talleres-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
-
-  .taller-card {
-    display: flex;
-    flex-direction: column;
-
-    &:hover:not(.estado-agotado) {
-      transform: translateY(-6px);
-    }
-  }
-
-  .taller-image {
-    width: 100%;
-    height: 280px;
-    border-radius: 12px 12px 0 0;
-  }
-
-  .taller-content {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .taller-actions {
-    gap: 12px;
-
-    .btn {
-      flex: 1;
-      min-width: auto;
-      padding: 12px 16px;
-      font-size: 13px;
-    }
-  }
+.btn-primary {
+  background: $primary;
+  color: #fff;
 }
 
-// ==================================================
-// TABLET LAYOUT (769px - 1023px) - HORIZONTAL CARDS
-// ==================================================
-@media (min-width: 768px) and (max-width: 1023px) {
-  .content-wrapper {
-    padding: 0 20px;
-  }
-
-  .taller-card {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    gap: 0;
-  }
-
-  .taller-image {
-    grid-column: 1;
-    grid-row: 1;
-    width: 200px;
-    height: 200px;
-    border-radius: 12px 0 0 12px;
-  }
-
-  .taller-content {
-    grid-column: 2;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  .disponibilidad-section {
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 8px 0;
-    background-color: transparent;
-    margin-bottom: 0;
-  }
-
-  .taller-actions {
-    gap: 8px;
-
-    .btn {
-      flex: 1;
-      min-width: 110px;
-      padding: 11px 14px;
-      font-size: 12px;
-    }
-  }
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid $primary;
+  color: $primary;
 }
 
-// ==================================================
-// MOBILE LAYOUT (max-width: 767px) - VERTICAL CARDS
-// ==================================================
-@media (max-width: 767px) {
-  .content-wrapper {
-    padding: 0 12px;
-  }
-
-  .header-section {
-    flex-direction: column;
-    gap: 16px;
-    text-align: center;
-
-    .notification-bell {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-    }
-  }
-
-  .taller-card {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .taller-image {
-    height: 220px;
-    border-radius: 12px 12px 0 0;
-  }
-
-  .taller-actions {
-    flex-direction: column;
-
-    .btn {
-      min-width: auto;
-      width: 100%;
-    }
-  }
-
-  .disponibilidad-section {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-  }
+.btn-secondary {
+  background: #e2e8f0;
+  color: $text-dark;
 }
 
-@media (max-width: 480px) {
-  .alumno-screen-container {
-    padding-top: 12px;
-    padding-bottom: 24px;
-  }
-
-  .content-wrapper {
-    padding: 0 8px;
-  }
-
-  .header-section {
-    padding: 16px;
-    margin-bottom: 20px;
-
-    .user-greeting {
-      gap: 12px;
-
-      .avatar {
-        width: 48px;
-        height: 48px;
-        font-size: 20px;
-      }
-
-      .greeting-text {
-        h1 {
-          font-size: 18px;
-        }
-
-        p {
-          font-size: 12px;
-        }
-      }
-    }
-  }
-
-  .taller-card {
-    box-shadow: $shadow-sm;
-  }
-
-  .taller-image {
-    height: 180px;
-  }
-
-  .taller-content {
-    padding: 16px;
-  }
-
-  .taller-titulo {
-    font-size: 18px;
-    margin-bottom: 12px;
-  }
-
-  .taller-actions {
-    .btn {
-      padding: 12px 16px;
-      font-size: 12px;
-    }
-  }
+.btn-warning {
+  background: #f59e0b;
+  color: #fff;
 }
 
-// ==================================================
-// SCROLLBAR CUSTOMIZATION
-// ==================================================
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: $neutral-light;
-}
-
-::-webkit-scrollbar-thumb {
-  background: $neutral-border;
-  border-radius: 4px;
-
-  &:hover {
-    background: $text-secondary;
-  }
+.btn-disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { timeout, catchError, finalize } from 'rxjs/operators';
@@ -22,11 +22,11 @@ export class EventoDetalleComponent implements OnInit {
     private inscripcionService = inject(InscripcionService);
     private eventoService = inject(EventoService);
     private toastService = inject(ToastService);
-
+    private cdr = inject(ChangeDetectorRef); 
     // ── Signals de estado ──
     isProcessing = signal(false);
     cupoLleno = signal(false);
-
+ 
     // ── Datos del evento ──
     evento: Evento | null = null;
     categoriaNombre = '';
@@ -48,22 +48,25 @@ export class EventoDetalleComponent implements OnInit {
                     this.router.navigate(['/alumno']);
                     return;
                 }
-                this.evento = evento;
-                this.categoriaNombre = this.eventoService.getCategoriaNombre(evento.categoriaId);
-                this.sedeNombre = this.eventoService.getSedeNombre(evento.sedeId);
-                this.aulaNombre = this.eventoService.getAulaNombre(evento.aulaId, evento.sedeId);
-                this.lugaresDisponibles = evento.cupoMaximo - (evento.inscritos ?? 0);
 
-                // Determinar si el evento ya está en lista de espera
+                this.evento = evento;
+                this.categoriaNombre = evento.categoriaNombre ?? 'Sin categoría';
+                this.sedeNombre      = evento.sedeNombre      ?? '';
+                this.aulaNombre      = evento.aulaNombre      ?? '';
+                this.lugaresDisponibles = (evento.cupoMaximo ?? 0) - (evento.inscritos ?? 0);
+
                 if (evento.isFull) {
                     this.cupoLleno.set(true);
                 }
+
+                this.cdr.detectChanges();  // ← fuerza re-render
             },
             error: () => {
                 this.toastService.show('Error al cargar el evento.', 'error');
                 this.router.navigate(['/alumno']);
             },
         });
+
     }
 
     /**

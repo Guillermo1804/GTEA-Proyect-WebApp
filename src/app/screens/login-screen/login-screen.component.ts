@@ -38,6 +38,11 @@ export class LoginScreenComponent implements OnInit {
       this.returnUrl = params['returnUrl'] || '';
     });
   }
+  showPassword = false;
+
+togglePasswordVisibility(): void {
+  this.showPassword = !this.showPassword;
+}
 
   // helpers
   get email() { return this.form.get('email'); }

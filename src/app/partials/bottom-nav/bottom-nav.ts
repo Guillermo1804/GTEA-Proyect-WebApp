@@ -30,10 +30,15 @@ export class BottomNav {
   constructor(private router: Router) { }
 
   private get effectiveRole(): 'admin' | 'organizador' | 'estudiante' {
-    const storedRole = localStorage.getItem('userRole');
-    if (storedRole === 'administrador') return 'admin';
-    if (storedRole === 'organizador') return 'organizador';
-    if (storedRole === 'alumno') return 'estudiante';
+    const groupRole = localStorage.getItem('gtea-proyecto-group_name');
+    const userRole = localStorage.getItem('userRole');
+
+    const currentRole = groupRole || userRole || this.role;
+
+    if (currentRole === 'administrador') return 'admin';
+    if (currentRole === 'organizador') return 'organizador';
+    if (currentRole === 'alumno') return 'estudiante';
+
     return this.role;
   }
 
@@ -52,12 +57,12 @@ export class BottomNav {
     },
     organizador: {
       left: [
-        { icon: 'dashboard', label: 'Inicio', route: '/organizador/dashboard' },
-        { icon: 'event', label: 'Eventos', route: '/organizador/eventos' },
+        { icon: 'dashboard', label: 'Inicio', route: '/admin/dashboard' },
+        { icon: 'event', label: 'Eventos', route: '/admin/eventos' },
       ],
       right: [
-        { icon: 'assessment', label: 'Reportes', route: '/organizador/reportes' },
-        { icon: 'person', label: 'Perfil', route: '/organizador/perfil' },
+        { icon: 'assessment', label: 'Reportes', route: '/admin/reportes' },
+        { icon: 'group', label: 'Usuarios', route: '/admin/usuarios' },
       ],
     },
     estudiante: {
@@ -66,7 +71,7 @@ export class BottomNav {
         { icon: 'bookmark', label: 'Mis Eventos', route: '/alumno/mis-eventos' },
       ],
       right: [
-        { icon: 'history', label: 'Historial', route: '/alumno/historial' },
+        // { icon: 'history', label: 'Historial', route: '/alumno/historial' },
         { icon: 'person', label: 'Perfil', route: '/alumno/perfil' },
       ],
     },

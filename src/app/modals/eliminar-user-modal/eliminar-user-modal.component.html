@@ -1,1 +1,26 @@
-<p>eliminar-user-modal works!</p>
+<div class="modal-backdrop" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Eliminar usuario</h2>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        ¿Estás seguro de que deseas eliminar a
+        <strong>{{ userName }}</strong>?
+      </p>
+      <p class="warning-text">
+        Esta acción no se puede deshacer.
+      </p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" type="button" (click)="onClose()">
+        Cancelar
+      </button>
+      <button class="btn-delete" type="button" (click)="onConfirm()">
+        Eliminar
+      </button>
+    </div>
+  </div>
+</div>

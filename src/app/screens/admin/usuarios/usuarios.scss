@@ -6,11 +6,11 @@
 
 .page-header {
     display: flex;
-    align-items: flex-start;
+
     justify-content: space-between;
     gap: 12px;
     flex-wrap: wrap;
-
+    padding: 20px 16px 0 16px;
     h1 {
         font-family: 'Inter', sans-serif;
         font-size: 20px;
@@ -400,3 +400,4 @@
         max-width: 1280px;
     }
 }
+

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { RespuestaInscripcion } from '../models/inscripcion.model';
+import { FacadeService } from './facade-service';
 
 // ─────────────────────────────────────────────
 // Opciones HTTP por defecto
@@ -17,7 +18,8 @@ const httpOptions = {
 export class InscripcionService {
 
     constructor(
-        private http: HttpClient
+        private http: HttpClient,
+        private facadeService: FacadeService
     ) { }
 
     // ─────────────────────────────────────────────
@@ -62,4 +64,17 @@ export class InscripcionService {
           httpOptions
         );
     }
+
+// inscripcion.service.ts esta es la nueva que necesitamos que funcione
+    public getMisEventos(): Observable<any[]> {
+    const token = this.facadeService.getSessionToken();
+    const headers = new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': 'Token ' + token,
+    });
+    // Endpoint que devuelve inscripciones del alumno autenticado
+    return this.http.get<any[]>(`${environment.url_api}/inscripciones/mis-eventos/`, { headers });
+}
+
+
 }

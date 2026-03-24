@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { FacadeService } from '../../services/facade-service';
 
 @Component({
   selector: 'app-top-navbar',
@@ -16,15 +17,21 @@ export class TopNavbar implements OnInit {
 
   userName: string = 'Usuario';
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private facadeService: FacadeService) { }
 
   ngOnInit(): void {
-    if (this.mode === 'auth' && typeof window !== 'undefined' && window.localStorage) {
-      const storedName = localStorage.getItem('gtea-proyecto-user_complete_name');
-      if (storedName) {
-        this.userName = storedName.split(' ')[0]; // Show first name only
-      }
+    if (this.mode !== 'auth') {
+      return;
     }
+
+    const fullName = this.facadeService.getUserDisplayName();
+
+    if (fullName && fullName !== 'Usuario') {
+      this.userName = fullName.split(' ')[0];
+      return;
+    }
+
+    this.userName = 'Usuario';
   }
 
   navigate(path: string): void {
@@ -39,6 +46,11 @@ export class TopNavbar implements OnInit {
     // TODO: open settings
   }
 
+  get isAdminUser(): boolean {
+    const group = this.facadeService.getUserGroup();
+    return this.mode === 'auth' && (group === 'administrador' || group === 'admin');
+  }
+
   logout(): void {
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.removeItem('userRole');
@@ -47,6 +59,9 @@ export class TopNavbar implements OnInit {
       localStorage.removeItem('gtea-proyecto-user_id');
       localStorage.removeItem('gtea-proyecto-user_complete_name');
       localStorage.removeItem('gtea-proyecto-group_name');
+      localStorage.removeItem('group_name');
+      localStorage.removeItem('user_complete_name');
+      localStorage.removeItem('userName');
     }
     this.router.navigate(['/']);
   }

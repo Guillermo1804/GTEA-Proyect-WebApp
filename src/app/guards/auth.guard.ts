@@ -36,10 +36,14 @@ export const authGuard: CanActivateFn = (route, state) => {
         return false;
     }
 
-    if (userRole !== expectedRole) {
+    const canAccess =
+        userRole === expectedRole ||
+        (userRole === 'organizador' && expectedRole === 'administrador');
+
+    if (!canAccess) {
         const roleToHome: Record<string, string> = {
             'administrador': '/admin/dashboard',
-            'organizador':   '/organizador/dashboard',
+            'organizador':   '/admin/dashboard',
             'alumno':        '/alumno/catalogo',
         };
         router.navigate([roleToHome[userRole] || '/login']);

@@ -114,18 +114,42 @@ export class FacadeService {
     if (typeof window === 'undefined' || !window.localStorage) return;
 
     try {
-      if (user_data.rol == "administrador") {
-        localStorage.setItem(user_id_cookie_name, String(user_data.id));
-        localStorage.setItem(user_email_cookie_name, String(user_data.email));
-        localStorage.setItem(user_complete_name_cookie_name, String(user_data.first_name + " " + user_data.last_name));
-      } else {
-        localStorage.setItem(user_id_cookie_name, String(user_data.user.id));
-        localStorage.setItem(user_email_cookie_name, String(user_data.user.email));
-        localStorage.setItem(user_complete_name_cookie_name, String(user_data.user.first_name + " " + user_data.user.last_name));
-      }
-      localStorage.setItem(session_cookie_name, String(user_data.token));
-      localStorage.setItem(group_name_cookie_name, String(user_data.rol));
-    } catch (e) {/* ignore */ }
+      const userPayload = user_data.user || user_data;
+
+      const rawFirstName =
+        userPayload.first_name ||
+        userPayload.firstName ||
+        userPayload.nombre ||
+        userPayload.name ||
+        userPayload.usuario ||
+        userPayload.username ||
+        '';
+
+      const rawLastName =
+        userPayload.last_name ||
+        userPayload.lastName ||
+        userPayload.apellido ||
+        '';
+
+      const completeName = `${rawFirstName} ${rawLastName}`.trim() ||
+        (userPayload.email ? userPayload.email.split('@')[0] : '') ||
+        userPayload.id ||
+        'Usuario';
+
+      localStorage.setItem(user_id_cookie_name, String(userPayload.id || ''));
+      localStorage.setItem(user_email_cookie_name, String(userPayload.email || ''));
+      localStorage.setItem(user_complete_name_cookie_name, String(completeName));
+      localStorage.setItem('user_complete_name', String(completeName));
+      localStorage.setItem('userName', String((completeName.split(' ')[0] || '').trim()));
+
+      localStorage.setItem(session_cookie_name, String(user_data.token || ''));
+      localStorage.setItem(group_name_cookie_name, String(user_data.rol || userPayload.rol || ''));
+      localStorage.setItem('group_name', String(user_data.rol || userPayload.rol || ''));
+
+      console.debug('saveUserData:', { user_data, userPayload, completeName });
+    } catch (e) {
+      console.error('saveUserData error:', e);
+    }
   }
 
   destroyUser() {
@@ -166,6 +190,28 @@ export class FacadeService {
       return localStorage.getItem(group_name_cookie_name) || '';
     }
     return '';
+  }
+
+  getUserDisplayName() {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return 'Usuario';
+    }
+
+    const completeName = localStorage.getItem(user_complete_name_cookie_name) ||
+      localStorage.getItem('user_complete_name') ||
+      localStorage.getItem('userName') ||
+      localStorage.getItem('user_name');
+
+    if (completeName && completeName.trim().length > 0) {
+      return completeName.trim();
+    }
+
+    const email = localStorage.getItem(user_email_cookie_name) || localStorage.getItem('email');
+    if (email && email.includes('@')) {
+      return email.split('@')[0];
+    }
+
+    return 'Usuario';
   }
 
   // Método para registrar usuario con rol automático basado en dominio de email
