@@ -104,18 +104,36 @@ export class RegistroScreenComponent implements OnInit {
   navigate(path: string): void {
     this.router.navigate([path]);
   }
-public soloLetras(event: Event): void {
-  const input = event.target as HTMLInputElement;
-
-  input.value = input.value
-    .replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '') // solo letras y espacios
-    .replace(/\s{2,}/g, ' '); // evita espacios dobles seguidos
-}
-public soloNumeros(event: Event): void {
-  const input = event.target as HTMLInputElement;
-
-  input.value = input.value
-    .replace(/\D/g, '') // elimina todo lo que no sea número
-    .slice(0, 9); // máximo 9 dígitos
-}
+  
+  public soloLetras(event: Event, controlName: 'firstName' | 'lastName'): void {
+    const input = event.target as HTMLInputElement;
+    const cleanValue = input.value
+      .replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '') // solo letras y espacios
+      .replace(/\s{2,}/g, ' '); // evita espacios dobles seguidos
+    
+    input.value = cleanValue;
+    
+    // Actualizar el FormControl correspondiente
+    const control = this.form.get(controlName);
+    if (control) {
+      control.setValue(cleanValue, { emitEvent: false });
+      control.updateValueAndValidity();
+    }
+  }
+  
+  public soloNumeros(event: Event, controlName: 'idNumber'): void {
+    const input = event.target as HTMLInputElement;
+    const cleanValue = input.value
+      .replace(/\D/g, '') // elimina todo lo que no sea número
+      .slice(0, 9); // máximo 9 dígitos
+    
+    input.value = cleanValue;
+    
+    // Actualizar el FormControl
+    const control = this.form.get(controlName);
+    if (control) {
+      control.setValue(cleanValue, { emitEvent: false });
+      control.updateValueAndValidity();
+    }
+  }
 }
