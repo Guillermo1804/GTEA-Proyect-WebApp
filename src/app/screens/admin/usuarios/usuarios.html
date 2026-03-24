@@ -1,0 +1,95 @@
+<app-top-navbar role="admin"></app-top-navbar>
+
+<div class="page-content">
+
+
+    <main class="main">
+            <div class="page-header">
+        <h1 class="page-title">Gestión de Usuarios</h1>
+        <button class="btn-add" (click)="addUser()">
+            <span class="material-icons">add</span>
+            Nuevo
+        </button>
+    </div>
+        <div class="search-section">
+            <div class="search-bar">
+                <span class="material-icons search-icon">search</span>
+                <input type="text" placeholder="Buscar usuarios..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)">
+            </div>
+            <div class="filter-tabs">
+                @for (filter of filters; track filter) {
+                <button class="filter-tab" [class.active]="activeFilter === filter" (click)="setFilter(filter)">
+                    {{ filter }}
+                </button>
+                }
+            </div>
+        </div>
+
+        <div class="user-list">
+            @for (user of paginatedUsers; track user.email) {
+            <div class="user-card">
+                <div class="user-left">
+                    <div class="user-avatar">{{ user.avatarInitials }}</div>
+                    <div class="user-info">
+                        <span class="user-name">{{ user.name }}</span>
+                        <span class="user-email">{{ user.email }}</span>
+                        <div class="user-tags">
+                            <span class="role-badge" [class]="user.roleBadgeClass">{{ user.role }}</span>
+                            <span class="status-dot" [class.active]="user.status === 'Activo'"></span>
+                            <span class="status-text">{{ user.status }}</span>
+                        </div>
+                    </div>
+                </div>
+                @if (currentRole === 'admin'){
+                <div class="user-actions">
+                    <button class="action-btn" (click)="editUser(user)">
+                        <span class="material-icons">edit</span>
+                    </button>
+                    <button class="action-btn delete" [disabled]="isSelf(user)" [class.disabled]="isSelf(user)" (click)="deleteUser(user)">
+                        <span class="material-icons">delete</span>
+                    </button>
+                </div>
+                }
+
+             
+
+            </div>
+            }
+        </div>
+    </main>
+
+    <div class="pagination">
+        <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1">
+            <span class="material-icons">chevron_left</span>
+            Anterior
+        </button>
+        <span class="page-info">Pág. {{ currentPage }} de {{ totalPages }}</span>
+        <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+            Siguiente
+            <span class="material-icons">chevron_right</span>
+        </button>
+    </div>
+</div>
+
+<app-bottom-nav role="admin" activeTab="/admin/usuarios" (fabAction)="onFabAction($event)"></app-bottom-nav>
+
+<!-- Modals -->
+@if (activeModal === 'nueva-aula') {
+<app-nueva-aula-modal (close)="closeModal()"></app-nueva-aula-modal>
+}
+@if (activeModal === 'nueva-sede') {
+<app-nueva-sede-modal (close)="closeModal()"></app-nueva-sede-modal>
+}
+@if (activeModal === 'nueva-categoria') {
+<app-nueva-categoria-modal (close)="closeModal()"></app-nueva-categoria-modal>
+}
+@if (activeModal === 'nuevo-usuario') {
+<app-nuevo-usuario-modal (close)="closeModal()"></app-nuevo-usuario-modal>
+}
+@if (activeModal === 'eliminar-usuario' && userToDelete) {
+<app-eliminar-user-modal
+  [userName]="userToDelete.name"
+  (close)="closeModal()"
+  (confirmDelete)="confirmDeleteUser()">
+</app-eliminar-user-modal>
+}
