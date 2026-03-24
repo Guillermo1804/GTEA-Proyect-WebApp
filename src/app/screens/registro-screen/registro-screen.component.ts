@@ -104,30 +104,18 @@ export class RegistroScreenComponent implements OnInit {
   navigate(path: string): void {
     this.router.navigate([path]);
   }
-  public soloLetras(event: KeyboardEvent) {
-      const charCode = event.key.charCodeAt(0);
-      // Permitir solo letras (mayúsculas y minúsculas) y espacio
-      if (
-        !(charCode >= 65 && charCode <= 90) &&  // Letras mayúsculas
-        !(charCode >= 97 && charCode <= 122) && // Letras minúsculas
-        charCode !== 32                         // Espacio
-      ) {
-        event.preventDefault();
-      }
-    }
-public soloNumeros(event: KeyboardEvent) {
+public soloLetras(event: Event): void {
   const input = event.target as HTMLInputElement;
-  const valorActual = input.value;
 
-  // 1. Permitir solo números (0-9) usando Regex
-  if (!/^[0-9]$/.test(event.key)) {
-    event.preventDefault();
-    return;
-  }
+  input.value = input.value
+    .replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '') // solo letras y espacios
+    .replace(/\s{2,}/g, ' '); // evita espacios dobles seguidos
+}
+public soloNumeros(event: Event): void {
+  const input = event.target as HTMLInputElement;
 
-  // 2. Si ya hay 9 dígitos, bloquear cualquier número adicional
-  if (valorActual.length >= 9) {
-    event.preventDefault();
-  }
+  input.value = input.value
+    .replace(/\D/g, '') // elimina todo lo que no sea número
+    .slice(0, 9); // máximo 9 dígitos
 }
 }

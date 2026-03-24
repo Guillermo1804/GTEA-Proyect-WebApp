@@ -1,15 +1,16 @@
 <app-top-navbar role="admin"></app-top-navbar>
 
 <div class="page-content">
-    <div class="page-header">
-        <h1>Gestión de Usuarios</h1>
+
+
+    <main class="main">
+            <div class="page-header">
+        <h1 class="page-title">Gestión de Usuarios</h1>
         <button class="btn-add" (click)="addUser()">
             <span class="material-icons">add</span>
             Nuevo
         </button>
     </div>
-
-    <main class="main">
         <div class="search-section">
             <div class="search-bar">
                 <span class="material-icons search-icon">search</span>
@@ -39,6 +40,7 @@
                         </div>
                     </div>
                 </div>
+                @if (currentRole === 'admin'){
                 <div class="user-actions">
                     <button class="action-btn" (click)="editUser(user)">
                         <span class="material-icons">edit</span>
@@ -47,6 +49,10 @@
                         <span class="material-icons">delete</span>
                     </button>
                 </div>
+                }
+
+             
+
             </div>
             }
         </div>
@@ -79,4 +85,11 @@
 }
 @if (activeModal === 'nuevo-usuario') {
 <app-nuevo-usuario-modal (close)="closeModal()"></app-nuevo-usuario-modal>
+}
+@if (activeModal === 'eliminar-usuario' && userToDelete) {
+<app-eliminar-user-modal
+  [userName]="userToDelete.name"
+  (close)="closeModal()"
+  (confirmDelete)="confirmDeleteUser()">
+</app-eliminar-user-modal>
 }

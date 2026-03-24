@@ -343,6 +343,8 @@ export class EventoService {
    * Mapea campos de la API a la interfaz Evento y agrega campos de display.
    */
   private _mapApiResponse(raw: any): Evento {
+    console.log('RAW categoria_nombre:', raw.categoria_nombre);
+
     return {
       id: raw.id,
       titulo: raw.titulo,

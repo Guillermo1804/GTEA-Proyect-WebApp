@@ -89,6 +89,26 @@ export const routes: Routes = [
           import('./screens/alumno/evento-detalle/evento-detalle.component')
             .then(m => m.EventoDetalleComponent),
       },
+
+       // ── Nuevas rutas ──────────────────────────────────────
+    {
+      path: 'mis-eventos',
+      loadComponent: () =>
+        import('./screens/alumno/mis-eventos/mis-eventos')
+          .then(m => m.MisEventos),
+    },
+    {
+      path: 'historial',
+      loadComponent: () =>
+        import('./screens/alumno/historial/historial')
+          .then(m => m.Historial),
+    },
+    {
+      path: 'perfil',
+      loadComponent: () =>
+        import('./screens/alumno/perfil/perfil')
+          .then(m => m.Perfil),
+    },
     ],
   },
 

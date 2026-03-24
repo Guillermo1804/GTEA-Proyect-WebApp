@@ -1,0 +1,149 @@
+.alumno-screen-container {
+  background: #f5f6fa;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+.content-wrapper {
+  padding: 16px;
+  max-width: 480px;
+  margin: 0 auto;
+  @media (min-width: 768px) { max-width: 720px; padding: 20px 32px; }
+  @media (min-width: 1024px) { max-width: 960px; }
+}
+
+// Banner progreso
+.progreso-banner {
+  display: flex;
+  gap: 14px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  align-items: flex-start;
+
+  .progreso-icon { font-size: 2rem; }
+
+  .progreso-texto {
+    .progreso-label { font-size: 0.78rem; color: #f97316; font-weight: 600; }
+    h2 { font-size: 1rem; font-weight: 700; color: #1a1a2e; margin: 4px 0; }
+    .progreso-numero { color: #2563eb; }
+    p { font-size: 0.8rem; color: #6b7280; margin: 0; }
+  }
+}
+
+// Filtros
+.filtros-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.filtro-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+}
+
+// Lista
+.eventos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.evento-card {
+  display: flex;
+  gap: 14px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.evento-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #1e3a5f;
+  flex-shrink: 0;
+}
+
+.evento-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.estado-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &.estado-completado  { color: #059669; }
+  &.estado-proximo     { color: #2563eb; }
+  &.estado-cancelado   { color: #dc2626; }
+  &.estado-lista-espera { color: #f97316; }
+}
+
+.evento-titulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.evento-meta {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.evento-acciones {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.btn-detalle {
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e5e7eb;
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+}
+
+.btn-certificado {
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 60px 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  span { font-size: 2.5rem; }
+}

@@ -10,6 +10,7 @@ import { NuevoUsuarioModal } from '../../../shared/modals/nuevo-usuario-modal/nu
 import { AdminServiceService } from '../../../services/admin-service.service';
 import { AlumnoService } from '../../../services/alumno-service';
 import { OrganizadorService } from '../../../services/organizador-service';
+import { EliminarUserModalComponent } from '../../../modals/eliminar-user-modal/eliminar-user-modal.component';
 
 interface User {
   id: number;
@@ -24,7 +25,7 @@ interface User {
 
 @Component({
   selector: 'app-admin-usuarios',
-  imports: [FormsModule, CommonModule, TopNavbar, BottomNav, NuevaAulaModal, NuevaSedeModal, NuevaCategoriaModal, NuevoUsuarioModal],
+  imports: [FormsModule, CommonModule, TopNavbar, BottomNav, NuevaAulaModal, NuevaSedeModal, NuevaCategoriaModal, NuevoUsuarioModal,EliminarUserModalComponent],
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.scss',
 })
@@ -33,16 +34,17 @@ export class Usuarios implements OnInit {
   errorMessage: string = '';
   successMessage: string = '';
 
+  userToDelete: User | null = null;
   searchQuery = '';
   activeFilter = 'Todos';
   filters = ['Todos', 'Admin', 'Organizador', 'Alumno'];
   currentPage = 1;
   readonly pageSize = 9;
 
-  activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | null = null;
+activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | 'eliminar-usuario' | null = null;
   users: User[] = [];
   isLoading = true;
-
+currentRole: 'admin' | 'organizador' | 'alumno' = 'alumno';
   constructor(
     private adminService: AdminServiceService,
     private alumnoService: AlumnoService,
@@ -52,6 +54,18 @@ export class Usuarios implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+      const storedRole = localStorage.getItem('gtea-proyecto-group_name') || '';
+
+  if (storedRole === 'admin' || storedRole === 'administrador') {
+    this.currentRole = 'admin';
+  } else if (storedRole === 'organizador') {
+    this.currentRole = 'organizador';
+  } else {
+    this.currentRole = 'alumno';
+  }
+
+  console.log('ROL NORMALIZADO:', this.currentRole);
+  this.loadUsers();
   }
 
   loadUsers(): void {
@@ -165,33 +179,46 @@ export class Usuarios implements OnInit {
 
   editUser(user: User): void { /* TODO */ }
 
-  deleteUser(user: User): void {
-    if (!confirm(`¿Eliminar a ${user.name}?`)) return;
+deleteUser(user: User): void {
+  this.userToDelete = user;
+  this.activeModal = 'eliminar-usuario';
+}
 
-    let deleteObs;
-    switch (user._roleSource) {
-      case 'admin':
-        deleteObs = this.adminService.eliminarAdmin(user.id);
-        break;
-      case 'alumno':
-        deleteObs = this.alumnoService.eliminarAlumno(user.id);
-        break;
-      case 'organizador':
-        deleteObs = this.organizadorService.eliminarOrg(user.id);
-        break;
-    }
+confirmDeleteUser(): void {
+  if (!this.userToDelete) return;
 
-    deleteObs.subscribe({
-      next: () => {
-        this.successMessage = `Usuario ${user.name} eliminado correctamente.`;
-        this.loadUsers();
-      },
-      error: (err: any) => {
-        console.error('Error eliminando usuario:', err);
-        this.errorMessage = err?.error?.message || 'Error al eliminar usuario.';
-      },
-    });
+  const user = this.userToDelete;
+  let deleteObs: any;
+
+  switch (user._roleSource) {
+    case 'admin':
+      deleteObs = this.adminService.eliminarAdmin(user.id);
+      break;
+    case 'alumno':
+      deleteObs = this.alumnoService.eliminarAlumno(user.id);
+      break;
+    case 'organizador':
+      deleteObs = this.organizadorService.eliminarOrg(user.id);
+      break;
+    default:
+      return;
   }
+
+  deleteObs.subscribe({
+    next: () => {
+      this.successMessage = `Usuario ${user.name} eliminado correctamente.`;
+      this.userToDelete = null;
+      this.activeModal = null;
+      this.loadUsers();
+    },
+    error: (err: any) => {
+      console.error('Error eliminando usuario:', err);
+      this.errorMessage = err?.error?.message || 'Error al eliminar usuario.';
+      this.userToDelete = null;
+      this.activeModal = null;
+    },
+  });
+}
 
   isSelf(user: User): boolean {
     if (typeof window === 'undefined' || !window.localStorage) {
@@ -212,5 +239,8 @@ export class Usuarios implements OnInit {
     }
   }
 
-  closeModal(): void { this.activeModal = null; this.loadUsers(); }
+closeModal(): void {
+  this.activeModal = null;
+  this.userToDelete = null;
+}
 }
