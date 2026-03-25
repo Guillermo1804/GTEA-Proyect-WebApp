@@ -19,7 +19,7 @@ interface EventoInscrito {
     tieneCertificado?: boolean;
 }
 
-type Filtro = 'todos' | 'proximos' | 'completados' | 'cancelados' | 'lista-espera';
+type Filtro = 'todos' | 'proximo' | 'completado' | 'cancelado' | 'lista-espera';
 
 @Component({
     selector: 'app-mis-eventos',
