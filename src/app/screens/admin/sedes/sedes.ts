@@ -175,14 +175,54 @@ export class Sedes implements OnInit {
 
   openFiltros(): void { this.activeModal = 'filtros'; }
 
-  exportarPDF(): void {
+  private async loadImageAsDataUrl(url: string): Promise<string> {
+    try {
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (e) => reject(e);
+        reader.readAsDataURL(blob);
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  async exportarPDF(): Promise<void> {
     const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
     const fecha = new Date();
+
+    // intentar cargar el logo desde assets (ruta pública)
+    let logoDataUrl: string | null = null;
+    try {
+      logoDataUrl = await this.loadImageAsDataUrl('/assets/LogoGTEA.png');
+    } catch (err) {
+      // si falla, seguimos sin logo
+      console.warn('No se pudo cargar el logo para el PDF:', err);
+      logoDataUrl = null;
+    }
 
     // Encabezado
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
     doc.text('Reporte de Sedes y Aulas', 40, 50);
+
+    // Si hay logo, añadirlo en la esquina superior derecha
+    try {
+      const pageSize = doc.internal.pageSize as any;
+      const pageWidth = pageSize.width ?? pageSize.getWidth?.() ?? 595;
+      if (logoDataUrl) {
+        const imgWidth = 90; // pts (aumentado)
+        const imgHeight = 90; // pts (aumentado)
+        const x = pageWidth - 40 - imgWidth; // margen derecho 40
+        const y = 30; // un poco por debajo del borde superior
+        doc.addImage(logoDataUrl, 'PNG', x, y, imgWidth, imgHeight);
+      }
+    } catch (e) {
+      console.warn('Error al añadir logo al PDF:', e);
+    }
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(11);
