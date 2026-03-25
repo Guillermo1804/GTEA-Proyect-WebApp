@@ -1,5 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 interface NavTab {
   icon: string;
@@ -20,14 +22,32 @@ interface FabAction {
   templateUrl: './bottom-nav.html',
   styleUrl: './bottom-nav.scss',
 })
-export class BottomNav {
+export class BottomNav implements OnInit, OnDestroy {
   @Input() role: 'admin' | 'organizador' | 'estudiante' = 'estudiante';
   @Input() activeTab = '';
   @Output() fabAction = new EventEmitter<string>();
 
   showFabMenu = false;
+  private routerSub!: Subscription;
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) { }
+
+  ngOnInit(): void {
+    this.routerSub = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.cdr.detectChanges();
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.routerSub) {
+      this.routerSub.unsubscribe();
+    }
+  }
 
   private get effectiveRole(): 'admin' | 'organizador' | 'estudiante' {
     const groupRole = localStorage.getItem('gtea-proyecto-group_name');

@@ -114,7 +114,9 @@ export class FacadeService {
     if (typeof window === 'undefined' || !window.localStorage) return;
 
     try {
-      const userPayload = user_data.user || user_data;
+      const userPayload = (user_data.user !== null && typeof user_data.user === 'object')
+        ? user_data.user
+        : user_data;
 
       const rawFirstName =
         userPayload.first_name ||

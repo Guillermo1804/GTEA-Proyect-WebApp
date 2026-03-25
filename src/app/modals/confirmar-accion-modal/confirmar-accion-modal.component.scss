@@ -1,0 +1,75 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 2000;
+}
+
+.modal-container {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  font-family: 'Inter', sans-serif;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.modal-body {
+  margin-top: 16px;
+
+  p {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.5;
+  }
+}
+
+.modal-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-cancel,
+.btn-delete {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-cancel {
+  background: #e2e8f0;
+  color: #334155;
+
+  &:hover {
+    background: #cbd5e1;
+  }
+}
+
+.btn-delete {
+  background: #dc2626;
+  color: white;
+
+  &:hover {
+    background: #b91c1c;
+  }
+}

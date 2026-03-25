@@ -265,6 +265,9 @@ export class Eventos implements OnInit {
   deleteEvent(event: EventItem): void {
     if (!confirm(`¿Eliminar el evento "${event.title}"?`)) return;
 
+    this.errorMessage = '';
+    this.successMessage = '';
+
     this.eventoService.eliminarEvento(event.id).subscribe({
       next: () => {
         this.successMessage = `Evento "${event.title}" eliminado correctamente.`;
@@ -273,8 +276,9 @@ export class Eventos implements OnInit {
       },
       error: (err: any) => {
         console.error('Error eliminando evento:', err);
-        this.errorMessage = err?.error?.message || 'Error al eliminar el evento.';
-        setTimeout(() => (this.errorMessage = ''), 4000);
+        // Expand timeout to 8 seconds so the user can read if it fails
+        this.errorMessage = err?.error?.message || 'Error al eliminar el evento. Verifica tu conexión o intenta más tarde.';
+        setTimeout(() => (this.errorMessage = ''), 8000);
       },
     });
   }
