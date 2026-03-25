@@ -333,6 +333,43 @@ export class Sedes implements OnInit {
     doc.save(`sedes-${stamp}.pdf`);
   }
 
+  exportarExcel(): void {
+    const datos = this.venuesFiltrados.flatMap(venue =>
+      venue.classrooms.map(room => ({
+        sede: venue.name,
+        aula: room.name,
+        capacidad: room.capacity,
+        estado: room.status
+      }))
+    );
+
+    const header = ['Sede', 'Aula', 'Capacidad', 'Estado'];
+    const rows = datos.map((r: any) => [r.sede, r.aula, String(r.capacidad), r.estado]);
+
+    const csvLines = [header, ...rows].map(cols =>
+      cols.map((cell: string) => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+    );
+    const csvContent = csvLines.join('\r\n');
+
+    // Prepend BOM so Excel detects UTF-8
+    const blob = new Blob(['\uFEFF', csvContent], { type: 'text/csv;charset=utf-8;' });
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+    const filename = `sedes-${stamp}.csv`;
+
+    if ((navigator as any).msSaveBlob) {
+      (navigator as any).msSaveBlob(blob, filename);
+    } else {
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+  }
+
   toggleVenue(venue: Venue): void { venue.expanded = !venue.expanded; }
 
   openNewAula(): void { this.activeModal = 'nueva-aula'; }
