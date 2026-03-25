@@ -1,0 +1,75 @@
+<!-- alumno-perfil.component.html -->
+<app-top-navbar role="estudiante" mode="auth"></app-top-navbar>
+
+<div class="perfil-screen">
+  <div class="perfil-header">
+
+
+    <div class="avatar-wrapper">
+      <div class="avatar-circle">
+        @if (perfil()?.avatarUrl) {
+          <img [src]="perfil()!.avatarUrl" [alt]="nombreCompleto" />
+        } @else {
+          <span class="avatar-initial">
+            {{ perfil()?.nombre?.[0] ?? '?' }}
+          </span>
+        }
+        <button class="avatar-edit">
+          <span class="material-icons">photo_camera</span>
+        </button>
+      </div>
+      <h2 class="perfil-nombre">{{ nombreCompleto }}</h2>
+      <p class="perfil-id">ID: {{ perfil()?.id }}</p>
+      <p class="perfil-correo">{{ perfil()?.correo }}</p>
+    </div>
+  </div>
+
+  <div class="perfil-tabs">
+
+    <span class="tab active">Informacion Personal</span>
+  </div>
+
+  <div class="perfil-content">
+    <form class="perfil-form">
+      <!-- Nombre completo (solo lectura) -->
+      <div class="form-group">
+        <label>Nombre (s)</label>
+        <div class="input-wrapper readonly">
+          <span class="material-icons">badge</span>
+          <input type="text" [value]="perfil()?.nombre" readonly />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Apellidos</label>
+        <div class="input-wrapper readonly">
+          <span class="material-icons">badge</span>
+          <input type="text" [value]="perfil()?.apellidos" readonly />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Correo Institucional</label>
+        <div class="input-wrapper readonly">
+          <span class="material-icons">mail</span>
+          <input type="email" [value]="perfil()?.correo" readonly />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Matrícula</label>
+        <div class="input-wrapper readonly">
+          <span class="material-icons">fingerprint</span>
+          <input type="text" [value]="perfil()?.id" readonly />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary">Cancelar</button>
+        <button type="submit" class="btn-primary">Guardar Cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<app-bottom-nav role="estudiante" activeTab="/alumno/perfil"></app-bottom-nav>
