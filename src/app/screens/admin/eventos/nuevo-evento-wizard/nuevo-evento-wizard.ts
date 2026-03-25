@@ -8,11 +8,12 @@ import {
   ValidationErrors,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { EventoService, Evento } from '../../../../services/evento-service';
+import { EventoService, Evento, EventoStatus } from '../../../../services/evento-service';
 import { ValidatorService } from '../../../../services/tools/validator-service';
 import { ErrorsService } from '../../../../services/tools/errors-service';
 import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
+import { TruncateSelectLabelPipe } from '../../../../shared/pipes/truncate-select-label.pipe';
 
 // ─────────────────────────────────────────────
 // Validador cruzado: fecha/hora de fin > inicio
@@ -34,7 +35,7 @@ function fechaFinValidator(group: AbstractControl): ValidationErrors | null {
 @Component({
   selector: 'app-nuevo-evento-wizard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TruncateSelectLabelPipe],
   templateUrl: './nuevo-evento-wizard.html',
   styleUrl: './nuevo-evento-wizard.scss',
 })
@@ -67,6 +68,14 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
   categorias: { id: number; nombre: string }[] = [];
   sedes: { id: number; nombre: string }[] = [];
   aulas: { id: number; nombre: string; capacidad: number }[] = [];
+
+  /** Opciones del estado del evento (valor API; "Completado" = Finalizado). */
+  readonly eventStatusOptions: { value: EventoStatus; label: string }[] = [
+    { value: 'Activo', label: 'Activo' },
+    { value: 'Cancelado', label: 'Cancelado' },
+    { value: 'Finalizado', label: 'Completado' },
+    { value: 'Borrador', label: 'Borrador' },
+  ];
 
   // ── Preview imagen ──
   imagenPreviewUrl: string | null = null;
@@ -124,8 +133,17 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
       listaEspera: data.listaEspera,
     }, { emitEvent: false }); // No disparar listeners para evitar que se limpie aulaId
 
+    const statusFromApi = data.status as EventoStatus | undefined;
+    const allowed: EventoStatus[] = ['Activo', 'Borrador', 'Finalizado', 'Cancelado'];
+    const resolvedStatus: EventoStatus =
+      statusFromApi && allowed.includes(statusFromApi)
+        ? statusFromApi
+        : data.publicarInmediatamente
+          ? 'Activo'
+          : 'Borrador';
+
     this.step3Form.patchValue({
-      publicarInmediatamente: data.publicarInmediatamente,
+      status: resolvedStatus,
       esOrganizador: data.esOrganizador,
     });
 
@@ -198,9 +216,9 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
       }
     });
 
-    // Paso 3 — Publicación (solo opciones booleanas)
+    // Paso 3 — Publicación (estado + organizador; publicarInmediatamente se deriva al enviar)
     this.step3Form = this.fb.group({
-      publicarInmediatamente: [true],
+      status: ['Activo' as EventoStatus, Validators.required],
       esOrganizador: [true],
     });
   }
@@ -344,6 +362,16 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
     return this.step2Form.get('costoEntrada')?.value || 0;
   }
 
+  get resumenEstadoLabel(): string {
+    const v = this.step3Form.get('status')?.value as EventoStatus | undefined;
+    return this.eventStatusOptions.find((o) => o.value === v)?.label || '—';
+  }
+
+  /** Texto completo de opción aula (tooltip); el pipe trunca en la lista. */
+  aulaOptionLabel(aula: { nombre: string; capacidad: number }): string {
+    return `${aula.nombre} (${aula.capacidad} personas)`;
+  }
+
   // ─────────────────────────────────────────────
   // Steppers numéricos (cupo y costo)
   // ─────────────────────────────────────────────
@@ -408,10 +436,14 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
     this.errorMessage = '';
     this.successMessage = '';
 
+    const step3 = this.step3Form.value;
+    const status = step3.status as EventoStatus;
+
     const payload: Evento = {
       ...this.step1Form.value,
       ...this.step2Form.value,
-      ...this.step3Form.value,
+      ...step3,
+      publicarInmediatamente: status === 'Activo',
     };
 
     // Sanitizar imagenPortada: el backend espera una URL string, no null ni File

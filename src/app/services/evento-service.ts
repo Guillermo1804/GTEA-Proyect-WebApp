@@ -14,6 +14,9 @@ const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
 };
 
+/** Estados de ciclo de vida del evento (alineado con listado admin y API). */
+export type EventoStatus = 'Activo' | 'Borrador' | 'Finalizado' | 'Cancelado';
+
 // ─────────────────────────────────────────────
 // Interfaz principal del Evento
 // ─────────────────────────────────────────────
@@ -43,7 +46,7 @@ export interface Evento {
 
   // Metadatos opcionales (respuesta del backend)
   id?: number;
-  status?: 'Activo' | 'Borrador' | 'Finalizado' | 'Cancelado';
+  status?: EventoStatus;
   organizador?: string;
   organizadorNombre?: string;   // Nombre completo del organizador (desde backend)
   inscritos?: number;
@@ -86,6 +89,7 @@ export class EventoService {
       listaEspera: false,
       publicarInmediatamente: true,
       esOrganizador: true,
+      status: 'Activo',
     };
   }
 

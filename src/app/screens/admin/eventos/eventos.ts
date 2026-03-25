@@ -246,6 +246,7 @@ export class Eventos implements OnInit {
             cupoMaximo:            event.capacity,
             costoEntrada:          0,
             listaEspera:           false,
+            status:                event.status,
             publicarInmediatamente: event.status === 'Activo',
             esOrganizador:         true,
           };
