@@ -1,0 +1,78 @@
+<div class="modal-overlay" (click)="onCancel()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Editar Usuario</h2>
+            <button class="close-btn" (click)="onCancel()">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <div class="modal-body">
+            @if (formError) {
+            <div class="error-message">{{ formError }}</div>
+            }
+
+            <!-- Rol badge (read-only) -->
+            <div class="form-group">
+                <label class="form-label">Rol</label>
+                <div class="fixed-role-chip">
+                    <span class="material-icons">person</span>
+                    {{ roleLabel }}
+                </div>
+            </div>
+
+            <!-- Nombre y Apellido (siempre visibles, requeridos) -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nombre *</label>
+                    <input class="form-input" type="text" placeholder="Nombre" [(ngModel)]="firstName">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Apellido *</label>
+                    <input class="form-input" type="text" placeholder="Apellido" [(ngModel)]="lastName">
+                </div>
+            </div>
+
+            <!-- Email (read-only) -->
+            <div class="form-group">
+                <label class="form-label">Correo electrónico</label>
+                <input class="form-input read-only" type="email" [value]="user?.email || ''" disabled>
+            </div>
+
+            <!-- Matrícula (solo para alumnos) -->
+            @if (roleSource === 'alumno') {
+            <div class="form-group">
+                <label class="form-label">Matrícula <span class="optional">(opcional)</span></label>
+                <input class="form-input" type="text" placeholder="Matrícula" [(ngModel)]="matricula">
+            </div>
+            }
+
+            <!-- Contraseña (solo visible para admin) -->
+            @if (canChangePassword) {
+            <div class="form-group">
+                <label class="form-label">Nueva Contraseña <span class="optional">(dejar vacío para no cambiar)</span></label>
+                <div class="password-wrapper">
+                    <input class="form-input" [type]="showPassword ? 'text' : 'password'" placeholder="Mínimo 8 caracteres" [(ngModel)]="password">
+                    <button type="button" class="password-toggle" (click)="togglePassword()">
+                        <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+                    </button>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="onCancel()" [disabled]="isSaving">Cancelar</button>
+            <button class="btn-save" (click)="onSave()" [disabled]="isSaving">
+                @if (isSaving) {
+                    Guardando...
+                } @else {
+                    Guardar Cambios
+                }
+            </button>
+        </div>
+    </div>
+</div>

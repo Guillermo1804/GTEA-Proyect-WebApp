@@ -120,6 +120,13 @@ export class AdminServiceService {
     return this.http.put<any>(`${environment.url_api}/admins/edit/`, data, { headers: headers });
   }
 
+  // Sprint S4: PUT con id en body (backend lee request.data["id"])
+  public actualizarAdmin(id: number, data: any): Observable<any> {
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
+    return this.http.put<any>(`${environment.url_api}/admins/edit/`, { id, ...data }, { headers: headers });
+  }
+
   //Eliminar Admin
   public eliminarAdmin(idUser: number): Observable<any> {
     var token = this.facadeService.getSessionToken();

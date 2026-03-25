@@ -72,7 +72,7 @@ togglePasswordVisibility(): void {
       next: (response) => {
         // Guardar datos de sesión
         if (response.token) {
-          this.facadeService.saveUserData(response);
+          this.facadeService.saveUserData(response, !!this.form.value.remember);
         }
         this.successMessage = '¡Inicio de sesión exitoso!';
 

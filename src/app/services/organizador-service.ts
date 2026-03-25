@@ -95,6 +95,13 @@ export class OrganizadorService {
     return this.http.put<any>(`${environment.url_api}/organizadores/edit/`, data, { headers: headers });
   }
 
+  // Sprint S4: PUT con id en body (backend lee request.data["id"])
+  public actualizarOrganizador(id: number, data: any): Observable<any> {
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
+    return this.http.put<any>(`${environment.url_api}/organizadores/edit/`, { id, ...data }, { headers: headers });
+  }
+
   //Eliminar Organizador
   public eliminarOrg(idUser: number): Observable<any> {
     var token = this.facadeService.getSessionToken();
