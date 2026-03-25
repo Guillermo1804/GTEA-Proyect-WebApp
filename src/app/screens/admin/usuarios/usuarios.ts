@@ -11,6 +11,9 @@ import { AdminServiceService } from '../../../services/admin-service.service';
 import { AlumnoService } from '../../../services/alumno-service';
 import { OrganizadorService } from '../../../services/organizador-service';
 import { EliminarUserModalComponent } from '../../../modals/eliminar-user-modal/eliminar-user-modal.component';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 interface User {
   id: number;
@@ -53,20 +56,22 @@ currentRole: 'admin' | 'organizador' | 'alumno' = 'alumno';
   ) { }
 
   ngOnInit(): void {
+    const storedRole = localStorage.getItem('gtea-proyecto-group_name') || '';
+
+    if (storedRole === 'admin' || storedRole === 'administrador') {
+      this.currentRole = 'admin';
+    } else if (storedRole === 'organizador') {
+      this.currentRole = 'organizador';
+    } else {
+      this.currentRole = 'alumno';
+    }
+
+    console.log('ROL NORMALIZADO:', this.currentRole);
     this.loadUsers();
-      const storedRole = localStorage.getItem('gtea-proyecto-group_name') || '';
-
-  if (storedRole === 'admin' || storedRole === 'administrador') {
-    this.currentRole = 'admin';
-  } else if (storedRole === 'organizador') {
-    this.currentRole = 'organizador';
-  } else {
-    this.currentRole = 'alumno';
   }
 
-  console.log('ROL NORMALIZADO:', this.currentRole);
-  this.loadUsers();
-  }
+
+  
 
   loadUsers(): void {
     this.isLoading = true;
@@ -163,6 +168,106 @@ currentRole: 'admin' | 'organizador' | 'alumno' = 'alumno';
   onSearchChange(value: string): void {
     this.searchQuery = value;
     this.currentPage = 1;
+  }
+
+  private async loadImageAsDataUrl(url: string): Promise<string> {
+    const response = await fetch(url, { cache: 'no-cache' });
+    const blob = await response.blob();
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string | null;
+        if (result) {
+          resolve(result);
+        } else {
+          reject(new Error('No se pudo leer el logo como DataURL'));
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async exportarPDF(): Promise<void> {
+    const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
+    const fecha = new Date();
+
+    const logoUrl = 'assets/LogoGTEA.png';
+    try {
+      const logoDataUrl = await this.loadImageAsDataUrl(logoUrl);
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const logoWidth = 140; // un poco más chico
+      const logoProps = doc.getImageProperties(logoDataUrl);
+      const logoHeight = (logoProps.height / logoProps.width) * logoWidth;
+      const logoX = pageWidth - logoWidth - 20; // hacia la derecha
+      const logoY = 15; // bajar un poco
+      doc.addImage(logoDataUrl, 'PNG', logoX, logoY, logoWidth, logoHeight);
+    } catch (error) {
+      console.warn('Error cargando el logo de GTEA para PDF:', error);
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text('Reporte de Usuarios', 40, 60);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.text(`Generado: ${fecha.toLocaleString()}`, 40, 80);
+    doc.text(`Filtro aplicado: ${this.activeFilter}`, 40, 95);
+
+    const datos = this.filteredUsers.map(u => ({
+      Nombre: u.name,
+      Email: u.email,
+      Rol: u.role,
+      Estatus: u.status
+    }));
+
+    const head = [['Nombre', 'Email', 'Rol', 'Estatus']];
+    const body = datos.map(r => [r.Nombre, r.Email, r.Rol, r.Estatus]);
+
+    autoTable(doc, {
+      head,
+      body,
+      startY: 150,
+      styles: {
+        font: 'helvetica',
+        fontSize: 10,
+        cellPadding: 8,
+        lineColor: [229, 231, 235],
+        lineWidth: 0.5
+      },
+      headStyles: {
+        fillColor: [19, 70, 236],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold'
+      },
+      bodyStyles: { textColor: [15, 23, 42] },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      columnStyles: {
+        0: { cellWidth: 150 },
+        1: { cellWidth: 200 },
+        2: { cellWidth: 100, halign: 'center' },
+        3: { cellWidth: 90, halign: 'center' }
+      }
+    });
+
+    const stamp = fecha.toISOString().slice(0, 19).replace(/[:T]/g, '-');
+    doc.save(`usuarios-${stamp}.pdf`);
+  }
+
+  exportarExcel(): void {
+    const datos = this.filteredUsers.map(u => ({
+      Nombre: u.name,
+      Email: u.email,
+      Rol: u.role,
+      Estatus: u.status
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(datos);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Usuarios');
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+    XLSX.writeFile(wb, `usuarios-${stamp}.xlsx`);
   }
 
   prevPage(): void { if (this.currentPage > 1) this.currentPage--; }
