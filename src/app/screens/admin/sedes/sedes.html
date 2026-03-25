@@ -22,7 +22,7 @@
 
         <!-- Filter Pills -->
         <div class="filter-pills">
-            <button class="pill active">
+            <button class="pill active" (click)="exportarPDF()">
                 <span class="material-icons">picture_as_pdf</span>
                 Exportar PDF
             </button>
@@ -30,7 +30,7 @@
                 <span class="material-icons">table_chart</span>
                 Exportar Excel
             </button>
-            <button class="pill">
+            <button class="pill" (click)="openFiltros()">
                 <span class="material-icons">filter_list</span>
                 Filtrar
             </button>
@@ -38,7 +38,7 @@
 
         <!-- Venue Cards -->
         <div class="venue-list">
-            @for (venue of venues; track venue.name) {
+            @for (venue of venuesFiltrados; track venue.name) {
             <div class="venue-card">
                 <div class="venue-header" (click)="toggleVenue(venue)">
                     <div class="venue-info">
@@ -92,4 +92,11 @@
 }
 @if (activeModal === 'nuevo-usuario') {
 <app-nuevo-usuario-modal (close)="closeModal()"></app-nuevo-usuario-modal>
+}
+@if (activeModal === 'filtros') {
+<app-filtros-sedes-modal
+  [filtros]="filtros"
+  (close)="closeModal()"
+  (aplicarFiltros)="onFiltrosAplicados($event)"
+></app-filtros-sedes-modal>
 }
