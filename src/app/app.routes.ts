@@ -89,7 +89,61 @@ export const routes: Routes = [
           import('./screens/alumno/evento-detalle/evento-detalle.component')
             .then(m => m.EventoDetalleComponent),
       },
+
+       // ── Nuevas rutas ──────────────────────────────────────
+    {
+      path: 'mis-eventos',
+      loadComponent: () =>
+        import('./screens/alumno/mis-eventos/mis-eventos')
+          .then(m => m.MisEventos),
+    },
+    {
+      path: 'historial',
+      loadComponent: () =>
+        import('./screens/alumno/historial/historial')
+          .then(m => m.Historial),
+    },
+    {
+      path: 'perfil',
+      loadComponent: () =>
+        import('./screens/alumno/perfil/perfil')
+          .then(m => m.Perfil),
+    },
     ],
   },
+
+    // ── Organizador routes (protegidas) ──
+  {
+    path: 'organizador',
+    canActivate: [authGuard],
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./screens/admin/dashboard/dashboard')
+            .then(m => m.Dashboard),
+      },
+      {
+        path: 'eventos',
+        loadComponent: () =>
+          import('./screens/admin/eventos/eventos')
+            .then(m => m.Eventos),
+      },
+      {
+        path: 'eventos/:id',
+        loadComponent: () =>
+          import('./screens/admin/eventos/evento-detail/evento-detail')
+            .then(m => m.EventoDetail),
+      },
+      {
+        path: 'reportes',
+        loadComponent: () =>
+          import('./screens/admin/reportes/reportes')
+            .then(m => m.Reportes),
+      },
+    ],
+  },
+
   { path: '**', redirectTo: 'landing' },
 ];

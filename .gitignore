@@ -41,3 +41,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Extra explicit rules as requested
+node_modules/
+dist/
+.angular/

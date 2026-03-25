@@ -104,30 +104,36 @@ export class RegistroScreenComponent implements OnInit {
   navigate(path: string): void {
     this.router.navigate([path]);
   }
-  public soloLetras(event: KeyboardEvent) {
-      const charCode = event.key.charCodeAt(0);
-      // Permitir solo letras (mayúsculas y minúsculas) y espacio
-      if (
-        !(charCode >= 65 && charCode <= 90) &&  // Letras mayúsculas
-        !(charCode >= 97 && charCode <= 122) && // Letras minúsculas
-        charCode !== 32                         // Espacio
-      ) {
-        event.preventDefault();
-      }
+  
+  public soloLetras(event: Event, controlName: 'firstName' | 'lastName'): void {
+    const input = event.target as HTMLInputElement;
+    const cleanValue = input.value
+      .replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '') // solo letras y espacios
+      .replace(/\s{2,}/g, ' '); // evita espacios dobles seguidos
+    
+    input.value = cleanValue;
+    
+    // Actualizar el FormControl correspondiente
+    const control = this.form.get(controlName);
+    if (control) {
+      control.setValue(cleanValue, { emitEvent: false });
+      control.updateValueAndValidity();
     }
-public soloNumeros(event: KeyboardEvent) {
-  const input = event.target as HTMLInputElement;
-  const valorActual = input.value;
-
-  // 1. Permitir solo números (0-9) usando Regex
-  if (!/^[0-9]$/.test(event.key)) {
-    event.preventDefault();
-    return;
   }
-
-  // 2. Si ya hay 9 dígitos, bloquear cualquier número adicional
-  if (valorActual.length >= 9) {
-    event.preventDefault();
+  
+  public soloNumeros(event: Event, controlName: 'idNumber'): void {
+    const input = event.target as HTMLInputElement;
+    const cleanValue = input.value
+      .replace(/\D/g, '') // elimina todo lo que no sea número
+      .slice(0, 9); // máximo 9 dígitos
+    
+    input.value = cleanValue;
+    
+    // Actualizar el FormControl
+    const control = this.form.get(controlName);
+    if (control) {
+      control.setValue(cleanValue, { emitEvent: false });
+      control.updateValueAndValidity();
+    }
   }
-}
 }
