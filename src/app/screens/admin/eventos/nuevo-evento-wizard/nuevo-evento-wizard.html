@@ -1,0 +1,512 @@
+<!-- ════════════════════════════════════════════
+     OVERLAY — fondo oscuro del modal
+     ════════════════════════════════════════════ -->
+<div class="wizard-overlay" (click)="onClose()"></div>
+
+<!-- ════════════════════════════════════════════
+     MODAL WIZARD
+     ════════════════════════════════════════════ -->
+<div class="wizard-modal" (click)="$event.stopPropagation()">
+
+  <!-- ── Header con logo y notificación ── -->
+  <div class="wizard-header">
+    <div class="wizard-brand">
+      <div class="brand-avatar">GT</div>
+      <span class="brand-name">{{ isEditMode ? 'Editar Evento' : 'Nuevo Evento' }}</span>
+    </div>
+    <button class="header-close-btn" (click)="onClose()" aria-label="Cerrar">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+
+  <!-- ── Barra de progreso ── -->
+  <div class="wizard-progress">
+    <div class="progress-track">
+      @for (step of [1, 2, 3]; track step) {
+        <div
+          class="progress-segment"
+          [class.active]="currentStep >= step"
+          [class.completed]="currentStep > step">
+        </div>
+      }
+    </div>
+    <p class="progress-label">Paso {{ currentStep }} de {{ totalSteps }}</p>
+  </div>
+
+  <!-- ── Mensajes de error / éxito globales ── -->
+  @if (errorMessage) {
+    <div class="wizard-alert error">
+      <span class="material-icons">error_outline</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+  }
+  @if (successMessage) {
+    <div class="wizard-alert success">
+      <span class="material-icons">check_circle_outline</span>
+      <span>{{ successMessage }}</span>
+    </div>
+  }
+
+  <!-- ════════════════════════════════════════
+       PASO 1 — Información General
+       ════════════════════════════════════════ -->
+  @if (currentStep === 1) {
+    <div class="wizard-body" [formGroup]="step1Form">
+
+      <!-- Campo: Título -->
+      <div class="form-group">
+        <label class="form-label" for="titulo">Título del evento</label>
+        <input
+          id="titulo"
+          class="form-input"
+          [class.invalid]="isFieldInvalid(step1Form, 'titulo')"
+          type="text"
+          placeholder="Ej. Taller de Innovación 2026"
+          formControlName="titulo"
+        />
+        @if (isFieldInvalid(step1Form, 'titulo')) {
+          <span class="form-error">{{ getFieldError(step1Form, 'titulo') }}</span>
+        }
+      </div>
+
+      <!-- Campo: Categoría -->
+      <div class="form-group">
+        <label class="form-label" for="categoriaId">Categoría</label>
+        <div class="select-wrapper">
+          <select
+            id="categoriaId"
+            class="form-select"
+            [class.invalid]="isFieldInvalid(step1Form, 'categoriaId')"
+            formControlName="categoriaId">
+            <option value="">Selecciona una categoría</option>
+            @for (cat of categorias; track cat.id) {
+              <option [value]="cat.id">{{ cat.nombre }}</option>
+            }
+          </select>
+          <span class="material-icons select-arrow">expand_more</span>
+        </div>
+        @if (isFieldInvalid(step1Form, 'categoriaId')) {
+          <span class="form-error">{{ getFieldError(step1Form, 'categoriaId') }}</span>
+        }
+      </div>
+
+      <!-- Campo: Descripción -->
+      <div class="form-group">
+        <label class="form-label" for="descripcion">Descripción</label>
+        <textarea
+          id="descripcion"
+          class="form-textarea"
+          [class.invalid]="isFieldInvalid(step1Form, 'descripcion')"
+          placeholder="Describe los detalles, objetivos y público del evento..."
+          rows="4"
+          formControlName="descripcion">
+        </textarea>
+        <div class="textarea-meta">
+          @if (isFieldInvalid(step1Form, 'descripcion')) {
+            <span class="form-error">{{ getFieldError(step1Form, 'descripcion') }}</span>
+          }
+          <span class="char-count">{{ step1Form.get('descripcion')?.value?.length || 0 }}/500</span>
+        </div>
+      </div>
+
+      <!-- Campo: Imagen de portada -->
+      <div class="form-group">
+        <label class="form-label">Imagen de portada</label>
+        @if (!imagenPreviewUrl) {
+          <label class="image-upload-area" for="imagenPortada">
+            <span class="material-icons image-upload-icon">image</span>
+            <span class="image-upload-text">Toca para subir imagen</span>
+            <span class="image-upload-hint">PNG, JPG hasta 5MB</span>
+            <input
+              id="imagenPortada"
+              type="file"
+              accept="image/png,image/jpeg"
+              class="visually-hidden"
+              (change)="onImageSelected($event)"
+            />
+          </label>
+        } @else {
+          <div class="image-preview-wrapper">
+            <img [src]="imagenPreviewUrl" alt="Preview" class="image-preview" />
+            <button class="image-remove-btn" (click)="removeImage()" type="button">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+  <!-- ════════════════════════════════════════
+       PASO 2 — Detalles del Evento
+       ════════════════════════════════════════ -->
+  @if (currentStep === 2) {
+    <div class="wizard-body" [formGroup]="step2Form">
+
+      <div class="step-title">
+        <h2>Detalles del Evento</h2>
+        <p>Configura horarios, capacidad y ubicación.</p>
+      </div>
+
+      <!-- Alerta de conflicto de horario -->
+      @if (hasConflict) {
+        <div class="conflict-alert">
+          <span class="material-icons conflict-icon">warning_amber</span>
+          <div class="conflict-body">
+            <strong>Conflicto de Horario</strong>
+            <p>{{ conflictMessage }}</p>
+          </div>
+        </div>
+      }
+
+      <!-- Fecha inicio y hora inicio -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Fecha de inicio</label>
+          <div class="date-input-wrapper">
+            <span class="material-icons date-icon">calendar_today</span>
+            <input
+              type="date"
+              class="form-input date-input"
+              [class.invalid]="isFieldInvalid(step2Form, 'fechaInicio')"
+              formControlName="fechaInicio"
+            />
+          </div>
+          @if (isFieldInvalid(step2Form, 'fechaInicio')) {
+            <span class="form-error">{{ getFieldError(step2Form, 'fechaInicio') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Hora</label>
+          <input
+            type="time"
+            class="form-input"
+            [class.invalid]="isFieldInvalid(step2Form, 'horaInicio')"
+            formControlName="horaInicio"
+          />
+          @if (isFieldInvalid(step2Form, 'horaInicio')) {
+            <span class="form-error">{{ getFieldError(step2Form, 'horaInicio') }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Fecha fin y hora fin -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Fecha de fin</label>
+          <div class="date-input-wrapper">
+            <span class="material-icons date-icon">calendar_today</span>
+            <input
+              type="date"
+              class="form-input date-input"
+              [class.invalid]="isFieldInvalid(step2Form, 'fechaFin') || isFechaFinInvalida"
+              formControlName="fechaFin"
+            />
+          </div>
+          @if (isFieldInvalid(step2Form, 'fechaFin')) {
+            <span class="form-error">{{ getFieldError(step2Form, 'fechaFin') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Hora</label>
+          <input
+            type="time"
+            class="form-input"
+            [class.invalid]="isFieldInvalid(step2Form, 'horaFin') || isFechaFinInvalida"
+            formControlName="horaFin"
+          />
+          @if (isFieldInvalid(step2Form, 'horaFin')) {
+            <span class="form-error">{{ getFieldError(step2Form, 'horaFin') }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Error de fechas cruzadas -->
+      @if (isFechaFinInvalida) {
+        <div class="form-error date-cross-error">
+          <span class="material-icons">error_outline</span>
+          La fecha y hora de fin debe ser posterior a la de inicio
+        </div>
+      }
+
+      <!-- Modalidad -->
+      <div class="form-group">
+        <label class="form-label">Modalidad</label>
+        <div class="modality-options">
+          <label
+            class="modality-card"
+            [class.selected]="step2Form.get('modalidad')?.value === 'Presencial'">
+            <input
+              type="radio"
+              value="Presencial"
+              formControlName="modalidad"
+              class="visually-hidden"
+            />
+            <span class="material-icons modality-icon">business</span>
+            <span>Presencial</span>
+            @if (step2Form.get('modalidad')?.value === 'Presencial') {
+              <span class="material-icons modality-check">check_circle</span>
+            }
+          </label>
+
+          <label
+            class="modality-card"
+            [class.selected]="step2Form.get('modalidad')?.value === 'Virtual'">
+            <input
+              type="radio"
+              value="Virtual"
+              formControlName="modalidad"
+              class="visually-hidden"
+            />
+            <span class="material-icons modality-icon">videocam</span>
+            <span>Virtual</span>
+            @if (step2Form.get('modalidad')?.value === 'Virtual') {
+              <span class="material-icons modality-check">check_circle</span>
+            }
+          </label>
+        </div>
+      </div>
+
+      <!-- Cupo límite y ubicación (solo Presencial) -->
+      @if (step2Form.get('modalidad')?.value === 'Presencial') {
+        <!-- Sede -->
+        <div class="form-group">
+          <label class="form-label" for="sedeId">Selecciona una Sede</label>
+          <div class="select-wrapper">
+            <select
+              id="sedeId"
+              class="form-select"
+              [class.invalid]="isFieldInvalid(step2Form, 'sedeId')"
+              formControlName="sedeId">
+              <option value="">Selecciona una Sede</option>
+              @for (sede of sedes; track sede.id) {
+                <option [value]="sede.id">{{ sede.nombre }}</option>
+              }
+            </select>
+            <span class="material-icons select-arrow">expand_more</span>
+          </div>
+          @if (isFieldInvalid(step2Form, 'sedeId')) {
+            <span class="form-error">{{ getFieldError(step2Form, 'sedeId') }}</span>
+          }
+        </div>
+
+        <!-- Aula -->
+        <div class="form-group">
+          <label class="form-label" for="aulaId">Selecciona un Aula</label>
+          <div class="select-wrapper">
+            <select
+              id="aulaId"
+              class="form-select"
+              [class.invalid]="isFieldInvalid(step2Form, 'aulaId')"
+              formControlName="aulaId"
+              [attr.disabled]="!step2Form.get('sedeId')?.value ? true : null">
+              <option value="">Selecciona un Aula</option>
+              @for (aula of aulas; track aula.id) {
+                <option [value]="aula.id">{{ aula.nombre }} ({{ aula.capacidad }} personas)</option>
+              }
+            </select>
+            <span class="material-icons select-arrow">expand_more</span>
+          </div>
+          @if (isFieldInvalid(step2Form, 'aulaId')) {
+            <span class="form-error">{{ getFieldError(step2Form, 'aulaId') }}</span>
+          }
+        </div>
+      }
+
+      <!-- Cupo máximo (stepper) -->
+      <div class="form-group">
+        <label class="form-label">Cupo límite</label>
+        <div class="stepper">
+          <button type="button" class="stepper-btn" (click)="decrementCupo()">
+            <span class="material-icons">remove</span>
+          </button>
+          <div class="stepper-display">
+            <span class="stepper-value">{{ step2Form.get('cupoMaximo')?.value }}</span>
+            <span class="stepper-unit">/{{ step2Form.get('cupoMaximo')?.value }}</span>
+          </div>
+          <button type="button" class="stepper-btn" (click)="incrementCupo()">
+            <span class="material-icons">add</span>
+          </button>
+        </div>
+        @if (isFieldInvalid(step2Form, 'cupoMaximo')) {
+          <span class="form-error">{{ getFieldError(step2Form, 'cupoMaximo') }}</span>
+        }
+      </div>
+
+      <!-- Costo de entrada (stepper) -->
+      <div class="form-group">
+        <label class="form-label">Costo entrada</label>
+        <div class="stepper">
+          <button type="button" class="stepper-btn" (click)="decrementCosto()">
+            <span class="material-icons">remove</span>
+          </button>
+          <div class="stepper-display">
+            <span class="stepper-value">${{ step2Form.get('costoEntrada')?.value | number:'1.2-2' }}</span>
+          </div>
+          <button type="button" class="stepper-btn" (click)="incrementCosto()">
+            <span class="material-icons">add</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista de espera (toggle) -->
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <span class="toggle-label">Lista de espera</span>
+          <span class="toggle-hint">Permitir inscripciones extra</span>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" formControlName="listaEspera" />
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+
+    </div>
+  }
+
+  <!-- ════════════════════════════════════════
+       PASO 3 — Resumen y Publicación
+       ════════════════════════════════════════ -->
+  @if (currentStep === 3) {
+    <div class="wizard-body" [formGroup]="step3Form">
+
+      <div class="step-title">
+        <h2>Resumen del Evento</h2>
+        <p>Verifica los detalles antes de publicar.</p>
+      </div>
+
+      <!-- Preview imagen -->
+      @if (imagenPreviewUrl) {
+        <div class="summary-image-wrapper">
+          <div class="summary-category-badge">
+            {{ resumenCategoria }}
+          </div>
+          <img [src]="imagenPreviewUrl" alt="Portada del evento" class="summary-image" />
+        </div>
+      } @else {
+        <div class="summary-image-placeholder">
+          <span class="material-icons">image</span>
+          <span>Sin imagen de portada</span>
+        </div>
+      }
+
+      <!-- Fecha y hora -->
+      <div class="summary-datetime">
+        <span class="material-icons summary-icon">calendar_today</span>
+        <span>{{ resumenFechaInicio }} – {{ resumenFechaFin }}</span>
+      </div>
+
+      <!-- Título -->
+      <h3 class="summary-title">{{ resumenTitulo }}</h3>
+
+      <!-- Ubicación -->
+      <div class="summary-location">
+        <span class="material-icons summary-icon">location_on</span>
+        <span>{{ resumenAula }}, {{ resumenSede }}</span>
+      </div>
+
+      <!-- Descripción -->
+      <div class="summary-section">
+        <h4 class="summary-section-title">Descripción</h4>
+        <p class="summary-description">{{ resumenDescripcion }}</p>
+      </div>
+
+      <!-- Stats: capacidad y modalidad -->
+      <div class="summary-stats">
+        <div class="summary-stat">
+          <span class="summary-stat-label">Capacidad</span>
+          <div class="summary-stat-value">
+            <span class="material-icons">group</span>
+            {{ resumenCupo }} personas
+          </div>
+        </div>
+        <div class="summary-stat">
+          <span class="summary-stat-label">Modalidad</span>
+          <div class="summary-stat-value">
+            <span class="material-icons">{{ resumenModalidad === 'Virtual' ? 'videocam' : 'business' }}</span>
+            {{ resumenModalidad }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Opciones de publicación -->
+      <div class="publish-options">
+        <!-- Publicar inmediatamente -->
+        <label
+          class="publish-card"
+          [class.selected]="step3Form.get('publicarInmediatamente')?.value === true">
+          <div class="publish-card-info">
+            <span class="material-icons publish-icon">rocket_launch</span>
+            <div>
+              <strong>Publicar Inmediatamente</strong>
+              <p>El evento será visible y las inscripciones se abrirán.</p>
+            </div>
+          </div>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              formControlName="publicarInmediatamente"
+            />
+            <span class="toggle-track"></span>
+          </div>
+        </label>
+
+        <!-- Soy el organizador -->
+        <label
+          class="publish-card"
+          [class.selected]="step3Form.get('esOrganizador')?.value === true">
+          <div class="publish-card-info">
+            <span class="material-icons publish-icon">person</span>
+            <div>
+              <strong>Soy el Organizador de este evento</strong>
+              <p>Aparecerás como el organizador de este evento</p>
+            </div>
+          </div>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              formControlName="esOrganizador"
+            />
+            <span class="toggle-track"></span>
+          </div>
+        </label>
+      </div>
+
+    </div>
+  }
+
+  <!-- ── Footer con botones de navegación ── -->
+  <div class="wizard-footer">
+    @if (currentStep > 1) {
+      <button class="btn-secondary" (click)="goPrev()" [disabled]="isSubmitting">
+        Anterior
+      </button>
+    } @else {
+      <button class="btn-secondary" (click)="onClose()">
+        Cancelar
+      </button>
+    }
+
+    @if (currentStep < totalSteps) {
+      <button class="btn-primary" (click)="goNext()">
+        Siguiente
+      </button>
+    } @else {
+      <button
+        class="btn-primary btn-publish"
+        (click)="onSubmit()"
+        [disabled]="isSubmitting">
+        @if (isSubmitting) {
+          <span class="spinner"></span>
+        } @else {
+          <span class="material-icons">{{ isEditMode ? 'save' : 'rocket_launch' }}</span>
+        }
+        {{ isEditMode ? 'Guardar Cambios' : 'Publicar Evento' }}
+      </button>
+    }
+  </div>
+
+</div>

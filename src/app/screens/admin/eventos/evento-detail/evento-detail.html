@@ -1,0 +1,228 @@
+<!-- ════════════════════════════════════════════
+     ESTADO: Cargando
+     ════════════════════════════════════════════ -->
+@if (isLoading) {
+  <div class="loading-screen">
+    <div class="spinner-ring"></div>
+    <p>Cargando evento...</p>
+  </div>
+}
+
+<!-- ════════════════════════════════════════════
+     ESTADO: Error
+     ════════════════════════════════════════════ -->
+@if (!isLoading && errorMessage) {
+  <div class="error-screen">
+    <span class="material-icons">error_outline</span>
+    <p>{{ errorMessage }}</p>
+    <button class="btn-back-error" (click)="goBack()">Volver a eventos</button>
+  </div>
+}
+
+<!-- ════════════════════════════════════════════
+     VISTA PRINCIPAL
+     ════════════════════════════════════════════ -->
+@if (!isLoading && evento && !errorMessage) {
+<div class="detail-page">
+
+  <!-- ── Navbar fijo ── -->
+  <div class="detail-navbar">
+    <div class="navbar-inner">
+      <div class="brand">
+        <div class="logo-tile">GT</div>
+        <span class="brand-name">GTEA</span>
+      </div>
+      <button class="icon-btn" aria-label="Notificaciones">
+        <span class="material-icons">notifications</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Hero image ── -->
+  <div class="hero-wrapper">
+    @if (!imagenError && evento.imagenPortada) {
+      <img
+        [src]="evento.imagenPortada"
+        [alt]="evento.titulo"
+        class="hero-img"
+        (error)="onImageError()"
+      />
+    } @else {
+      <div class="hero-placeholder">
+        <span class="material-icons">image</span>
+      </div>
+    }
+
+    <!-- Botón volver -->
+    <button class="hero-back-btn" (click)="goBack()" aria-label="Volver">
+      <span class="material-icons">arrow_back</span>
+    </button>
+
+    <!-- Badge de categoría -->
+    <span
+      class="hero-category-badge"
+      [style.background]="evento.categoriaColor">
+      {{ evento.categoria }}
+    </span>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       TARJETA DE CONTENIDO
+       ════════════════════════════════════════ -->
+  <div class="content-card">
+
+    <!-- Estado del evento -->
+    <div class="event-status-row">
+      <span class="status-badge"
+        [class.active]="evento.status === 'Activo'"
+        [class.draft]="evento.status === 'Borrador'"
+        [class.finished]="evento.status === 'Finalizado'"
+        [class.cancelled]="evento.status === 'Cancelado'">
+        {{ evento.status }}
+      </span>
+      <span class="modalidad-badge" [class.virtual]="evento.modalidad === 'Virtual'">
+        <span class="material-icons">{{ evento.modalidad === 'Virtual' ? 'videocam' : 'business' }}</span>
+        {{ evento.modalidad }}
+      </span>
+    </div>
+
+    <!-- Título -->
+    <h1 class="event-title">{{ evento.titulo }}</h1>
+
+    <!-- Fecha y hora -->
+    <div class="info-row">
+      <div class="info-icon-wrap">
+        <span class="material-icons">calendar_today</span>
+      </div>
+      <div class="info-body">
+        <span class="info-primary">{{ evento.fechaInicio }}</span>
+        <span class="info-secondary">{{ evento.horaInicio }} - {{ evento.horaFin }}</span>
+      </div>
+    </div>
+
+    <!-- Ubicación -->
+    <div class="info-row">
+      <div class="info-icon-wrap">
+        <span class="material-icons">location_on</span>
+      </div>
+      <div class="info-body">
+        <span class="info-primary">{{ evento.sede }}</span>
+        <span class="info-secondary">{{ evento.aula }}</span>
+      </div>
+    </div>
+
+    <!-- Organizador -->
+    <div class="organizer-row">
+      <div class="organizer-avatar">
+        @if (evento.organizadorAvatar) {
+          <img [src]="evento.organizadorAvatar" [alt]="evento.organizadorNombre" />
+        } @else {
+          <span class="avatar-initials">{{ inicialeOrganizador }}</span>
+        }
+      </div>
+      <div class="organizer-info">
+        <span class="organizer-label">Impartido por</span>
+        <span class="organizer-name">{{ evento.organizadorNombre }}</span>
+      </div>
+      <button class="ver-perfil-btn" (click)="verPerfil()">Ver Perfil</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Descripción -->
+    <div class="description-section">
+      <h3 class="section-title">Acerca del taller</h3>
+      <p class="description-text">{{ evento.descripcion }}</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Cupo y costo -->
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="material-icons stat-icon">group</span>
+        <div class="stat-info">
+          <span class="stat-label">Inscritos</span>
+          <span class="stat-value">{{ evento.inscritos }}/{{ evento.cupoMaximo }}</span>
+        </div>
+      </div>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat-item">
+        <span class="material-icons stat-icon">sell</span>
+        <div class="stat-info">
+          <span class="stat-label">Costo</span>
+          <span class="stat-value" [class.free]="!esCosto">
+            {{ esCosto ? ('$' + evento.costoEntrada) : 'Gratuito' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat-item">
+        <span class="material-icons stat-icon">pending_actions</span>
+        <div class="stat-info">
+          <span class="stat-label">Lista espera</span>
+          <span class="stat-value">{{ evento.listaEspera ? 'Sí' : 'No' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de ocupación -->
+    <div class="occupancy-section">
+      <div class="occupancy-header">
+        <span class="occupancy-label">Ocupación</span>
+        <span class="occupancy-pct" [style.color]="ocupacionColor">
+          {{ ocupacionPct }}%
+        </span>
+      </div>
+      <div class="occupancy-bar">
+        <div
+          class="occupancy-fill"
+          [style.width.%]="ocupacionPct"
+          [style.background]="ocupacionColor">
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Mapa placeholder -->
+    <div class="map-section">
+      <div class="map-placeholder">
+        <div class="map-watermark">
+          <span class="material-icons">map</span>
+        </div>
+        <div class="map-label-row">
+          <span class="material-icons map-pin-icon">location_on</span>
+          <span class="map-label">{{ evento.sede }} · {{ evento.aula }}</span>
+        </div>
+      </div>
+      <button class="btn-ver-mapa">
+        <span class="material-icons">open_in_new</span>
+        Ver en Mapa
+      </button>
+    </div>
+
+    <!-- Espaciado para el footer fijo -->
+    <div class="footer-spacer"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       FOOTER FIJO — Acciones admin
+       ════════════════════════════════════════ -->
+  <div class="detail-footer">
+    <button class="btn-footer-secondary" (click)="eliminarEvento()">
+      <span class="material-icons">delete</span>
+      Eliminar
+    </button>
+    <button class="btn-footer-primary" (click)="editarEvento()">
+      <span class="material-icons">edit</span>
+      Editar Evento
+    </button>
+  </div>
+
+</div>
+}

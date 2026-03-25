@@ -1,0 +1,90 @@
+<div class="modal-overlay" (click)="onCancel()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Nueva Sede</h2>
+            <button class="close-btn" (click)="onCancel()">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <div class="modal-body">
+            @if (formError) {
+            <div class="error-message">{{ formError }}</div>
+            }
+
+            <div class="form-group">
+                <label class="form-label">Nombre de la Sede</label>
+                <input class="form-input" type="text" placeholder="Ej: Edificio D - Deportes" [(ngModel)]="sedeName">
+                @if (hasError('sedeName')) {
+                <small class="error-message">{{ getFieldError('sedeName') }}</small>
+                }
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Dirección</label>
+                <input class="form-input" type="text" placeholder="Calle, número, colonia..." [(ngModel)]="address">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Teléfono</label>
+                    <input class="form-input" type="tel" placeholder="(000) 000-0000" [(ngModel)]="phone">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Correo</label>
+                    <input class="form-input" type="email" placeholder="sede@universidad.edu" [(ngModel)]="email">
+                    @if (hasError('email')) {
+                    <small class="error-message">{{ getFieldError('email') }}</small>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Pisos</label>
+                <div class="counter">
+                    <button class="counter-btn" (click)="decrementFloors()">
+                        <span class="material-icons">remove</span>
+                    </button>
+                    <span class="counter-value">{{ floors }}</span>
+                    <button class="counter-btn" (click)="incrementFloors()">
+                        <span class="material-icons">add</span>
+                    </button>
+                </div>
+                @if (hasError('floors')) {
+                <small class="error-message">{{ getFieldError('floors') }}</small>
+                }
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Instalaciones</label>
+                <div class="equipment-list">
+                    @for (item of facilities; track item.name) {
+                    <div class="equipment-item">
+                        <div class="equipment-info">
+                            <span class="material-icons equip-icon">{{ item.icon }}</span>
+                            <span class="equip-name">{{ item.name }}</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" [checked]="item.enabled" (change)="toggleFacility(item)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Notas adicionales</label>
+                <textarea class="form-textarea" rows="3" placeholder="Observaciones..." [(ngModel)]="notes"></textarea>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="onCancel()">Cancelar</button>
+            <button class="btn-save" (click)="onSave()">Guardar</button>
+        </div>
+    </div>
+</div>
