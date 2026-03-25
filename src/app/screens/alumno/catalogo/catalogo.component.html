@@ -2,80 +2,113 @@
 
 <div class="alumno-screen-container">
   <div class="content-wrapper">
-    <!-- Header Section -->
+
+    <div class="alumno-screen-container">
+  <div class="content-wrapper">
+
+    <!-- ── Header: Saludo ── -->
     <div class="header-section">
-      <!-- <div class="notification-bell"></div> -->
+      <div class="user-greeting">
+        <!-- <div class="avatar">
+          <img src="assets/avatar-juana.png" alt="Avatar" />
+        </div> -->
+        <div class="greeting-text">
+          <h2>¡Hola, Estudiante!</h2>
+          <!-- <span class="user-greeting">¡Hola, {{ userName }}!</span> -->
+          <!-- <span class="carrera">Estudiante universitario</span> -->
+        </div>
+        <!-- <button class="notification-bell" aria-label="Notificaciones">
+          
+        </button> -->
+      </div>
     </div>
 
-    <!-- Talleres List -->
+    <!-- ── Banner de Alerta ── -->
+    <div class="alert-banner">
+      <span class="alert-icon">📢</span>
+      <p>¡Atención! La inscripción a talleres cierra mañana. No pierdas tu lugar.</p>
+      <button class="alert-close" aria-label="Cerrar">✕</button>
+    </div>
+
+    <!-- ── Resumen Académico ── -->
+    <section class="resumen-section">
+      <h3 class="section-title">Resumen Académico</h3>
+      <div class="resumen-grid">
+        <div class="resumen-card">
+          <span class="resumen-icon resumen-icon--blue">🎓</span>
+          <span class="resumen-number">2</span>
+          <span class="resumen-label">Inscritos</span>
+        </div>
+        <div class="resumen-card">
+          <span class="resumen-icon resumen-icon--green">✅</span>
+          <span class="resumen-number">12</span>
+          <span class="resumen-label">Completados</span>
+        </div>
+        <div class="resumen-card">
+          <span class="resumen-icon resumen-icon--purple">🏆</span>
+          <span class="resumen-number">5</span>
+          <span class="resumen-label">Certificados</span>
+        </div>
+      </div>
+    </section>
+
+    <h2 class="section-title">Eventos Recomendados Para Ti</h2>
+
     <div class="talleres-list">
       @for (taller of talleres(); track taller.id) {
-      <div class="taller-card" [ngClass]="'estado-' + taller.estado">
-        <!-- Taller Image -->
-        <div class="taller-image">
-          <img [src]="taller.imagen" [alt]="taller.titulo" />
-        </div>
+        <div class="taller-card" [ngClass]="'estado-' + taller.estado">
 
-        <!-- Taller Content -->
-        <div class="taller-content">
-          <!-- Categoria Badge -->
-          <span class="category-badge" [ngClass]="'categoria-' + taller.categoria.toLowerCase()">
-            {{ taller.categoria }}
-          </span>
+          <!-- Imagen con badge encima -->
+          <div class="taller-image-wrapper">
+            <img [src]="taller.imagen" [alt]="taller.titulo" class="taller-image" />
+            <span class="category-badge" [ngClass]="'categoria-' + taller.categoria.toLowerCase()">
+              {{ taller.categoria }}
+            </span>
+          </div>
 
-          <!-- Titulo -->
-          <h3 class="taller-titulo">{{ taller.titulo }}</h3>
+          <!-- Contenido de la tarjeta -->
+          <div class="taller-content">
+            <h3 class="taller-titulo">{{ taller.titulo }}</h3>
+            <p class="taller-descripcion">{{ taller.descripcion }}</p>
 
-          <!-- Detalles -->
-          <div class="taller-details">
             <div class="detail-item">
               <span class="detail-icon">📅</span>
-              <span>{{ taller.fecha }} • {{ taller.hora }}</span>
+              <span>{{ taller.fecha }}</span>
             </div>
+
             <div class="detail-item">
               <span class="detail-icon">📍</span>
               <span>{{ taller.ubicacion }}</span>
             </div>
+
+            <div class="disponibilidad-section">
+              <span class="disponibilidad-text">{{ taller.disponibilidad }}</span>
+              <span class="inscritos-count">{{ taller.inscritos }}/{{ taller.totalCupos }} inscritos</span>
+            </div>
+
+            <div class="taller-actions">
+              @switch (taller.estado) {
+                @case ('disponible') {
+                  <button class="btn btn-outline" (click)="abrirDetalles(taller)">Ver Detalles</button>
+                  <button class="btn btn-primary" (click)="inscribirse(taller)">Inscribirme</button>
+                }
+                @case ('inscrito') {
+                  <button class="btn btn-secondary" (click)="abrirDetalles(taller)">Ver Detalles</button>
+                }
+                @case ('lista-espera') {
+                  <button class="btn btn-warning" (click)="cancelarEspera(taller)">Lista de Espera</button>
+                }
+                @case ('agotado') {
+                  <button class="btn btn-disabled" disabled>Agotado</button>
+                }
+              }
+            </div>
           </div>
 
-          <!-- Disponibilidad -->
-          <div class="disponibilidad-section">
-            <span class="disponibilidad-text">{{ taller.disponibilidad }}</span>
-            <span class="inscritos-count">{{ taller.inscritos }}/{{ taller.totalCupos }} inscritos</span>
-          </div>
-
-          <!-- Acciones -->
-          <div class="taller-actions">
-            @switch (taller.estado) {
-            @case ('disponible') {
-            <button class="btn btn-primary" (click)="abrirDetalles(taller)">
-              Ver Detalles
-            </button>
-            <button class="btn btn-inscribir" (click)="inscribirse(taller)">
-              Inscribirme
-            </button>
-            }
-            @case ('inscrito') {
-            <button class="btn btn-secondary" (click)="abrirDetalles(taller)">
-              Ver Detalles
-            </button>
-            }
-            @case ('lista-espera') {
-            <button class="btn btn-warning" (click)="cancelarEspera(taller)">
-              Lista de Espera
-            </button>
-            }
-            @case ('agotado') {
-            <button class="btn btn-disabled">
-              Agotado
-            </button>
-            }
-            }
-          </div>
         </div>
-      </div>
       }
     </div>
+
   </div>
 </div>
 

@@ -56,158 +56,7 @@ export interface Evento {
   providedIn: 'root',
 })
 export class EventoService {
-  // ════════════════════════════════════════════════
-  // 🔧 MOCKS CENTRALIZADOS — Se eliminan cuando llegue el backend
-  // ════════════════════════════════════════════════
 
-  private readonly MOCK_CATEGORIAS = [
-    { id: 1, nombre: 'Talleres' },
-    { id: 2, nombre: 'Conferencias' },
-    { id: 3, nombre: 'Seminarios' },
-    { id: 4, nombre: 'Deportes' },
-    { id: 5, nombre: 'Culturales' },
-  ];
-
-  private readonly MOCK_SEDES = [
-    { id: 1, nombre: 'Edificio A - Ingeniería' },
-    { id: 2, nombre: 'Edificio B - Ciencias' },
-    { id: 3, nombre: 'Edificio C - Humanidades' },
-  ];
-
-  private readonly MOCK_AULAS: { [sedeId: number]: any[] } = {
-    1: [
-      { id: 101, nombre: 'Lab. Sistemas #1', capacidad: 40 },
-      { id: 102, nombre: 'Lab. Sistemas #2', capacidad: 40 },
-      { id: 103, nombre: 'Lab. Sistemas #3', capacidad: 40 },
-    ],
-    2: [
-      { id: 201, nombre: 'Auditorio Principal', capacidad: 200 },
-      { id: 202, nombre: 'Lab. Química', capacidad: 30 },
-    ],
-    3: [
-      { id: 301, nombre: 'Aula Magna', capacidad: 120 },
-      { id: 302, nombre: 'Sala de Usos Múltiples', capacidad: 50 },
-      { id: 303, nombre: 'Galería Central', capacidad: 100 },
-    ],
-  };
-
-  // Base de datos mock de eventos (sincronizada con eventos.ts)
-  private readonly MOCK_EVENTOS: Evento[] = [
-    {
-      id: 1,
-      titulo: 'Taller de Python Avanzado',
-      categoriaId: 1, // Talleres
-      descripcion: 'Taller intensivo sobre programación avanzada en Python, incluyendo estructuras de datos complejas, programación asíncrona y frameworks modernos.',
-      imagenPortada: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=800',
-      fechaInicio: '2026-03-12',
-      horaInicio: '09:00',
-      fechaFin: '2026-03-12',
-      horaFin: '12:00',
-      modalidad: 'Presencial',
-      sedeId: 1,
-      aulaId: 103, // Lab. Sistemas #3
-      cupoMaximo: 40,
-      costoEntrada: 0,
-      listaEspera: false,
-      publicarInmediatamente: true,
-      esOrganizador: true,
-    },
-    {
-      id: 2,
-      titulo: 'Conferencia Inteligencia Artificial',
-      categoriaId: 2, // Conferencias
-      descripcion: 'Conferencia sobre las últimas tendencias en inteligencia artificial, machine learning y sus aplicaciones en la industria moderna.',
-      imagenPortada: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800',
-      fechaInicio: '2026-03-15',
-      horaInicio: '16:00',
-      fechaFin: '2026-03-15',
-      horaFin: '18:00',
-      modalidad: 'Presencial',
-      sedeId: 2,
-      aulaId: 201, // Auditorio Principal
-      cupoMaximo: 200,
-      costoEntrada: 0,
-      listaEspera: false,
-      publicarInmediatamente: true,
-      esOrganizador: true,
-    },
-    {
-      id: 3,
-      titulo: 'Torneo de Ajedrez Interuniversitario',
-      categoriaId: 4, // Deportes
-      descripcion: 'Torneo de ajedrez abierto a todas las universidades. Categorías: principiantes, intermedios y avanzados.',
-      imagenPortada: 'https://images.unsplash.com/photo-1528819622765-d6bcf132ac08?w=800',
-      fechaInicio: '2026-03-20',
-      horaInicio: '10:00',
-      fechaFin: '2026-03-20',
-      horaFin: '17:00',
-      modalidad: 'Presencial',
-      sedeId: 3,
-      aulaId: 302, // Sala de Usos Múltiples
-      cupoMaximo: 50,
-      costoEntrada: 0,
-      listaEspera: false,
-      publicarInmediatamente: true,
-      esOrganizador: true,
-    },
-    {
-      id: 4,
-      titulo: 'Seminario de Metodología de Investigación',
-      categoriaId: 3, // Seminarios
-      descripcion: 'Seminario dirigido a estudiantes de posgrado sobre metodologías de investigación científica y redacción de artículos académicos.',
-      imagenPortada: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800',
-      fechaInicio: '2026-03-25',
-      horaInicio: '14:00',
-      fechaFin: '2026-03-25',
-      horaFin: '16:00',
-      modalidad: 'Presencial',
-      sedeId: 3,
-      aulaId: 301, // Aula Magna
-      cupoMaximo: 80,
-      costoEntrada: 0,
-      listaEspera: false,
-      publicarInmediatamente: false, // Borrador
-      esOrganizador: true,
-    },
-    {
-      id: 5,
-      titulo: 'Hackathon GTEA 2026',
-      categoriaId: 1, // Talleres
-      descripcion: 'Maratón de programación de 12 horas. Desarrolla soluciones innovadoras y compite por premios en efectivo. Incluye comida y bebidas.',
-      imagenPortada: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=800',
-      fechaInicio: '2026-04-01',
-      horaInicio: '08:00',
-      fechaFin: '2026-04-01',
-      horaFin: '20:00',
-      modalidad: 'Presencial',
-      sedeId: 1,
-      aulaId: 101, // Lab. Sistemas #1
-      cupoMaximo: 60,
-      costoEntrada: 0,
-      listaEspera: true,
-      publicarInmediatamente: true,
-      esOrganizador: true,
-    },
-    {
-      id: 6,
-      titulo: 'Exposición de Arte Digital',
-      categoriaId: 5, // Culturales
-      descripcion: 'Exposición de obras de arte digital creadas por estudiantes. Incluye realidad virtual, animación 3D y arte generativo.',
-      imagenPortada: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800',
-      fechaInicio: '2026-02-05',
-      horaInicio: '11:00',
-      fechaFin: '2026-02-05',
-      horaFin: '19:00',
-      modalidad: 'Presencial',
-      sedeId: 3,
-      aulaId: 303, // Galería Central
-      cupoMaximo: 100,
-      costoEntrada: 0,
-      listaEspera: false,
-      publicarInmediatamente: true,
-      esOrganizador: true,
-    },
-  ];
 
   constructor(
     private http: HttpClient,
@@ -343,6 +192,8 @@ export class EventoService {
    * Mapea campos de la API a la interfaz Evento y agrega campos de display.
    */
   private _mapApiResponse(raw: any): Evento {
+    console.log('RAW categoria_nombre:', raw.categoria_nombre);
+
     return {
       id: raw.id,
       titulo: raw.titulo,
