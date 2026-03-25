@@ -1,0 +1,68 @@
+<app-top-navbar role="estudiante" mode="auth"></app-top-navbar>
+
+<div class="alumno-screen-container">
+  <div class="content-wrapper">
+
+    <!-- Banner de progreso -->
+    <div class="progreso-banner">
+      <div class="progreso-icon">🏆</div>
+      <div class="progreso-texto">
+        <span class="progreso-label">Tu Progreso</span>
+        <h2>Has participado en <span class="progreso-numero">{{ totalEventos() }} eventos</span></h2>
+        <p>¡Continúa aprendiendo y expandiendo tus habilidades!</p>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-wrapper">
+      <button class="filtro-btn" [class.active]="filtroActivo()==='todos'"        (click)="setFiltro('todos')">Todos</button>
+      <button class="filtro-btn" [class.active]="filtroActivo()==='proximo'"      (click)="setFiltro('proximo')">Próximos</button>
+      <button class="filtro-btn" [class.active]="filtroActivo()==='completado'"   (click)="setFiltro('completado')">Completados</button>
+      <button class="filtro-btn" [class.active]="filtroActivo()==='cancelado'"    (click)="setFiltro('cancelado')">Cancelados</button>
+      <button class="filtro-btn" [class.active]="filtroActivo()==='lista-espera'" (click)="setFiltro('lista-espera')">En Lista de Espera</button>
+    </div>
+
+    <!-- Lista -->
+    @if (eventosFiltrados.length === 0) {
+      <div class="empty-state">
+        <span>📭</span>
+        <p>No tienes eventos en esta categoría.</p>
+      </div>
+    } @else {
+      <div class="eventos-list">
+        @for (evento of eventosFiltrados; track evento.id) {
+          <div class="evento-card">
+            <img [src]="evento.imagen" [alt]="evento.titulo" class="evento-thumb"
+                 (error)="$any($event.target).style.display='none'" />
+            <div class="evento-info">
+              <span class="estado-badge estado-{{ evento.estado }}">
+                @switch (evento.estado) {
+                  @case ('completado')   { ✅ Completado }
+                  @case ('proximo')      { 🔵 Próximo }
+                  @case ('cancelado')    { ❌ Cancelado }
+                  @case ('lista-espera') { 🔴 Lista de espera #{{ evento.posicionLista }} }
+                }
+              </span>
+              <h3 class="evento-titulo">{{ evento.titulo }}</h3>
+              <div class="evento-meta">
+                <span>📅 {{ evento.fecha }} • {{ evento.hora }}</span>
+              </div>
+              <div class="evento-meta">
+                <span>📍 {{ evento.ubicacion }}</span>
+              </div>
+              <div class="evento-acciones">
+                <button class="btn-detalle" (click)="verDetalle(evento.id)">Ver Detalles</button>
+                @if (evento.tieneCertificado) {
+                  <button class="btn-certificado">Ver Constancia 📄</button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</div>
+
+<app-bottom-nav role="estudiante" activeTab="/alumno/mis-eventos"></app-bottom-nav>

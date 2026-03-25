@@ -1,0 +1,45 @@
+<!-- FAB Action Menu Overlay -->
+@if (showFabMenu) {
+<div class="fab-overlay" (click)="closeFabMenu()"></div>
+
+<div class="fab-menu">
+    @for (action of visibleFabActions; track action.action) {
+    <button class="fab-action-item" (click)="onFabAction(action.action)">
+        <div class="fab-action-icon" [style.background]="action.color">
+            <span class="material-icons">{{ action.icon }}</span>
+        </div>
+        <span class="fab-action-label">{{ action.label }}</span>
+    </button>
+    }
+</div>
+}
+
+<!-- Bottom Nav Bar -->
+<nav class="bottom-nav">
+    <div class="nav-tabs">
+        <!-- Left Tabs -->
+        @for (tab of leftTabs; track tab.route) {
+        <button class="nav-tab" [class.active]="isActive(tab.route)" (click)="navigate(tab.route)">
+            <span class="material-icons">{{ tab.icon }}</span>
+            <span class="tab-label">{{ tab.label }}</span>
+        </button>
+        }
+
+        <!-- Center FAB -->
+        @if (hasFab) {
+        <div class="fab-spacer">
+            <button class="fab-button" [class.open]="showFabMenu" (click)="toggleFabMenu()">
+                <span class="material-icons fab-icon">{{ showFabMenu ? 'close' : 'add' }}</span>
+            </button>
+        </div>
+        }
+
+        <!-- Right Tabs -->
+        @for (tab of rightTabs; track tab.route) {
+        <button class="nav-tab" [class.active]="isActive(tab.route)" (click)="navigate(tab.route)">
+            <span class="material-icons">{{ tab.icon }}</span>
+            <span class="tab-label">{{ tab.label }}</span>
+        </button>
+        }
+    </div>
+</nav>
