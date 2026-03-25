@@ -309,6 +309,28 @@ export class EventoService {
     return this.http.delete<any>(`${environment.url_api}/eventos/edit/?id=${idEvento}`, { headers });
   }
 
+  // ─────────────────────────────────────────────
+  // [CREATE] Upload imagen de portada (dev/prod simple)
+  // Endpoint esperado: POST /eventos/imagen-upload/
+  // Recibe multipart/form-data con el campo `imagen`
+  // Devuelve: { imagen_url: string }
+  // ─────────────────────────────────────────────
+  public subirImagenPortada(file: File): Observable<{ imagen_url: string }> {
+    const token = this.facadeService.getSessionToken();
+    const headers = new HttpHeaders({
+      'Authorization': 'Token ' + token,
+    });
+
+    const formData = new FormData();
+    formData.append('imagen', file);
+
+    return this.http.post<{ imagen_url: string }>(
+      `${environment.url_api}/eventos/imagen-upload/`,
+      formData,
+      { headers }
+    );
+  }
+
   /**
    * [READ] Obtener categorías disponibles para el select del Paso 1
    * Endpoint esperado: GET /categorias/
