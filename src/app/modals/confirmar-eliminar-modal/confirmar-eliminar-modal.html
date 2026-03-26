@@ -1,0 +1,26 @@
+<div class="modal-overlay" (click)="onCancelar()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-icon">
+      <span class="material-icons">delete_forever</span>
+    </div>
+
+    <h2 class="modal-title">{{ titulo || 'Eliminar elemento' }}</h2>
+    <p class="modal-message">{{ mensaje || '¿Estás seguro? Esta acción no se puede deshacer.' }}</p>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="onCancelar()" [disabled]="isLoading">
+        Cancelar
+      </button>
+      <button class="btn-delete" (click)="onConfirmar()" [disabled]="isLoading">
+        @if (isLoading) {
+          <span class="material-icons spinning">sync</span>
+        } @else {
+          <span class="material-icons">delete</span>
+        }
+        {{ isLoading ? 'Eliminando...' : 'Sí, eliminar' }}
+      </button>
+    </div>
+
+  </div>
+</div>
