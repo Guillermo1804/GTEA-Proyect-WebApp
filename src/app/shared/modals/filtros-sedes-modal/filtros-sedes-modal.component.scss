@@ -1,0 +1,256 @@
+// Modal Overlay
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+// Modal Header
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+
+  h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    color: #6b7280;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .material-icons {
+      font-size: 20px;
+    }
+  }
+}
+
+// Modal Body
+.modal-body {
+  padding: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.filter-section {
+  margin-bottom: 24px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.filter-label {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #1346ec;
+    box-shadow: 0 0 0 3px rgba(19, 70, 236, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+// Estado Options
+.estado-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.estado-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #374151;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #1346ec;
+    background: #f3f4f6;
+  }
+
+  &.active {
+    border-color: #1346ec;
+    background: #e8ecf7;
+    color: #1e3fae;
+  }
+
+  .estado-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+
+    &.disponible {
+      background: #166534;
+    }
+
+    &.ocupada {
+      background: #92400e;
+    }
+
+    &.mantenimiento {
+      background: #991b1b;
+    }
+  }
+}
+
+// Capacidad Inputs
+.capacidad-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.capacidad-input {
+  flex: 1;
+  max-width: 120px;
+}
+
+.capacidad-separator {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+// Modal Footer
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-cancel {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: #1346ec;
+  color: #fff;
+  border-color: #1346ec;
+
+  &:hover {
+    background: #0f3ad4;
+  }
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #1346ec;
+  border-color: #1346ec;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+}
+
+.btn-cancel {
+  background: #fff;
+  color: #6b7280;
+  border-color: #d1d5db;
+
+  &:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+  }
+}
+
+// Responsive
+@media (max-width: 640px) {
+  .modal-content {
+    margin: 16px;
+    max-height: calc(100vh - 32px);
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-footer {
+    padding: 16px 20px;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .footer-actions {
+    justify-content: flex-end;
+  }
+}

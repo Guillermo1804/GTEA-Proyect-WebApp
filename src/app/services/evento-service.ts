@@ -14,6 +14,9 @@ const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
 };
 
+/** Estados de ciclo de vida del evento (alineado con listado admin y API). */
+export type EventoStatus = 'Activo' | 'Borrador' | 'Finalizado' | 'Cancelado';
+
 // ─────────────────────────────────────────────
 // Interfaz principal del Evento
 // ─────────────────────────────────────────────
@@ -43,7 +46,7 @@ export interface Evento {
 
   // Metadatos opcionales (respuesta del backend)
   id?: number;
-  status?: 'Activo' | 'Borrador' | 'Finalizado' | 'Cancelado';
+  status?: EventoStatus;
   organizador?: string;
   organizadorNombre?: string;   // Nombre completo del organizador (desde backend)
   inscritos?: number;
@@ -86,6 +89,7 @@ export class EventoService {
       listaEspera: false,
       publicarInmediatamente: true,
       esOrganizador: true,
+      status: 'Activo',
     };
   }
 
@@ -303,6 +307,28 @@ export class EventoService {
     });
 
     return this.http.delete<any>(`${environment.url_api}/eventos/edit/?id=${idEvento}`, { headers });
+  }
+
+  // ─────────────────────────────────────────────
+  // [CREATE] Upload imagen de portada (dev/prod simple)
+  // Endpoint esperado: POST /eventos/imagen-upload/
+  // Recibe multipart/form-data con el campo `imagen`
+  // Devuelve: { imagen_url: string }
+  // ─────────────────────────────────────────────
+  public subirImagenPortada(file: File): Observable<{ imagen_url: string }> {
+    const token = this.facadeService.getSessionToken();
+    const headers = new HttpHeaders({
+      'Authorization': 'Token ' + token,
+    });
+
+    const formData = new FormData();
+    formData.append('imagen', file);
+
+    return this.http.post<{ imagen_url: string }>(
+      `${environment.url_api}/eventos/imagen-upload/`,
+      formData,
+      { headers }
+    );
   }
 
   /**
