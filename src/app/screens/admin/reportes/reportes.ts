@@ -43,8 +43,6 @@ interface MonthlyData {
 })
 export class Reportes implements OnInit {
     readonly form: any;
-    errorMessage: string = '';
-    successMessage: string = '';
 
     constructor(
         private http: HttpClient,

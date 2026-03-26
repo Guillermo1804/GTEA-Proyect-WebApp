@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { EventoService, Evento } from '../../../../services/evento-service';
+import { ToastService } from '../../../../services/tools/toast.service';
 
 interface EventoDetalle {
   id: number;
@@ -39,6 +40,8 @@ export class EventoDetail implements OnInit {
 
   // Estado de imagen hero
   imagenError = false;
+
+  private toastService = inject(ToastService);
 
   constructor(
     private route: ActivatedRoute,
@@ -162,7 +165,7 @@ export class EventoDetail implements OnInit {
     this.eventoService.eliminarEvento(this.evento.id).subscribe({
       next: () => this.router.navigate(['/admin/eventos']),
       error: (err: any) => {
-        this.errorMessage = err?.error?.message || 'Error al eliminar el evento.';
+        this.toastService.show(err?.error?.message || 'Error al eliminar el evento.', 'error');
       },
     });
   }

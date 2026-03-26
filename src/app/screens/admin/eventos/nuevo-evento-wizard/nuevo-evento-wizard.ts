@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, HostListener, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -14,6 +14,7 @@ import { ErrorsService } from '../../../../services/tools/errors-service';
 import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { TruncateSelectLabelPipe } from '../../../../shared/pipes/truncate-select-label.pipe';
+import { ToastService } from '../../../../services/tools/toast.service';
 
 // ─────────────────────────────────────────────
 // Validador cruzado: fecha/hora de fin > inicio
@@ -57,8 +58,8 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
   currentStep = 1;
   readonly totalSteps = 3;
   isSubmitting = false;
-  errorMessage = '';
-  successMessage = '';
+
+  private toastService = inject(ToastService);
 
   // ── Alerta de conflicto de horario ──
   hasConflict = false;
@@ -292,18 +293,16 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
     const file = input.files?.[0];
     if (!file) return;
 
-    // Validar tipo y tamaño (PNG/JPG, max 5MB)
     const validTypes = ['image/png', 'image/jpeg'];
     if (!validTypes.includes(file.type)) {
-      this.errorMessage = 'Solo se aceptan imágenes PNG o JPG';
+      this.toastService.show('Solo se aceptan imágenes PNG o JPG', 'error');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      this.errorMessage = 'La imagen no debe superar 5MB';
+      this.toastService.show('La imagen no debe superar 5MB', 'error');
       return;
     }
 
-    this.errorMessage = '';
     this.imagenFile = file;
     // No enviamos el File al backend: primero lo subimos y guardamos la URL devuelta.
     this.step1Form.get('imagenPortada')?.setValue('');
@@ -438,13 +437,11 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
     const titulo = this.step1Form.get('titulo')?.value;
 
     if (!this.validatorService.required(titulo) || this.step1Form.invalid || this.step2Form.invalid) {
-      this.errorMessage = 'Por favor completa todos los pasos correctamente.';
+      this.toastService.show('Por favor completa todos los pasos correctamente.', 'error');
       return;
     }
 
     this.isSubmitting = true;
-    this.errorMessage = '';
-    this.successMessage = '';
 
     const step3 = this.step3Form.value;
     const status = step3.status as EventoStatus;
@@ -467,13 +464,13 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
         this.eventoService.editarEvento(this.editId, payload).subscribe({
           next: () => {
             this.isSubmitting = false;
-            this.successMessage = '¡Evento actualizado exitosamente!';
+            this.toastService.show('Evento actualizado exitosamente', 'success');
             this.eventoCreado.emit({ ...payload, id: this.editId! });
             setTimeout(() => this.onClose(), 1500);
           },
           error: (err) => {
             this.isSubmitting = false;
-            this.errorMessage = this._parseDRFError(err) || 'Error al actualizar el evento.';
+            this.toastService.show(this._parseDRFError(err) || 'Error al actualizar el evento.', 'error');
           },
         });
         return;
@@ -483,13 +480,13 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
       this.eventoService.crearEvento(payload).subscribe({
         next: () => {
           this.isSubmitting = false;
-          this.successMessage = '¡Evento creado exitosamente!';
+          this.toastService.show('Evento creado exitosamente', 'success');
           this.eventoCreado.emit(payload);
           setTimeout(() => this.onClose(), 1500);
         },
         error: (err) => {
           this.isSubmitting = false;
-          this.errorMessage = this._parseDRFError(err) || 'Error al crear el evento. Intenta de nuevo.';
+          this.toastService.show(this._parseDRFError(err) || 'Error al crear el evento. Intenta de nuevo.', 'error');
         },
       });
     };
@@ -503,7 +500,7 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.isSubmitting = false;
-          this.errorMessage = this._parseDRFError(err) || 'Error al subir la imagen de portada.';
+          this.toastService.show(this._parseDRFError(err) || 'Error al subir la imagen de portada.', 'error');
         },
       });
       return;

@@ -181,7 +181,7 @@ export class CatalogoComponent implements OnInit {
                         taller.inscritos = (taller.inscritos ?? 0) + 1;
                         this.cdr.detectChanges();
                         this.toastService.show(
-                            respuesta.mensaje || '¡Inscripción exitosa!',
+                            respuesta.mensaje || 'Inscripción exitosa',
                             'success'
                         );
                     }

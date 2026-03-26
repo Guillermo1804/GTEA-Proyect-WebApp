@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -10,6 +10,7 @@ import { NuevaCategoriaModal } from '../../../shared/modals/nueva-categoria-moda
 import { NuevoUsuarioModal } from '../../../shared/modals/nuevo-usuario-modal/nuevo-usuario-modal';
 import { NuevoEventoWizard } from './nuevo-evento-wizard/nuevo-evento-wizard';
 import { EventoService, Evento } from '../../../services/evento-service';
+import { ToastService } from '../../../services/tools/toast.service';
 
 interface EventItem {
   id: number;
@@ -42,9 +43,8 @@ interface EventItem {
   styleUrl: './eventos.scss',
 })
 export class Eventos implements OnInit {
-  errorMessage: string = '';
-  successMessage: string = '';
   isLoading = false;
+  private toastService = inject(ToastService);
 
   // ── Estado de modales ──
   activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | 'nuevo-evento' | null = null;
@@ -102,14 +102,12 @@ export class Eventos implements OnInit {
               this.editingEventData = data;
               this.activeModal = 'nuevo-evento';
             } else {
-              this.errorMessage = 'No se pudo cargar el evento para editar.';
-              setTimeout(() => (this.errorMessage = ''), 4000);
+              this.toastService.show('No se pudo cargar el evento para editar.', 'error');
             }
           },
           error: (err) => {
             console.error('Error cargando evento:', err);
-            this.errorMessage = 'Error al cargar el evento.';
-            setTimeout(() => (this.errorMessage = ''), 4000);
+            this.toastService.show('Error al cargar el evento.', 'error');
           },
         });
       }
@@ -140,7 +138,7 @@ export class Eventos implements OnInit {
       },
       error: (err) => {
         console.error('Error cargando eventos:', err);
-        this.errorMessage = 'Error al cargar eventos.';
+        this.toastService.show('Error al cargar eventos.', 'error');
         this.isLoading = false;
       },
     });
@@ -256,8 +254,7 @@ export class Eventos implements OnInit {
       },
       error: (err) => {
         console.error('Error cargando evento para editar:', err);
-        this.errorMessage = 'No se pudo cargar el evento para editar.';
-        setTimeout(() => (this.errorMessage = ''), 4000);
+        this.toastService.show('No se pudo cargar el evento para editar.', 'error');
       },
     });
   }
@@ -265,37 +262,30 @@ export class Eventos implements OnInit {
   deleteEvent(event: EventItem): void {
     if (!confirm(`¿Eliminar el evento "${event.title}"?`)) return;
 
-    this.errorMessage = '';
-    this.successMessage = '';
-
     this.eventoService.eliminarEvento(event.id).subscribe({
       next: () => {
-        this.successMessage = `Evento "${event.title}" eliminado correctamente.`;
+        this.toastService.show(`Evento "${event.title}" eliminado correctamente.`, 'success');
         this.events = this.events.filter((e) => e.id !== event.id);
         this.cdr.detectChanges();
-        setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: (err: any) => {
         console.error('Error eliminando evento:', err);
         // Expand timeout to 8 seconds so the user can read if it fails
-        this.errorMessage = err?.error?.message || 'Error al eliminar el evento. Verifica tu conexión o intenta más tarde.';
+        this.toastService.show(err?.error?.message || 'Error al eliminar el evento. Verifica tu conexión o intenta más tarde.', 'error', 8000);
         this.cdr.detectChanges();
-        setTimeout(() => (this.errorMessage = ''), 8000);
       },
     });
   }
 
-  // ── Callback: evento creado o actualizado desde el wizard ──
   onEventoCreado(evento: Evento): void {
     if (this.editingEventId !== null) {
-      this.successMessage = `Evento "${evento.titulo}" actualizado exitosamente.`;
+      this.toastService.show(`Evento "${evento.titulo}" actualizado exitosamente.`, 'success');
     } else {
-      this.successMessage = `Evento "${evento.titulo}" creado exitosamente.`;
+      this.toastService.show(`Evento "${evento.titulo}" creado exitosamente.`, 'success');
     }
     // Recargar la lista completa para garantizar datos frescos del backend
     // (incluyendo categoria_nombre, inscritos, status, etc.)
     this.loadEvents();
-    setTimeout(() => (this.successMessage = ''), 4000);
   }
 
   // ── FAB y modales ──

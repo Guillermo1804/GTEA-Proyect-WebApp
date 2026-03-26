@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
 import { NuevaAulaModal } from '../../../shared/modals/nueva-aula-modal/nueva-aula-modal';
@@ -6,6 +6,7 @@ import { NuevaSedeModal } from '../../../shared/modals/nueva-sede-modal/nueva-se
 import { NuevaCategoriaModal } from '../../../shared/modals/nueva-categoria-modal/nueva-categoria-modal';
 import { NuevoUsuarioModal } from '../../../shared/modals/nuevo-usuario-modal/nuevo-usuario-modal';
 import { CategoriaService, Categoria } from '../../../services/categoria.service';
+import { ToastService } from '../../../services/tools/toast.service';
 
 @Component({
   selector: 'app-admin-categorias',
@@ -15,8 +16,7 @@ import { CategoriaService, Categoria } from '../../../services/categoria.service
 })
 export class Categorias implements OnInit {
   readonly form: any;
-  errorMessage: string = '';
-  successMessage: string = '';
+  private toastService = inject(ToastService);
 
   constructor(private categoriaService: CategoriaService, private cdr: ChangeDetectorRef) { }
 
@@ -44,7 +44,7 @@ export class Categorias implements OnInit {
       },
       error: (err) => {
         console.error('Error cargando categorías:', err);
-        this.errorMessage = 'Error al cargar categorías';
+        this.toastService.show('Error al cargar categorías', 'error');
       },
     });
   }
@@ -65,8 +65,14 @@ export class Categorias implements OnInit {
   deleteCategory(cat: any): void {
     if (!confirm(`¿Eliminar la categoría "${cat.name}"?`)) return;
     this.categoriaService.eliminarCategoria(cat.id).subscribe({
-      next: () => { this.loadCategorias(); this.successMessage = 'Categoría eliminada'; },
-      error: (err) => { console.error('Error eliminando categoría:', err); this.errorMessage = 'Error al eliminar'; },
+      next: () => {
+        this.toastService.show('Categoría eliminada', 'success');
+        this.loadCategorias();
+      },
+      error: (err) => {
+        console.error('Error eliminando categoría:', err);
+        this.toastService.show('Error al eliminar', 'error');
+      },
     });
   }
 

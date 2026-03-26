@@ -26,8 +26,7 @@ interface Benefit {
   styleUrl: './landing-screen.component.scss'
 })
 export class LandingScreenComponent implements OnInit {
-  errorMessage: string = '';
-  successMessage: string = '';
+  activeTab: 'todos' | 'proximos' | 'concluidos' = 'todos';
   events: EventCard[] = [];
 
   private cdr = inject(ChangeDetectorRef);

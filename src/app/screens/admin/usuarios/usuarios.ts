@@ -39,8 +39,6 @@ interface User {
 })
 export class Usuarios implements OnInit {
   readonly form: any;
-  errorMessage: string = '';
-
   userToDelete: User | null = null;
   searchQuery = '';
   activeFilter = 'Todos';
@@ -100,7 +98,6 @@ export class Usuarios implements OnInit {
 
   loadUsers(): void {
     this.isLoading = true;
-    this.errorMessage = '';
     let pending = 3;
     const allUsers: User[] = [];
 
@@ -280,7 +277,7 @@ confirmDeleteUser(): void {
     },
     error: (err: any) => {
       console.error('Error eliminando usuario:', err);
-      this.errorMessage = err?.error?.message || 'Error al eliminar usuario.';
+      this.toastService.show(err?.error?.message || 'Error al eliminar usuario.', 'error');
       this.userToDelete = null;
       this.activeModal = null;
     },

@@ -33,20 +33,6 @@
     <p class="progress-label">Paso {{ currentStep }} de {{ totalSteps }}</p>
   </div>
 
-  <!-- ── Mensajes de error / éxito globales ── -->
-  @if (errorMessage) {
-    <div class="wizard-alert error">
-      <span class="material-icons">error_outline</span>
-      <span>{{ errorMessage }}</span>
-    </div>
-  }
-  @if (successMessage) {
-    <div class="wizard-alert success">
-      <span class="material-icons">check_circle_outline</span>
-      <span>{{ successMessage }}</span>
-    </div>
-  }
-
   <!-- ════════════════════════════════════════
        PASO 1 — Información General
        ════════════════════════════════════════ -->

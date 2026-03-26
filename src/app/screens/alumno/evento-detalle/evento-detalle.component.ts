@@ -187,7 +187,7 @@ export class EventoDetalleComponent implements OnInit {
                     } else {
                         this.estaInscrito.set(true);
                         this.toastService.show(
-                            respuesta.mensaje || '¡Inscripción exitosa!',
+                            respuesta.mensaje || 'Inscripción exitosa',
                             'success'
                         );
                         setTimeout(() => this.goBack(), 1500);
@@ -241,6 +241,24 @@ export class EventoDetalleComponent implements OnInit {
             this.close.emit();
         } else {
             this.router.navigate(['/alumno']);
+        }
+    }
+
+    public compartirEvento(): void {
+        if (typeof navigator === 'undefined') return;
+
+        const urlToShare = `https://gtea.ezarr.rocks/alumno/evento/${this.eventoId}`;
+        const titleToShare = this.evento?.titulo || 'Evento en GTEA';
+
+        if (navigator.share) {
+            navigator.share({
+                title: titleToShare,
+                url: urlToShare
+            }).catch((error) => console.error('Error compartiendo:', error));
+        } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(urlToShare)
+                .then(() => this.toastService.show('Enlace copiado', 'success'))
+                .catch(() => this.toastService.show('Error al copiar el enlace', 'error'));
         }
     }
 }

@@ -38,8 +38,7 @@ interface RecentEvent {
 })
 export class Dashboard implements OnInit {
   readonly form: any;
-  errorMessage: string = '';
-  successMessage: string = '';
+  isLoading = true;
 
   constructor(
     private router: Router,

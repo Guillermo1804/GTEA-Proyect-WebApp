@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
@@ -8,7 +8,8 @@ import { NuevaSedeModal } from '../../../shared/modals/nueva-sede-modal/nueva-se
 import { NuevaCategoriaModal } from '../../../shared/modals/nueva-categoria-modal/nueva-categoria-modal';
 import { NuevoUsuarioModal } from '../../../shared/modals/nuevo-usuario-modal/nuevo-usuario-modal';
 import { FiltrosSedesModal } from '../../../shared/modals/filtros-sedes-modal/filtros-sedes-modal.component';
-import { SedeService } from '../../../services/sede.service';
+import { SedeService, Sede, Aula } from '../../../services/sede.service';
+import { ToastService } from '../../../services/tools/toast.service';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
@@ -45,8 +46,8 @@ interface FiltrosSedes {
 })
 export class Sedes implements OnInit {
   readonly form: any;
-  errorMessage: string = '';
-  successMessage: string = '';
+  isLoading = true;
+  private toastService = inject(ToastService);
 
   constructor(private sedeService: SedeService, private cdr: ChangeDetectorRef) { }
 
@@ -104,7 +105,9 @@ export class Sedes implements OnInit {
       },
       error: (err) => {
         console.error('Error cargando sedes:', err);
-        this.errorMessage = 'Error al cargar sedes';
+        this.toastService.show('Error al cargar sedes', 'error');
+        this.isLoading = false;
+        this.cdr.markForCheck();
       },
     });
   }
