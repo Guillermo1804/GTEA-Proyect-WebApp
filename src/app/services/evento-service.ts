@@ -393,4 +393,8 @@ export class EventoService {
     if (!id || !sedeId) return '—';
     return `Aula #${id}`;
   }
+
+  public getEventosPublicos(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.url_api}/eventos/public/`);
+  }
 }
