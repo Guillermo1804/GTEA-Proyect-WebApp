@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef, HostListener } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -30,10 +30,11 @@ import { forkJoin, of } from 'rxjs';
 import { InscripcionService } from '../../../services/inscripcion.service';
 import { FacadeService } from '../../../services/facade-service';
 import { ConfirmarAccionModalComponent } from '../../../modals/confirmar-accion-modal/confirmar-accion-modal.component';
+import { EventoDetalleComponent } from '../evento-detalle/evento-detalle.component';
 
 @Component({
     selector: 'app-catalogo',
-    imports: [CommonModule, TopNavbar, BottomNav, ConfirmarAccionModalComponent],
+    imports: [CommonModule, TopNavbar, BottomNav, ConfirmarAccionModalComponent, EventoDetalleComponent],
     templateUrl: './catalogo.component.html',
     styleUrl: './catalogo.component.scss',
 })
@@ -49,8 +50,15 @@ export class CatalogoComponent implements OnInit {
 
     mostrarConfirmar = false;
     tallerPendiente: Taller | null = null;
-mostrarAlerta: boolean = true;
+    mostrarAlerta: boolean = true;
+    eventoSeleccionado: Taller | null = null;
 
+    @HostListener('window:keydown.Escape')
+    handleKeyDown() {
+        if (this.eventoSeleccionado) {
+            this.cerrarDetalles();
+        }
+    }
 
     ngOnInit() {
         this.cargarTalleres();
@@ -144,7 +152,11 @@ mostrarAlerta: boolean = true;
     }
 
     abrirDetalles(taller: Taller) {
-        this.router.navigate(['/alumno/evento', taller.id]);
+        this.eventoSeleccionado = taller;
+    }
+
+    cerrarDetalles() {
+        this.eventoSeleccionado = null;
     }
 
     inscribirse(taller: Taller): void {

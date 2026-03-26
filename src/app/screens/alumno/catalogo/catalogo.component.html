@@ -97,6 +97,14 @@
   </div>
 </div>
 
+@if (eventoSeleccionado) {
+  <div class="modal-backdrop-blur" (click)="cerrarDetalles()">
+    <div class="modal-content-wrapper" (click)="$event.stopPropagation()">
+      <app-evento-detalle [eventoId]="eventoSeleccionado.id" (close)="cerrarDetalles()"></app-evento-detalle>
+    </div>
+  </div>
+}
+
 @if (mostrarConfirmar && tallerPendiente) {
   <app-confirmar-accion-modal
     [titulo]="'Cancelar inscripción'"

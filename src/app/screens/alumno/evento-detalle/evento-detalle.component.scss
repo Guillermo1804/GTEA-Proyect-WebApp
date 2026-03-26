@@ -328,75 +328,72 @@ $border-divider: #e5e7eb;
 }
 
 // ==================================================
-// TABLET
+// TABLET & DESKTOP — hero izquierdo, content derecho
 // ==================================================
 @media (min-width: 768px) {
   .evento-detalle-wrapper {
-    max-width: 600px;
+    display: grid;
+    grid-template-columns: minmax(300px, 4fr) 5fr;
+    grid-template-rows: 1fr auto;
+    max-width: 960px;
     margin: 0 auto;
-  }
-
-  .hero-section { height: 320px; }
-
-  .content-card { padding: 32px 32px 160px; }
-
-  .sticky-footer {
-    max-width: 600px;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 64px;
-  }
-}
-
-// ==================================================
-// DESKTOP — hero + content lado a lado
-// ==================================================
-@media (min-width: 1024px) {
-  // ← Cancela el grid, vuelve a flex columna normal
-  .evento-detalle-wrapper {
-    display: flex;
-    flex-direction: column;
-    max-width: 680px;        // ← ancho de tarjeta centrada
-    margin: 0 auto;
-    min-height: 100vh;
-    box-shadow: 0 0 40px rgba(0,0,0,0.08);  // sombra sutil para destacar del fondo
+    min-height: 500px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.08);
+    background: $bg-white;
+    border-radius: 24px;
+    // Overrides any stray column overrides
+    flex-direction: initial;
   }
 
   .hero-section {
-    height: 360px;           // ← altura fija, no 100vh
+    grid-column: 1;
+    grid-row: 1 / -1;
+    height: 100%;
     position: relative;
-    border-radius: 0;
+    border-radius: 24px 0 0 24px;
+    margin: 0;
   }
 
   .content-card {
-    flex: 1;
-    margin-top: -24px;
-    border-radius: 24px 24px 0 0;
-    padding: 36px 40px 200px;  // ← padding-bottom para que el footer no tape
-    overflow-y: visible;
-    max-height: none;
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: 0;
+    border-radius: 0 24px 0 0;
+    padding: 32px 32px 32px;
     display: flex;
     flex-direction: column;
+    max-height: none;
+    overflow-y: visible;
   }
 
-  // ← Footer vuelve a fixed, pero centrado con el wrapper
   .sticky-footer {
-    position: fixed;
-    bottom: 64px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 680px;            // ← mismo ancho que el wrapper
+    grid-column: 2;
+    grid-row: 2;
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
     border-top: 1px solid $border-divider;
     background: $bg-white;
     z-index: 20;
+    border-radius: 0 0 24px 0;
   }
 
-  .evento-titulo { font-size: 24px; }
+  .evento-titulo { font-size: 22px; }
 
   .enrollment-btn {
-    min-width: 220px;
+    min-width: 200px;
     height: 48px;
   }
+}
+
+@media (min-width: 1024px) {
+  .content-card {
+    padding: 36px 40px 32px;
+  }
+  .evento-titulo { font-size: 24px; }
+  .enrollment-btn { min-width: 220px; }
 }
 
 

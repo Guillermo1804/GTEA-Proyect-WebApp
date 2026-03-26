@@ -372,3 +372,46 @@ $badge-radius: 6px;
   color: #9ca3af;
   cursor: not-allowed;
 }
+
+// ─── Modal Backdrop ───────────────────────────────────────
+.modal-backdrop-blur {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.modal-content-wrapper {
+  width: 100%;
+  max-width: 960px;
+  max-height: 90vh;
+  border-radius: 24px;
+  overflow-y: auto;
+  position: relative;
+  background: #f6f6f8;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  
+  // Overrides to child component when acting as modal
+  ::ng-deep {
+    .evento-detalle-wrapper {
+      min-height: auto;
+      box-shadow: none;
+    }
+    .sticky-footer {
+      position: sticky;
+      bottom: 0;
+      left: 0;
+      transform: none;
+      width: 100%;
+    }
+    .content-card {
+      padding-bottom: 24px; // Reduce padding since footer is sticky
+    }
+  }
+}

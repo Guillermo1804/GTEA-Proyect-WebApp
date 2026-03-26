@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
@@ -7,6 +7,7 @@ import { InscripcionService } from '../../../services/inscripcion.service';
 import { FacadeService } from '../../../services/facade-service';
 import { ToastService } from '../../../services/tools/toast.service';
 import { ConfirmarAccionModalComponent } from '../../../modals/confirmar-accion-modal/confirmar-accion-modal.component';
+import { EventoDetalleComponent } from '../evento-detalle/evento-detalle.component';
 
 interface EventoInscrito {
     id: number;
@@ -25,7 +26,7 @@ type Filtro = 'todos' | 'proximo' | 'completado' | 'cancelado' | 'lista-espera';
 
 @Component({
     selector: 'app-mis-eventos',
-    imports: [CommonModule, TopNavbar, BottomNav, ConfirmarAccionModalComponent],
+    imports: [CommonModule, TopNavbar, BottomNav, ConfirmarAccionModalComponent, EventoDetalleComponent],
     templateUrl: './mis-eventos.html',
     styleUrl: './mis-eventos.scss',
 })
@@ -38,6 +39,14 @@ export class MisEventos implements OnInit {
     // ── Control del modal de desinscripción ──
     mostrarConfirmar = false;
     eventoPendiente: EventoInscrito | null = null;
+    eventoSeleccionado: number | null = null;
+
+    @HostListener('window:keydown.Escape')
+    handleKeyDown() {
+        if (this.eventoSeleccionado) {
+            this.cerrarDetalles();
+        }
+    }
 
     private router = inject(Router);
     private inscripcionService = inject(InscripcionService);
@@ -95,7 +104,9 @@ export class MisEventos implements OnInit {
 
     setFiltro(f: Filtro): void { this.filtroActivo.set(f); }
 
-    verDetalle(id: number): void { this.router.navigate(['/alumno/evento', id]); }
+    verDetalle(id: number): void { this.eventoSeleccionado = id; }
+
+    cerrarDetalles(): void { this.eventoSeleccionado = null; }
 
     desinscribirse(evento: EventoInscrito): void {
         this.eventoPendiente = evento;

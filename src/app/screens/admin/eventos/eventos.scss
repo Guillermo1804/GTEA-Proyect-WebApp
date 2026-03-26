@@ -393,6 +393,10 @@
 
 // Tablet
 @media (min-width: 768px) {
+    .page-content {
+        padding-bottom: 24px;
+    }
+
     .main {
         padding: 24px;
         max-width: 900px;

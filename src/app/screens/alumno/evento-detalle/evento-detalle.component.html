@@ -124,4 +124,6 @@
   />
 }
 
-<app-bottom-nav role="estudiante" activeTab="/alumno/catalogo"></app-bottom-nav>
+@if (!eventoId) {
+  <app-bottom-nav role="estudiante" activeTab="/alumno/catalogo"></app-bottom-nav>
+}

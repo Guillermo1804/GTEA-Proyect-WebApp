@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { timeout, catchError, finalize } from 'rxjs/operators';
@@ -19,6 +19,9 @@ import { ConfirmarAccionModalComponent } from '../../../modals/confirmar-accion-
     styleUrl: './evento-detalle.component.scss',
 })
 export class EventoDetalleComponent implements OnInit {
+    @Input() eventoId?: number;
+    @Output() close = new EventEmitter<void>();
+
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private inscripcionService = inject(InscripcionService);
@@ -41,12 +44,16 @@ export class EventoDetalleComponent implements OnInit {
     lugaresDisponibles = 0;
 
     ngOnInit(): void {
-        const id = Number(this.route.snapshot.paramMap.get('id'));
+        const id = this.eventoId || Number(this.route.snapshot.paramMap.get('id'));
         if (!id) {
             this.router.navigate(['/alumno']);
             return;
         }
 
+        this.cargarEvento(id);
+    }
+
+    private cargarEvento(id: number): void {
         forkJoin({
             evento: this.eventoService.getEventoByID(id),
             misEventos: this.inscripcionService.getMisEventos().pipe(catchError(() => of([])))
@@ -230,6 +237,10 @@ export class EventoDetalleComponent implements OnInit {
     }
 
     goBack(): void {
-        this.router.navigate(['/alumno']);
+        if (this.eventoId) {
+            this.close.emit();
+        } else {
+            this.router.navigate(['/alumno']);
+        }
     }
 }
