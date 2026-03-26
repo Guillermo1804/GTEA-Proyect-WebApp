@@ -19,12 +19,21 @@
                 <span class="material-icons search-icon">search</span>
                 <input type="text" placeholder="Buscar usuarios..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)">
             </div>
-            <div class="filter-tabs">
+            <!-- Filter and Export Pills -->
+            <div class="filter-pills">
                 @for (filter of filters; track filter) {
-                <button class="filter-tab" [class.active]="activeFilter === filter" (click)="setFilter(filter)">
+                <button class="pill" [class.active]="activeFilter === filter" (click)="setFilter(filter)">
                     {{ filter }}
                 </button>
                 }
+                <button class="pill" (click)="exportarPDF()">
+                    <span class="material-icons">picture_as_pdf</span>
+                    Exportar PDF
+                </button>
+                <button class="pill" (click)="exportarExcel()">
+                    <span class="material-icons">table_chart</span>
+                    Exportar Excel
+                </button>
             </div>
         </div>
 
@@ -110,4 +119,4 @@
   (updated)="onUserUpdated()"
   (close)="closeEditModal()">
 </app-editar-usuario-modal>
-}
+}

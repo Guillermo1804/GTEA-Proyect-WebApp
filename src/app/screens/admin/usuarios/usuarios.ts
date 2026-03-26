@@ -16,6 +16,9 @@ import { EliminarUserModalComponent } from '../../../modals/eliminar-user-modal/
 import { EditarUsuarioModal } from '../../../shared/modals/editar-usuario-modal/editar-usuario-modal';
 import { ToastService } from '../../../services/tools/toast.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 interface User {
   id: number;
@@ -208,6 +211,131 @@ export class Usuarios implements OnInit {
   onSearchChange(value: string): void {
     this.searchQuery = value;
     this.currentPage = 1;
+  }
+
+  private async loadImageAsDataUrl(url: string): Promise<string> {
+    const response = await fetch(url, { cache: 'no-cache' });
+    const blob = await response.blob();
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string | null;
+        if (result) {
+          resolve(result);
+        } else {
+          reject(new Error('No se pudo leer el logo como DataURL'));
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async exportarPDF(): Promise<void> {
+    const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
+    const fecha = new Date();
+
+    // Logo en esquina superior derecha
+    const logoUrl = 'assets/LogoGTEA.png';
+    try {
+      const logoDataUrl = await this.loadImageAsDataUrl(logoUrl);
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const logoWidth = 120;
+      const logoProps = doc.getImageProperties(logoDataUrl);
+      const logoHeight = (logoProps.height / logoProps.width) * logoWidth;
+      const logoX = pageWidth - logoWidth - 40;
+      const logoY = 20;
+      doc.addImage(logoDataUrl, 'PNG', logoX, logoY, logoWidth, logoHeight);
+    } catch (error) {
+      console.warn('Error cargando el logo de GTEA para PDF:', error);
+    }
+
+    // Encabezado
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text('Reporte de Usuarios', 40, 55);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.text(`Generado: ${fecha.toLocaleString()}`, 40, 70);
+    doc.text(`Filtro: ${this.activeFilter}`, 40, 85);
+
+    // Datos a exportar (usar datos filtrados)
+    const datos = this.filteredUsers.map(user => ({
+      nombre: user.name,
+      email: user.email,
+      rol: user.role,
+      estatus: user.status
+    }));
+
+    const totalRegistros = datos.length;
+    doc.text(`Total de usuarios: ${totalRegistros}`, 40, 100);
+
+    const head = [['Nombre', 'Email', 'Rol', 'Estatus']];
+
+    const body = datos.map((r: any) => [
+      r.nombre,
+      r.email,
+      r.rol,
+      r.estatus
+    ]);
+
+    autoTable(doc, {
+      head,
+      body,
+      startY: 160,
+      styles: {
+        font: 'helvetica',
+        fontSize: 10,
+        cellPadding: 8,
+        lineColor: [229, 231, 235],
+        lineWidth: 0.5
+      },
+      headStyles: {
+        fillColor: [19, 70, 236],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold'
+      },
+      bodyStyles: {
+        textColor: [15, 23, 42]
+      },
+      alternateRowStyles: {
+        fillColor: [248, 250, 252]
+      },
+      columnStyles: {
+        0: { cellWidth: 150 },
+        1: { cellWidth: 200 },
+        2: { halign: 'center', cellWidth: 80 },
+        3: { halign: 'center', cellWidth: 100 }
+      },
+      didDrawPage: () => {
+        const pageSize = doc.internal.pageSize as any;
+        const pageHeight = pageSize.height ?? pageSize.getHeight?.() ?? 842;
+        const pageWidth = pageSize.width ?? pageSize.getWidth?.() ?? 595;
+        const page = doc.getNumberOfPages();
+        doc.setFontSize(9);
+        doc.setTextColor(107, 114, 128);
+        doc.text(`Página ${page}`, pageWidth - 60, pageHeight - 20);
+      }
+    });
+
+    const stamp = fecha.toISOString().slice(0, 19).replace(/[:T]/g, '-');
+    doc.save(`usuarios-${stamp}.pdf`);
+  }
+
+  exportarExcel(): void {
+    const datos = this.filteredUsers.map(user => ({
+      Nombre: user.name,
+      Email: user.email,
+      Rol: user.role,
+      Estatus: user.status
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(datos);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Usuarios');
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+    XLSX.writeFile(wb, `usuarios-${stamp}.xlsx`);
   }
 
   prevPage(): void { if (this.currentPage > 1) this.currentPage--; }
