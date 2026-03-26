@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { TopNavbar } from '../../partials/top-navbar/top-navbar';
+import { EventoService } from '../../services/evento-service';
 
 interface EventCard {
   image: string;
@@ -25,29 +26,11 @@ interface Benefit {
   styleUrl: './landing-screen.component.scss'
 })
 export class LandingScreenComponent implements OnInit {
-  readonly form: any;
   errorMessage: string = '';
   successMessage: string = '';
-  ngOnInit(): void {
+  events: EventCard[] = [];
 
-  }
-  events: EventCard[] = [
-    {
-      image: '', category: 'Ingeniería', categoryColor: '#1e40af',
-      title: 'Taller de Robótica', date: '12 Oct • 10:00 AM',
-      enrolled: 28, capacity: 40
-    },
-    {
-      image: '', category: 'Artes', categoryColor: '#7c3aed',
-      title: 'Seminario de Diseño', date: '15 Oct • 14:00 PM',
-      enrolled: 35, capacity: 50
-    },
-    {
-      image: '', category: 'Ciencias', categoryColor: '#059669',
-      title: 'Conferencia AI', date: '20 Oct • 09:00 AM',
-      enrolled: 180, capacity: 200
-    },
-  ];
+  private cdr = inject(ChangeDetectorRef);
 
   benefits: Benefit[] = [
     {
@@ -67,17 +50,74 @@ export class LandingScreenComponent implements OnInit {
     },
   ];
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private eventoService: EventoService
+  ) { }
+
+  ngOnInit(): void {
+    this.cargarEventos();
+  }
+
+  private cargarEventos(): void {
+    this.eventoService.getEventosPublicos().subscribe({
+      next: (data) => {
+        this.events = data.map(e => this.mapToEventCard(e));
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.events = [];
+      }
+    });
+  }
+
+  /**
+   * Backend JSON fields (GET /eventos/public/):
+   *   id, titulo, categoria, categoria_nombre, descripcion, imagen_portada,
+   *   fecha_inicio, hora_inicio, fecha_fin, hora_fin, modalidad, sede,
+   *   sede_nombre, aula, aula_nombre, cupo_maximo, costo_entrada,
+   *   lista_espera, publicar_inmediatamente, es_organizador, organizador,
+   *   organizador_nombre, status, inscritos, is_full, creation, update
+   */
+  private mapToEventCard(e: any): EventCard {
+    return {
+      image: e.imagen_portada ?? '',
+      category: e.categoria_nombre ?? 'General',
+      categoryColor: this.getCategoryColor(e.categoria_nombre ?? ''),
+      title: e.titulo ?? '',
+      date: e.fecha_inicio
+        ? new Date(e.fecha_inicio).toLocaleDateString('es-MX', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        })
+        : 'Fecha por confirmar',
+      enrolled: e.inscritos ?? 0,
+      capacity: e.cupo_maximo ?? 0,
+    };
+  }
+
+  private getCategoryColor(category: string): string {
+    const colors: Record<string, string> = {
+      'Ingeniería': '#1e40af',
+      'Artes': '#7c3aed',
+      'Ciencias': '#059669',
+      'Ciberseguridad': '#dc2626',
+      'Default': '#3b82f6'
+    };
+    return colors[category] || colors['Default'];
+  }
 
   navigate(path: string): void {
     this.router.navigate([path]);
   }
 
   goToEvent(index: number): void {
-    this.router.navigate(['/login'], { queryParams: { returnUrl: `/alumno/evento/${index + 1}` } });
+    this.router.navigate(['/login']);
   }
 
   getOccupancy(event: EventCard): number {
-    return Math.round((event.enrolled / event.capacity) * 100);
+    if (!event.capacity) return 0;
+    return Math.min(100, Math.round((event.enrolled / event.capacity) * 100));
   }
 }

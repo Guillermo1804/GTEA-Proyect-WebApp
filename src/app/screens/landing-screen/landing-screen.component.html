@@ -52,6 +52,10 @@
           <button class="event-btn" (click)="goToEvent($index)">Ver más detalles</button>
         </div>
       </div>
+      } @empty {
+        <div class="no-events">
+          <p>Por el momento no hay eventos próximos disponibles.</p>
+        </div>
       }
     </div>
   </section>
