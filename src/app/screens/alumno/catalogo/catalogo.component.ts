@@ -49,10 +49,18 @@ export class CatalogoComponent implements OnInit {
 
     mostrarConfirmar = false;
     tallerPendiente: Taller | null = null;
+mostrarAlerta: boolean = true;
+
 
     ngOnInit() {
         this.cargarTalleres();
+          const alertaCerrada = localStorage.getItem('alertaCerrada');
+  this.mostrarAlerta = alertaCerrada !== 'true';
     }
+    cerrarAlerta() {
+  this.mostrarAlerta = false;
+  localStorage.setItem('alertaCerrada', 'true');
+}
 
     private cargarTalleres(): void {
         forkJoin({

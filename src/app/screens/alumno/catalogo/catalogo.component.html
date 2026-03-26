@@ -24,33 +24,13 @@
     </div>
 
     <!-- ── Banner de Alerta ── -->
-    <div class="alert-banner">
-      <span class="alert-icon">📢</span>
-      <p>¡Atención! La inscripción a talleres cierra mañana. No pierdas tu lugar.</p>
-      <button class="alert-close" aria-label="Cerrar">✕</button>
-    </div>
+<div class="alert-banner" *ngIf="mostrarAlerta">
+  <span class="alert-icon">📢</span>
+  <p>¡Atención! Preparate para unirte a talleres</p>
+  <button class="alert-close" (click)="cerrarAlerta()" aria-label="Cerrar">✕</button>
+</div>
 
-    <!-- ── Resumen Académico ── -->
-    <section class="resumen-section">
-      <h3 class="section-title">Resumen Académico</h3>
-      <div class="resumen-grid">
-        <div class="resumen-card">
-          <span class="resumen-icon resumen-icon--blue">🎓</span>
-          <span class="resumen-number">2</span>
-          <span class="resumen-label">Inscritos</span>
-        </div>
-        <div class="resumen-card">
-          <span class="resumen-icon resumen-icon--green">✅</span>
-          <span class="resumen-number">12</span>
-          <span class="resumen-label">Completados</span>
-        </div>
-        <div class="resumen-card">
-          <span class="resumen-icon resumen-icon--purple">🏆</span>
-          <span class="resumen-number">5</span>
-          <span class="resumen-label">Certificados</span>
-        </div>
-      </div>
-    </section>
+
 
     <h2 class="section-title">Eventos Recomendados Para Ti</h2>
 

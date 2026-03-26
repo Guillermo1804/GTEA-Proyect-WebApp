@@ -37,8 +37,7 @@ interface EventItem {
     NuevaSedeModal,
     NuevaCategoriaModal,
     NuevoUsuarioModal,
-    NuevoEventoWizard,
-  ],
+    NuevoEventoWizard  ],
   templateUrl: './eventos.html',
   styleUrl: './eventos.scss',
 })
