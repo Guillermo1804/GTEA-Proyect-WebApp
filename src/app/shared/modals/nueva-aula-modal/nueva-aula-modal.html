@@ -17,12 +17,14 @@
             <!-- Sede Select -->
             <div class="form-group">
                 <label class="form-label">Sede</label>
-                <select class="form-select" [(ngModel)]="selectedSede">
-                    <option value="" disabled>Seleccionar sede</option>
-                    @for (sede of sedes; track sede.id) {
-                    <option [value]="sede.id">{{ sede.nombre }}</option>
-                    }
-                </select>
+                <div class="select-wrapper">
+                    <select class="form-select" [(ngModel)]="selectedSede">
+                        <option value="" disabled>Seleccionar sede</option>
+                        @for (sede of sedes; track sede.id) {
+                        <option [value]="sede.id" [attr.title]="sede.nombre">{{ sede.nombre | truncateSelectLabel }}</option>
+                        }
+                    </select>
+                </div>
                 @if (hasError('selectedSede')) {
                 <small class="error-message">{{ getFieldError('selectedSede') }}</small>
                 }

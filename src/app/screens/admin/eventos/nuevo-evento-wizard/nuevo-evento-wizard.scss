@@ -55,6 +55,7 @@ $bp-xl:  1280px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-width: 0;
   animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   // ── Mobile: full screen ──
@@ -217,6 +218,8 @@ $bp-xl:  1280px;
 .wizard-body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -268,6 +271,7 @@ $bp-xl:  1280px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .form-label {
@@ -347,6 +351,9 @@ $bp-xl:  1280px;
 // ── Select con flecha personalizada ──
 .select-wrapper {
   position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 
   .form-select {
     appearance: none;
@@ -800,7 +807,7 @@ $bp-xl:  1280px;
 
 .summary-stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
 }
 
@@ -829,6 +836,19 @@ $bp-xl:  1280px;
   color: $text-dark;
 
   .material-icons { font-size: 18px; color: $text-soft; }
+}
+
+// ── Estado del evento (paso 3) ──
+.status-select-group {
+  margin-top: 4px;
+}
+
+.form-hint.status-hint {
+  font-family: $font;
+  font-size: 12px;
+  color: $text-muted;
+  line-height: 1.45;
+  margin: 0;
 }
 
 // ── Opciones de publicación ──
