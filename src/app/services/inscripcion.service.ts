@@ -5,13 +5,6 @@ import { environment } from '../../environments/environment';
 import { RespuestaInscripcion } from '../models/inscripcion.model';
 import { FacadeService } from './facade-service';
 
-// ─────────────────────────────────────────────
-// Opciones HTTP por defecto
-// ─────────────────────────────────────────────
-const httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-};
-
 @Injectable({
     providedIn: 'root',
 })
@@ -30,11 +23,16 @@ export class InscripcionService {
         const payload = {
             evento_id: eventoId
         };
+        const token = this.facadeService.getSessionToken();
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': 'Token ' + token,
+        });
 
         return this.http.post<RespuestaInscripcion>(
           `${environment.url_api}/inscripciones/`,
           payload,
-          httpOptions
+          { headers }
         );
     }
 
@@ -46,6 +44,11 @@ export class InscripcionService {
         eventoId: number,
         alumnoId: number
     ): Observable<any> {
+        const token = this.facadeService.getSessionToken();
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': 'Token ' + token,
+        });
         return this.http.delete<any>(
           `${environment.url_api}/inscripciones/cancel/`,
           {
@@ -53,7 +56,7 @@ export class InscripcionService {
               evento_id: eventoId.toString(),
               alumno_id: alumnoId.toString()
             },
-            headers: httpOptions.headers
+            headers,
           }
         );
     }
@@ -63,9 +66,14 @@ export class InscripcionService {
     // Endpoint: GET /inscripciones/lista-espera/?evento={id}
     // ─────────────────────────────────────────────
     public getListaEspera(eventoId: number): Observable<any[]> {
+        const token = this.facadeService.getSessionToken();
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': 'Token ' + token,
+        });
         return this.http.get<any[]>(
           `${environment.url_api}/inscripciones/lista-espera/?evento=${eventoId}`,
-          httpOptions
+          { headers }
         );
     }
 
