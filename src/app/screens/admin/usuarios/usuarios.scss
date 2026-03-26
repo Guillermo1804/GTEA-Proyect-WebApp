@@ -10,7 +10,6 @@
     justify-content: space-between;
     gap: 12px;
     flex-wrap: wrap;
-    padding: 20px 16px 0 16px;
     h1 {
         font-family: 'Inter', sans-serif;
         font-size: 20px;
@@ -105,6 +104,42 @@
     &::-webkit-scrollbar {
         display: none; // Chrome/Safari
     }
+}
+
+.export-buttons {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+}
+
+.export-buttons .pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    border: 0.8px solid #e5e7eb;
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.export-buttons .pill:hover {
+    background: #f3f4f6;
+}
+
+.export-buttons .pill .material-icons {
+    font-size: 16px;
+}
+
+.export-buttons .pill.active {
+    background: #e8ecf7;
+    color: #1e3fae;
+    border-color: #d0dafb;
 }
 
 .filter-tab {
@@ -241,11 +276,58 @@
     font-family: 'Inter', sans-serif;
     font-size: 11px;
     color: #9ca3af;
+
+    &.status-inactive {
+        color: #ef4444;
+    }
+}
+
+// Success Toast (Sprint S2)
+.toast-success {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #10b981;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    z-index: 1000;
+    animation: slideUpToast 0.3s ease;
+
+    .material-icons {
+        font-size: 20px;
+    }
+}
+
+@keyframes slideUpToast {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
 }
 
 .user-actions {
     display: flex;
     gap: 8px;
+    width: 72px; // Enough for 2 buttons (32+32+8)
+    justify-content: flex-end; // Align to the right of the actions block
+
+    .action-btn:empty {
+        display: none;
+    }
 }
 
 .action-btn {

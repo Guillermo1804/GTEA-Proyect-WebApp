@@ -1,5 +1,8 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { FacadeService } from '../../services/facade-service';
 
 interface NavTab {
   icon: string;
@@ -20,18 +23,37 @@ interface FabAction {
   templateUrl: './bottom-nav.html',
   styleUrl: './bottom-nav.scss',
 })
-export class BottomNav {
+export class BottomNav implements OnInit, OnDestroy {
   @Input() role: 'admin' | 'organizador' | 'estudiante' = 'estudiante';
   @Input() activeTab = '';
   @Output() fabAction = new EventEmitter<string>();
 
   showFabMenu = false;
+  private routerSub!: Subscription;
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private facadeService: FacadeService
+  ) { }
+
+  ngOnInit(): void {
+    this.routerSub = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.cdr.detectChanges();
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.routerSub) {
+      this.routerSub.unsubscribe();
+    }
+  }
 
   private get effectiveRole(): 'admin' | 'organizador' | 'estudiante' {
-    const groupRole = localStorage.getItem('gtea-proyecto-group_name');
-    const userRole = localStorage.getItem('userRole');
+    const groupRole = this.facadeService.getUserGroup();
+    const userRole = this.facadeService.getCookieValue('userRole');
 
     const currentRole = groupRole || userRole || this.role;
 
@@ -87,7 +109,9 @@ export class BottomNav {
 
   get visibleFabActions(): FabAction[] {
     if (this.effectiveRole === 'organizador') {
-      return this.fabActions.filter(action => action.action === 'nuevo-evento');
+      return this.fabActions.filter(action => 
+        action.action === 'nuevo-evento' || action.action === 'nuevo-usuario'
+      );
     }
     // admin y estudiante (si se habilita) pueden ver todo lo definido
     return this.fabActions;
@@ -127,6 +151,12 @@ export class BottomNav {
     // Si es "nuevo-evento", navegar directamente a /admin/eventos con query param
     if (action === 'nuevo-evento') {
       this.router.navigate(['/admin/eventos'], { queryParams: { new: 'true' } });
+      return;
+    }
+
+    // Si es "nuevo-usuario", navegar a /admin/usuarios con query param (Sprint S2 v3)
+    if (action === 'nuevo-usuario') {
+      this.router.navigate(['/admin/usuarios'], { queryParams: { openModal: 'nuevo-usuario' } });
       return;
     }
     

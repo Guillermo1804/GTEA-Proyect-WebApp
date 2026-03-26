@@ -1,34 +1,37 @@
-import { Component, Output, EventEmitter, HostListener } from '@angular/core';
+import { Component, Output, EventEmitter, HostListener, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AdminServiceService } from '../../../services/admin-service.service';
 import { OrganizadorService } from '../../../services/organizador-service';
 import { AlumnoService } from '../../../services/alumno-service';
-import { ValidatorService } from '../../../services/tools/validator-service';
 import { ErrorsService } from '../../../services/tools/errors-service';
+import { ToastService } from '../../../services/tools/toast.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-nuevo-usuario-modal',
-    imports: [FormsModule],
+    imports: [FormsModule, CommonModule],
     templateUrl: './nuevo-usuario-modal.html',
     styleUrl: './nuevo-usuario-modal.scss',
 })
 export class NuevoUsuarioModal {
+    @Input() fixedRole = '';
     @Output() close = new EventEmitter<void>();
+    @Output() created = new EventEmitter<void>();
 
     constructor(
         private adminService: AdminServiceService,
         private organizadorService: OrganizadorService,
         private alumnoService: AlumnoService,
-        private validatorService: ValidatorService,
         private errorsService: ErrorsService,
+        private toastService: ToastService,
     ) { }
 
     firstName = '';
     lastName = '';
     email = '';
-    phone = '';
+    password = '';
+    showPassword = false;
     selectedRole = '';
-    sendInvite = true;
     submitted = false;
     formError = '';
 
@@ -41,31 +44,45 @@ export class NuevoUsuarioModal {
         this.onCancel();
     }
 
-    hasError(field: 'firstName' | 'email' | 'selectedRole' | 'phone'): boolean {
+    hasError(field: 'firstName' | 'email' | 'selectedRole' | 'password'): boolean {
         return this.submitted && this.getFieldError(field).length > 0;
     }
 
-    getFieldError(field: 'firstName' | 'email' | 'selectedRole' | 'phone'): string {
+    getFieldError(field: 'firstName' | 'email' | 'selectedRole' | 'password'): string {
         if (!this.submitted) return '';
 
         if (field === 'firstName') {
-            if (!this.validatorService.required(this.firstName)) return this.errorsService.required;
-            if (!this.validatorService.max(this.firstName.trim(), 120)) return this.errorsService.max(120);
+            if (!this.firstName || this.firstName.trim().length === 0) return this.errorsService.required;
+            if (this.firstName.trim().length > 120) return this.errorsService.max(120);
         }
 
         if (field === 'email') {
-            if (!this.validatorService.required(this.email)) return this.errorsService.required;
-            if (!this.validatorService.email(this.email.trim())) return this.errorsService.email;
+            if (!this.email || this.email.trim().length === 0) return this.errorsService.required;
+            // Basic email regex since ValidatorService was removed
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(this.email.trim())) return this.errorsService.email;
+
+            // Validación de dominio (Sprint S2 v5)
+            const dominios: Record<string, string> = {
+                alumno: '@alumno.com',
+                organizador: '@organizador.com',
+                administrador: '@admin.com',
+                admin: '@admin.com'
+            };
+            const role = (this.fixedRole || this.selectedRole).toLowerCase();
+            const dominioEsperado = dominios[role];
+            if (dominioEsperado && !this.email.trim().endsWith(dominioEsperado)) {
+                return `El email debe pertenecer al dominio ${dominioEsperado} para este tipo de usuario`;
+            }
         }
 
-        if (field === 'selectedRole' && !this.validatorService.required(this.selectedRole)) {
+        if (field === 'selectedRole' && !this.fixedRole && (!this.selectedRole || this.selectedRole.length === 0)) {
             return this.errorsService.required;
         }
 
-        if (field === 'phone' && this.validatorService.required(this.phone)) {
-            const sanitizedPhone = this.phone.replace(/\s|\(|\)|-/g, '');
-            if (!this.validatorService.numeric(sanitizedPhone)) return this.errorsService.numeric;
-            if (!this.validatorService.max(sanitizedPhone, 15)) return this.errorsService.max(15);
+        if (field === 'password') {
+            if (!this.password || this.password.length === 0) return this.errorsService.required;
+            if (this.password.length < 8) return this.errorsService.min(8);
         }
 
         return '';
@@ -85,7 +102,11 @@ export class NuevoUsuarioModal {
         return !this.getFieldError('firstName') &&
             !this.getFieldError('email') &&
             !this.getFieldError('selectedRole') &&
-            !this.getFieldError('phone');
+            !this.getFieldError('password');
+    }
+
+    togglePassword(): void {
+        this.showPassword = !this.showPassword;
     }
 
     onSave(): void {
@@ -93,16 +114,32 @@ export class NuevoUsuarioModal {
         this.formError = '';
         if (!this.isValidForm()) return;
 
+        const dominios: Record<string, string> = {
+            alumno: '@alumno.com',
+            organizador: '@organizador.com',
+            administrador: '@admin.com',
+            admin: '@admin.com'
+        };
+        const role = (this.fixedRole || this.selectedRole).toLowerCase();
+        const dominioEsperado = dominios[role];
+        if (dominioEsperado && !this.email.trim().endsWith(dominioEsperado)) {
+            return; // Bloqueado por getFieldError
+        }
+
+        const roleToAssign = this.fixedRole || this.selectedRole;
+        // Mapeo a lowercase requerido por el backend
+        const roleKey = roleToAssign.toLowerCase() === 'admin' ? 'administrador' : roleToAssign.toLowerCase();
+
         const userData: any = {
             first_name: this.firstName.trim(),
             last_name: this.lastName.trim(),
             email: this.email.trim(),
-            password: 'Temporal123!',
-            telefono: this.phone.trim(),
-            rol: this.selectedRole.toLowerCase(),
+            password: this.password,
+            rol: roleKey, 
         };
+
         let service$;
-        switch (this.selectedRole) {
+        switch (roleToAssign) {
             case 'Admin':
                 service$ = this.adminService.registrarAdmin(userData);
                 break;
@@ -116,11 +153,19 @@ export class NuevoUsuarioModal {
                 this.formError = this.errorsService.required;
                 return;
         }
+
         service$.subscribe({
-            next: () => this.close.emit(),
+            next: () => {
+                this.created.emit();
+                this.close.emit();
+            },
             error: (err: any) => {
                 console.error('Error creando usuario:', err);
-                this.formError = this.parseApiError(err);
+                const errorBody = err.error;
+                const mensaje = errorBody?.message || errorBody?.detail ||
+                                errorBody?.error || 'Error al crear el usuario';
+                this.toastService.show(mensaje, 'error');
+                this.formError = mensaje;
             },
         });
     }

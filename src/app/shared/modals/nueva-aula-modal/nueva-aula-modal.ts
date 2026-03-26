@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { SedeService, Sede } from '../../../services/sede.service';
 import { ValidatorService } from '../../../services/tools/validator-service';
 import { ErrorsService } from '../../../services/tools/errors-service';
+import { TruncateSelectLabelPipe } from '../../pipes/truncate-select-label.pipe';
 
 interface Equipment {
   name: string;
@@ -12,7 +13,8 @@ interface Equipment {
 
 @Component({
   selector: 'app-nueva-aula-modal',
-  imports: [FormsModule],
+  standalone: true,
+  imports: [FormsModule, TruncateSelectLabelPipe],
   templateUrl: './nueva-aula-modal.html',
   styleUrl: './nueva-aula-modal.scss',
 })

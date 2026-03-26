@@ -5,20 +5,18 @@
                 <span class="logo-text">GT</span>
             </div>
             <span class="brand-name">GTEA</span>
-            @if (isAdminUser) {
-                <span class="user-greeting">¡Hola, {{ userName }}!</span>
+            @if (mode === 'auth') {
+                <div class="user-meta">
+                    <span class="user-greeting">¡Hola, {{ userName }}!</span>
+                    <span class="user-role">{{ getRoleLabel() }}</span>
+                </div>
             }
         </div>
         <div class="actions">
             @if (mode === 'auth') {
-            <button class="icon-btn" (click)="onNotifications()" aria-label="Notificaciones">
-                <span class="material-icons">notifications</span>
-            </button>
-            <button class="icon-btn" (click)="onSettings()" aria-label="Configuración">
-                <span class="material-icons">settings</span>
-            </button>
-            <button class="icon-btn" (click)="logout()" aria-label="Cerrar Sesión">
+            <button class="logout-btn" (click)="logout()" aria-label="Cerrar Sesión">
                 <span class="material-icons">logout</span>
+                <span>Cerrar sesión</span>
             </button>
             } @else {
             <button class="cta-btn" (click)="navigate(ctaRoute)">{{ ctaLabel }}</button>

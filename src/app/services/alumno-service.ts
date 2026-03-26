@@ -96,6 +96,13 @@ export class AlumnoService {
     return this.http.put<any>(`${environment.url_api}/alumnos/edit/`, data, { headers: headers });
   }
 
+  // Sprint S4: PUT alumno usa request.user (autenticado), campos: nombre, apellidos
+  public actualizarAlumno(id: number, data: any): Observable<any> {
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Token ' + token });
+    return this.http.put<any>(`${environment.url_api}/alumnos/edit/`, { id, ...data }, { headers: headers });
+  }
+
   //Eliminar Alumno
   public eliminarAlumno(idUser: number): Observable<any> {
     var token = this.facadeService.getSessionToken();

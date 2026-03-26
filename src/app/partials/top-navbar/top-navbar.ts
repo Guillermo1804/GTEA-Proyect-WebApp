@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { FacadeService } from '../../services/facade-service';
 
@@ -17,7 +18,11 @@ export class TopNavbar implements OnInit {
 
   userName: string = 'Usuario';
 
-  constructor(private router: Router, private facadeService: FacadeService) { }
+  constructor(
+    private router: Router, 
+    private facadeService: FacadeService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) { }
 
   ngOnInit(): void {
     if (this.mode !== 'auth') {
@@ -27,7 +32,7 @@ export class TopNavbar implements OnInit {
     const fullName = this.facadeService.getUserDisplayName();
 
     if (fullName && fullName !== 'Usuario') {
-      this.userName = fullName.split(' ')[0];
+      this.userName = fullName;
       return;
     }
 
@@ -38,12 +43,12 @@ export class TopNavbar implements OnInit {
     this.router.navigate([path]);
   }
 
-  onNotifications(): void {
-    // TODO: open notifications panel
-  }
-
-  onSettings(): void {
-    // TODO: open settings
+  getRoleLabel(): string {
+    const group = this.facadeService.getUserGroup().toLowerCase();
+    if (group === 'admin' || group === 'administrador') return 'Admin';
+    if (group === 'organizador') return 'Organizador';
+    if (group === 'alumno') return 'Alumno';
+    return '';
   }
 
   get isAdminUser(): boolean {
@@ -52,16 +57,8 @@ export class TopNavbar implements OnInit {
   }
 
   logout(): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('gtea-proyecto-token');
-      localStorage.removeItem('gtea-proyecto-email');
-      localStorage.removeItem('gtea-proyecto-user_id');
-      localStorage.removeItem('gtea-proyecto-user_complete_name');
-      localStorage.removeItem('gtea-proyecto-group_name');
-      localStorage.removeItem('group_name');
-      localStorage.removeItem('user_complete_name');
-      localStorage.removeItem('userName');
+    if (isPlatformBrowser(this.platformId)) {
+      this.facadeService.destroyUser();
     }
     this.router.navigate(['/']);
   }
