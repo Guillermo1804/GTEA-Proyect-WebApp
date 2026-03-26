@@ -6,6 +6,7 @@ import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
 import { InscripcionService } from '../../../services/inscripcion.service';
 import { FacadeService } from '../../../services/facade-service';
 import { ToastService } from '../../../services/tools/toast.service';
+import { ConfirmarAccionModalComponent } from '../../../modals/confirmar-accion-modal/confirmar-accion-modal.component';
 
 interface EventoInscrito {
     id: number;
@@ -24,7 +25,7 @@ type Filtro = 'todos' | 'proximo' | 'completado' | 'cancelado' | 'lista-espera';
 
 @Component({
     selector: 'app-mis-eventos',
-    imports: [CommonModule, TopNavbar, BottomNav],
+    imports: [CommonModule, TopNavbar, BottomNav, ConfirmarAccionModalComponent],
     templateUrl: './mis-eventos.html',
     styleUrl: './mis-eventos.scss',
 })
@@ -33,6 +34,10 @@ export class MisEventos implements OnInit {
     filtroActivo = signal<Filtro>('todos');
     totalEventos = signal<number>(0);
     userName = '';
+
+    // ── Control del modal de desinscripción ──
+    mostrarConfirmar = false;
+    eventoPendiente: EventoInscrito | null = null;
 
     private router = inject(Router);
     private inscripcionService = inject(InscripcionService);
@@ -93,12 +98,21 @@ export class MisEventos implements OnInit {
     verDetalle(id: number): void { this.router.navigate(['/alumno/evento', id]); }
 
     desinscribirse(evento: EventoInscrito): void {
+        this.eventoPendiente = evento;
+        this.mostrarConfirmar = true;
+    }
+
+    confirmarDesinscripcion(): void {
+        if (!this.eventoPendiente) return;
+        const evento = this.eventoPendiente;
+        this.mostrarConfirmar = false;
+        this.eventoPendiente = null;
+
         const alumnoId = Number(this.facadeService.getUserId());
         if (!alumnoId) {
             console.error('alumnoId no disponible');
             return;
         }
-        if (!confirm(`¿Estás seguro de cancelar tu inscripción a "${evento.titulo}"?`)) return;
 
         this.inscripcionService.cancelarInscripcion(evento.id, alumnoId).subscribe({
             next: () => {
@@ -110,5 +124,10 @@ export class MisEventos implements OnInit {
                 this.toastService.show('Error al cancelar la inscripción.', 'error');
             }
         });
+    }
+
+    cancelarModal(): void {
+        this.mostrarConfirmar = false;
+        this.eventoPendiente = null;
     }
 }

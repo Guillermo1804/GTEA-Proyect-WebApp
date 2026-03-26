@@ -273,12 +273,14 @@ export class Eventos implements OnInit {
       next: () => {
         this.successMessage = `Evento "${event.title}" eliminado correctamente.`;
         this.events = this.events.filter((e) => e.id !== event.id);
+        this.cdr.detectChanges();
         setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: (err: any) => {
         console.error('Error eliminando evento:', err);
         // Expand timeout to 8 seconds so the user can read if it fails
         this.errorMessage = err?.error?.message || 'Error al eliminar el evento. Verifica tu conexión o intenta más tarde.';
+        this.cdr.detectChanges();
         setTimeout(() => (this.errorMessage = ''), 8000);
       },
     });

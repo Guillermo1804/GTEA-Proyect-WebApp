@@ -68,4 +68,15 @@
   </div>
 </div>
 
+@if (mostrarConfirmar && eventoPendiente) {
+  <app-confirmar-accion-modal
+    [titulo]="'Cancelar inscripción'"
+    [mensaje]="'¿Estás seguro de cancelar tu inscripción a &quot;' + eventoPendiente.titulo + '&quot;?'"
+    [labelConfirmar]="'Desinscribirse'"
+    [labelCancelar]="'Volver'"
+    (confirmar)="confirmarDesinscripcion()"
+    (cancelar)="cancelarModal()"
+  />
+}
+
 <app-bottom-nav role="estudiante" activeTab="/alumno/mis-eventos"></app-bottom-nav>
