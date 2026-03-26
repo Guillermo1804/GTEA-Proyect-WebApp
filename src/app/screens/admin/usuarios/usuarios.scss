@@ -106,6 +106,42 @@
     }
 }
 
+.export-buttons {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+}
+
+.export-buttons .pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    border: 0.8px solid #e5e7eb;
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.export-buttons .pill:hover {
+    background: #f3f4f6;
+}
+
+.export-buttons .pill .material-icons {
+    font-size: 16px;
+}
+
+.export-buttons .pill.active {
+    background: #e8ecf7;
+    color: #1e3fae;
+    border-color: #d0dafb;
+}
+
 .filter-tab {
     padding: 6px 16px;
     border: 1px solid #e5e7eb;
