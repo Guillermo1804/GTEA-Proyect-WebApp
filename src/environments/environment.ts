@@ -3,5 +3,6 @@
 // El backend team debe reemplazar la URL placeholder antes del deploy.
 export const environment = {
   production: false,
-  url_api: "http://127.0.0.1:8000"
+  url_api: "https://gtea.ezarr.rocks/api",
+  apiUrl: "https://gtea.ezarr.rocks/api"
 };
