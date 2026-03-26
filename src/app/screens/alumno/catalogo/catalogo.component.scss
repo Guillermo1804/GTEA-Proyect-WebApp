@@ -223,6 +223,22 @@ $badge-radius: 6px;
   border-radius: $border-radius-card;
   overflow: hidden;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+
+  &.estado-inscrito .disponibilidad-text {
+    color: #10b981; // verde — confirmado
+  }
+
+  &.estado-en-espera .disponibilidad-text {
+    color: #f59e0b; // amarillo — en lista
+  }
+
+  &.estado-lista-espera .disponibilidad-text {
+    color: #f59e0b; // amarillo — lista disponible
+  }
+
+  &.estado-agotado .disponibilidad-text {
+    color: #ef4444; // rojo — sin lugares
+  }
 }
 
 // ─── Imagen + Badge ───────────────────────────────────────
@@ -300,8 +316,8 @@ $badge-radius: 6px;
   font-size: 0.8rem;
 
   .disponibilidad-text {
-    color: #10b981;
     font-weight: 600;
+    color: #10b981; // default: disponible
   }
 
   .inscritos-count {

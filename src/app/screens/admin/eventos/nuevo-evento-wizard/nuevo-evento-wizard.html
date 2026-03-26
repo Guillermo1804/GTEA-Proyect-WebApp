@@ -80,7 +80,7 @@
             formControlName="categoriaId">
             <option value="">Selecciona una categoría</option>
             @for (cat of categorias; track cat.id) {
-              <option [value]="cat.id">{{ cat.nombre }}</option>
+              <option [value]="cat.id" [attr.title]="cat.nombre">{{ cat.nombre | truncateSelectLabel }}</option>
             }
           </select>
           <span class="material-icons select-arrow">expand_more</span>
@@ -283,7 +283,7 @@
               formControlName="sedeId">
               <option value="">Selecciona una Sede</option>
               @for (sede of sedes; track sede.id) {
-                <option [value]="sede.id">{{ sede.nombre }}</option>
+                <option [value]="sede.id" [attr.title]="sede.nombre">{{ sede.nombre | truncateSelectLabel }}</option>
               }
             </select>
             <span class="material-icons select-arrow">expand_more</span>
@@ -305,7 +305,7 @@
               [attr.disabled]="!step2Form.get('sedeId')?.value ? true : null">
               <option value="">Selecciona un Aula</option>
               @for (aula of aulas; track aula.id) {
-                <option [value]="aula.id">{{ aula.nombre }} ({{ aula.capacidad }} personas)</option>
+                <option [value]="aula.id" [attr.title]="aulaOptionLabel(aula)">{{ aulaOptionLabel(aula) | truncateSelectLabel }}</option>
               }
             </select>
             <span class="material-icons select-arrow">expand_more</span>
@@ -414,7 +414,7 @@
         <p class="summary-description">{{ resumenDescripcion }}</p>
       </div>
 
-      <!-- Stats: capacidad y modalidad -->
+      <!-- Stats: capacidad, modalidad y estado -->
       <div class="summary-stats">
         <div class="summary-stat">
           <span class="summary-stat-label">Capacidad</span>
@@ -430,30 +430,38 @@
             {{ resumenModalidad }}
           </div>
         </div>
+        <div class="summary-stat">
+          <span class="summary-stat-label">Estado</span>
+          <div class="summary-stat-value">
+            <span class="material-icons">flag</span>
+            {{ resumenEstadoLabel }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado del evento -->
+      <div class="form-group status-select-group">
+        <label class="form-label" for="eventoStatus">Estado del evento</label>
+        <div class="select-wrapper">
+          <select
+            id="eventoStatus"
+            class="form-select"
+            [class.invalid]="isFieldInvalid(step3Form, 'status')"
+            formControlName="status">
+            @for (opt of eventStatusOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+          <span class="material-icons select-arrow">expand_more</span>
+        </div>
+        @if (isFieldInvalid(step3Form, 'status')) {
+          <span class="form-error">{{ getFieldError(step3Form, 'status') }}</span>
+        }
+        <p class="form-hint status-hint">Solo en <strong>Activo</strong> el evento queda publicado y con inscripciones abiertas (según reglas del servidor).</p>
       </div>
 
       <!-- Opciones de publicación -->
       <div class="publish-options">
-        <!-- Publicar inmediatamente -->
-        <label
-          class="publish-card"
-          [class.selected]="step3Form.get('publicarInmediatamente')?.value === true">
-          <div class="publish-card-info">
-            <span class="material-icons publish-icon">rocket_launch</span>
-            <div>
-              <strong>Publicar Inmediatamente</strong>
-              <p>El evento será visible y las inscripciones se abrirán.</p>
-            </div>
-          </div>
-          <div class="toggle-switch">
-            <input
-              type="checkbox"
-              formControlName="publicarInmediatamente"
-            />
-            <span class="toggle-track"></span>
-          </div>
-        </label>
-
         <!-- Soy el organizador -->
         <label
           class="publish-card"

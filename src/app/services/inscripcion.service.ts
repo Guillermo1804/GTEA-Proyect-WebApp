@@ -39,18 +39,22 @@ export class InscripcionService {
     }
 
     // ─────────────────────────────────────────────
-    // [POST] Cancelar inscripción / salir lista de espera
-    // Endpoint: POST /inscripciones/cancel/
+    // [DELETE] Cancelar inscripción / salir lista de espera
+    // Endpoint: DELETE /inscripciones/cancel/?evento_id=X&alumno_id=Y
     // ─────────────────────────────────────────────
-    public cancelarInscripcion(inscripcionId: number): Observable<any> {
-        const payload = {
-            inscripcion_id: inscripcionId
-        };
-
-        return this.http.post<any>(
+    public cancelarInscripcion(
+        eventoId: number,
+        alumnoId: number
+    ): Observable<any> {
+        return this.http.delete<any>(
           `${environment.url_api}/inscripciones/cancel/`,
-          payload,
-          httpOptions
+          {
+            params: {
+              evento_id: eventoId.toString(),
+              alumno_id: alumnoId.toString()
+            },
+            headers: httpOptions.headers
+          }
         );
     }
 

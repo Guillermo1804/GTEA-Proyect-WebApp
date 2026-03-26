@@ -94,6 +94,11 @@
                 }
                 @case ('inscrito') {
                   <button class="btn btn-secondary" (click)="abrirDetalles(taller)">Ver Detalles</button>
+                  <button class="btn btn-danger" (click)="desinscribirse(taller)">Desinscribirse</button>
+                }
+                @case ('en-espera') {
+                  <button class="btn btn-secondary" (click)="abrirDetalles(taller)">Ver Detalles</button>
+                  <button class="btn btn-danger" (click)="desinscribirse(taller)">Salir de lista de espera</button>
                 }
                 @case ('lista-espera') {
                   <button class="btn btn-warning" (click)="cancelarEspera(taller)">Lista de Espera</button>
@@ -111,5 +116,16 @@
 
   </div>
 </div>
+
+@if (mostrarConfirmar && tallerPendiente) {
+  <app-confirmar-accion-modal
+    [titulo]="'Cancelar inscripción'"
+    [mensaje]="'¿Estás seguro de cancelar tu inscripción a &quot;' + tallerPendiente.titulo + '&quot;?'"
+    [labelConfirmar]="'Desinscribirse'"
+    [labelCancelar]="'Volver'"
+    (confirmar)="confirmarDesinscripcion()"
+    (cancelar)="cancelarModal()"
+  />
+}
 
 <app-bottom-nav role="estudiante" activeTab="/alumno/catalogo"></app-bottom-nav>

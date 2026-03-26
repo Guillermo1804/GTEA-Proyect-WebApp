@@ -37,41 +37,40 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Teléfono</label>
-                <input class="form-input" type="tel" placeholder="(000) 000-0000" [(ngModel)]="phone">
-                @if (hasError('phone')) {
-                <small class="error-message">{{ getFieldError('phone') }}</small>
+                <label class="form-label">Contraseña</label>
+                <div class="password-wrapper">
+                    <input class="form-input" [type]="showPassword ? 'text' : 'password'" placeholder="Mínimo 8 caracteres" [(ngModel)]="password">
+                    <button type="button" class="password-toggle" (click)="togglePassword()">
+                        <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+                    </button>
+                </div>
+                @if (hasError('password')) {
+                <small class="error-message">{{ getFieldError('password') }}</small>
                 }
             </div>
 
             <!-- Role Selector -->
             <div class="form-group">
                 <label class="form-label">Rol</label>
-                <div class="role-grid">
-                    @for (role of roles; track role) {
-                    <button class="role-option" [class.selected]="selectedRole === role" (click)="selectedRole = role">
-                        {{ role }}
-                    </button>
-                    }
-                </div>
+                
+                @if (!fixedRole) {
+                    <div class="role-grid">
+                        @for (role of roles; track role) {
+                        <button class="role-option" [class.selected]="selectedRole === role" (click)="selectedRole = role">
+                            {{ role }}
+                        </button>
+                        }
+                    </div>
+                } @else {
+                    <div class="fixed-role-chip">
+                        <span class="material-icons">person</span>
+                        {{ fixedRole }}
+                    </div>
+                }
+
                 @if (hasError('selectedRole')) {
                 <small class="error-message">{{ getFieldError('selectedRole') }}</small>
                 }
-            </div>
-
-            <!-- Send Invite Toggle -->
-            <div class="invite-toggle">
-                <div class="invite-info">
-                    <span class="material-icons">mail_outline</span>
-                    <div>
-                        <span class="invite-title">Enviar invitación</span>
-                        <span class="invite-sub">El usuario recibirá un correo para activar su cuenta</span>
-                    </div>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" [checked]="sendInvite" (change)="sendInvite = !sendInvite">
-                    <span class="toggle-slider"></span>
-                </label>
             </div>
         </div>
 
@@ -81,4 +80,4 @@
             <button class="btn-save" (click)="onSave()">Crear Usuario</button>
         </div>
     </div>
-</div>
+</div>

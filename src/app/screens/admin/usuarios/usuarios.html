@@ -4,13 +4,16 @@
 
 
     <main class="main">
-            <div class="page-header">
-        <h1 class="page-title">Gestión de Usuarios</h1>
-        <button class="btn-add" (click)="addUser()">
-            <span class="material-icons">add</span>
-            Nuevo
-        </button>
-    </div>
+        <div class="page-header">
+            <div>
+                <h1>Gestión de Usuarios</h1>
+                <p>Administra los usuarios registrados en el sistema</p>
+            </div>
+            <button class="btn-add" (click)="addUser()">
+                <span class="material-icons">add</span>
+                Nuevo
+            </button>
+        </div>
         <div class="search-section">
             <div class="search-bar">
                 <span class="material-icons search-icon">search</span>
@@ -22,16 +25,6 @@
                     {{ filter }}
                 </button>
                 }
-            </div>
-            <div class="export-buttons">
-                <button class="pill" (click)="exportarPDF()">
-                    <span class="material-icons">picture_as_pdf</span>
-                    Exportar PDF
-                </button>
-                <button class="pill" (click)="exportarExcel()">
-                    <span class="material-icons">table_chart</span>
-                    Exportar Excel
-                </button>
             </div>
         </div>
 
@@ -50,18 +43,24 @@
                         </div>
                     </div>
                 </div>
-                @if (currentRole === 'admin'){
                 <div class="user-actions">
-                    <button class="action-btn" (click)="editUser(user)">
+                    @if (isSelf(user)) {
+                      <!-- Solo botón de perfil propio -->
+                      <button class="action-btn" (click)="editUser(user)" title="Editar mi perfil">
+                        <span class="material-icons">manage_accounts</span>
+                      </button>
+                    } @else if (canEdit(user)) {
+                      <!-- Botones de gestión (visibles solo si tiene permiso) -->
+                      <button class="action-btn" (click)="editUser(user)">
                         <span class="material-icons">edit</span>
-                    </button>
-                    <button class="action-btn delete" [disabled]="isSelf(user)" [class.disabled]="isSelf(user)" (click)="deleteUser(user)">
-                        <span class="material-icons">delete</span>
-                    </button>
+                      </button>
+                      @if (currentRole === 'admin') {
+                        <button class="action-btn delete" (click)="deleteUser(user.id)">
+                          <span class="material-icons">delete</span>
+                        </button>
+                      }
+                    }
                 </div>
-                }
-
-
 
             </div>
             }
@@ -94,7 +93,8 @@
 <app-nueva-categoria-modal (close)="closeModal()"></app-nueva-categoria-modal>
 }
 @if (activeModal === 'nuevo-usuario') {
-<app-nuevo-usuario-modal (close)="closeModal()"></app-nuevo-usuario-modal>
+<app-nuevo-usuario-modal [fixedRole]="fixedRole" (close)="closeModal()" (created)="onUserCreated()">
+</app-nuevo-usuario-modal>
 }
 @if (activeModal === 'eliminar-usuario' && userToDelete) {
 <app-eliminar-user-modal
@@ -103,3 +103,11 @@
   (confirmDelete)="confirmDeleteUser()">
 </app-eliminar-user-modal>
 }
+@if (userToEdit) {
+<app-editar-usuario-modal
+  [user]="userToEdit"
+  [callerRole]="currentRole"
+  (updated)="onUserUpdated()"
+  (close)="closeEditModal()">
+</app-editar-usuario-modal>
+}

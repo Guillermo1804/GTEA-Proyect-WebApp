@@ -1,6 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject, DestroyRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router, ActivatedRoute } from '@angular/router';
+import { FacadeService } from '../../../services/facade-service';
 import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
 import { NuevaAulaModal } from '../../../shared/modals/nueva-aula-modal/nueva-aula-modal';
@@ -11,31 +13,33 @@ import { AdminServiceService } from '../../../services/admin-service.service';
 import { AlumnoService } from '../../../services/alumno-service';
 import { OrganizadorService } from '../../../services/organizador-service';
 import { EliminarUserModalComponent } from '../../../modals/eliminar-user-modal/eliminar-user-modal.component';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import * as XLSX from 'xlsx';
+import { EditarUsuarioModal } from '../../../shared/modals/editar-usuario-modal/editar-usuario-modal';
+import { ToastService } from '../../../services/tools/toast.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface User {
   id: number;
   name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   role: 'Admin' | 'Organizador' | 'Alumno';
   roleBadgeClass: string;
   status: 'Activo' | 'Inactivo';
   avatarInitials: string;
   _roleSource: 'admin' | 'alumno' | 'organizador';
+  extraFields: Record<string, any>;
 }
 
 @Component({
   selector: 'app-admin-usuarios',
-  imports: [FormsModule, CommonModule, TopNavbar, BottomNav, NuevaAulaModal, NuevaSedeModal, NuevaCategoriaModal, NuevoUsuarioModal,EliminarUserModalComponent],
+  imports: [FormsModule, CommonModule, TopNavbar, BottomNav, NuevaAulaModal, NuevaSedeModal, NuevaCategoriaModal, NuevoUsuarioModal, EliminarUserModalComponent, EditarUsuarioModal],
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.scss',
 })
 export class Usuarios implements OnInit {
   readonly form: any;
   errorMessage: string = '';
-  successMessage: string = '';
 
   userToDelete: User | null = null;
   searchQuery = '';
@@ -44,19 +48,28 @@ export class Usuarios implements OnInit {
   currentPage = 1;
   readonly pageSize = 9;
 
-activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | 'eliminar-usuario' | null = null;
+  activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | 'eliminar-usuario' | null = null;
   users: User[] = [];
   isLoading = true;
-currentRole: 'admin' | 'organizador' | 'alumno' = 'alumno';
+  currentRole: 'admin' | 'organizador' | 'alumno' = 'alumno';
+  fixedRole = '';
+  userToEdit: User | null = null;
+
+  private destroyRef = inject(DestroyRef);
+  private route = inject(ActivatedRoute);
+
   constructor(
     private adminService: AdminServiceService,
     private alumnoService: AlumnoService,
     private organizadorService: OrganizadorService,
     private cdr: ChangeDetectorRef,
+    private router: Router,
+    private toastService: ToastService,
+    private facadeService: FacadeService,
   ) { }
 
   ngOnInit(): void {
-    const storedRole = localStorage.getItem('gtea-proyecto-group_name') || '';
+    const storedRole = this.facadeService.getUserGroup();
 
     if (storedRole === 'admin' || storedRole === 'administrador') {
       this.currentRole = 'admin';
@@ -66,12 +79,24 @@ currentRole: 'admin' | 'organizador' | 'alumno' = 'alumno';
       this.currentRole = 'alumno';
     }
 
+    this.fixedRole = this.currentRole === 'organizador' ? 'Alumno' : '';
     console.log('ROL NORMALIZADO:', this.currentRole);
     this.loadUsers();
+
+    // Manejar apertura automática vía FAB (Sprint S2 v3)
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        if (params['openModal'] === 'nuevo-usuario') {
+          this.activeModal = 'nuevo-usuario';
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {},
+            replaceUrl: true
+          });
+        }
+      });
   }
-
-
-  
 
   loadUsers(): void {
     this.isLoading = true;
@@ -79,9 +104,16 @@ currentRole: 'admin' | 'organizador' | 'alumno' = 'alumno';
     let pending = 3;
     const allUsers: User[] = [];
 
+    const myEmail = this.facadeService.getUserEmail();
+
     const done = () => {
       pending--;
       if (pending === 0) {
+        // Sprint S2: Sort logged-in user at position 0
+        allUsers.sort((a, b) =>
+          a.email === myEmail ? -1 : b.email === myEmail ? 1 : 0
+        );
+
         this.users = allUsers;
         this.ensureCurrentPageValid();
         this.isLoading = false;
@@ -140,13 +172,21 @@ currentRole: 'admin' | 'organizador' | 'alumno' = 'alumno';
     const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
     return {
       id,
-      name: `${firstName} ${lastName}`,
+      first_name: firstName,
+      last_name: lastName,
+      name: `${firstName} ${lastName}`.trim(),
       email,
       role,
       roleBadgeClass: badgeClass,
-      status: 'Activo',
+      status: u.is_active === false ? 'Inactivo' : 'Activo',
       avatarInitials: initials || '??',
       _roleSource: source,
+      extraFields: {
+        matricula: u.matricula ?? null,
+        ocupacion: u.ocupacion ?? null,
+        clave_admin: u.clave_admin ?? null,
+        id_trabajador: u.id_trabajador ?? null,
+      },
     };
   }
 
@@ -170,106 +210,6 @@ currentRole: 'admin' | 'organizador' | 'alumno' = 'alumno';
     this.currentPage = 1;
   }
 
-  private async loadImageAsDataUrl(url: string): Promise<string> {
-    const response = await fetch(url, { cache: 'no-cache' });
-    const blob = await response.blob();
-    return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string | null;
-        if (result) {
-          resolve(result);
-        } else {
-          reject(new Error('No se pudo leer el logo como DataURL'));
-        }
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  }
-
-  async exportarPDF(): Promise<void> {
-    const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
-    const fecha = new Date();
-
-    const logoUrl = 'assets/LogoGTEA.png';
-    try {
-      const logoDataUrl = await this.loadImageAsDataUrl(logoUrl);
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const logoWidth = 140; // un poco más chico
-      const logoProps = doc.getImageProperties(logoDataUrl);
-      const logoHeight = (logoProps.height / logoProps.width) * logoWidth;
-      const logoX = pageWidth - logoWidth - 20; // hacia la derecha
-      const logoY = 15; // bajar un poco
-      doc.addImage(logoDataUrl, 'PNG', logoX, logoY, logoWidth, logoHeight);
-    } catch (error) {
-      console.warn('Error cargando el logo de GTEA para PDF:', error);
-    }
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    doc.text('Reporte de Usuarios', 40, 60);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(11);
-    doc.text(`Generado: ${fecha.toLocaleString()}`, 40, 80);
-    doc.text(`Filtro aplicado: ${this.activeFilter}`, 40, 95);
-
-    const datos = this.filteredUsers.map(u => ({
-      Nombre: u.name,
-      Email: u.email,
-      Rol: u.role,
-      Estatus: u.status
-    }));
-
-    const head = [['Nombre', 'Email', 'Rol', 'Estatus']];
-    const body = datos.map(r => [r.Nombre, r.Email, r.Rol, r.Estatus]);
-
-    autoTable(doc, {
-      head,
-      body,
-      startY: 150,
-      styles: {
-        font: 'helvetica',
-        fontSize: 10,
-        cellPadding: 8,
-        lineColor: [229, 231, 235],
-        lineWidth: 0.5
-      },
-      headStyles: {
-        fillColor: [19, 70, 236],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold'
-      },
-      bodyStyles: { textColor: [15, 23, 42] },
-      alternateRowStyles: { fillColor: [248, 250, 252] },
-      columnStyles: {
-        0: { cellWidth: 150 },
-        1: { cellWidth: 200 },
-        2: { cellWidth: 100, halign: 'center' },
-        3: { cellWidth: 90, halign: 'center' }
-      }
-    });
-
-    const stamp = fecha.toISOString().slice(0, 19).replace(/[:T]/g, '-');
-    doc.save(`usuarios-${stamp}.pdf`);
-  }
-
-  exportarExcel(): void {
-    const datos = this.filteredUsers.map(u => ({
-      Nombre: u.name,
-      Email: u.email,
-      Rol: u.role,
-      Estatus: u.status
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(datos);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Usuarios');
-    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-    XLSX.writeFile(wb, `usuarios-${stamp}.xlsx`);
-  }
-
   prevPage(): void { if (this.currentPage > 1) this.currentPage--; }
   nextPage(): void { if (this.currentPage < this.totalPages) this.currentPage++; }
 
@@ -282,11 +222,33 @@ currentRole: 'admin' | 'organizador' | 'alumno' = 'alumno';
     return this.filteredUsers.slice(startIndex, startIndex + this.pageSize);
   }
 
-  editUser(user: User): void { /* TODO */ }
+  editUser(user: User): void {
+    this.userToEdit = user;
+  }
 
-deleteUser(user: User): void {
-  this.userToDelete = user;
-  this.activeModal = 'eliminar-usuario';
+  /** Admin puede editar a todos; organizador solo a alumnos */
+  canEdit(user: User): boolean {
+    if (this.currentRole === 'admin') return true;
+    if (this.currentRole === 'organizador') return user._roleSource === 'alumno';
+    return false;
+  }
+
+  onUserUpdated(): void {
+    this.toastService.show('Usuario actualizado correctamente.', 'success');
+    this.loadUsers();
+    this.userToEdit = null;
+  }
+
+  closeEditModal(): void {
+    this.userToEdit = null;
+  }
+
+deleteUser(id: number): void {
+  const user = this.users.find(u => u.id === id);
+  if (user) {
+    this.userToDelete = user;
+    this.activeModal = 'eliminar-usuario';
+  }
 }
 
 confirmDeleteUser(): void {
@@ -311,7 +273,7 @@ confirmDeleteUser(): void {
 
   deleteObs.subscribe({
     next: () => {
-      this.successMessage = `Usuario ${user.name} eliminado correctamente.`;
+      this.toastService.show(`Usuario ${user.name} eliminado correctamente.`, 'success');
       this.userToDelete = null;
       this.activeModal = null;
       this.loadUsers();
@@ -326,11 +288,13 @@ confirmDeleteUser(): void {
 }
 
   isSelf(user: User): boolean {
-    if (typeof window === 'undefined' || !window.localStorage) {
-      return false;
-    }
-    const loggedInEmail = localStorage.getItem('gtea-proyecto-email') || '';
-    return user.email === loggedInEmail;
+    return user.email === this.facadeService.getUserEmail();
+  }
+
+  onUserCreated(): void {
+    this.toastService.show('Usuario creado correctamente', 'success');
+    this.loadUsers();
+    this.activeModal = null;
   }
 
   addUser(): void { this.activeModal = 'nuevo-usuario'; }
