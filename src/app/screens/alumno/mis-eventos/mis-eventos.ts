@@ -5,6 +5,7 @@ import { TopNavbar } from '../../../partials/top-navbar/top-navbar';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
 import { InscripcionService } from '../../../services/inscripcion.service';
 import { FacadeService } from '../../../services/facade-service';
+import { ToastService } from '../../../services/tools/toast.service';
 
 interface EventoInscrito {
     id: number;
@@ -37,6 +38,7 @@ export class MisEventos implements OnInit {
     private inscripcionService = inject(InscripcionService);
     private facadeService = inject(FacadeService);
     private cdr = inject(ChangeDetectorRef);
+    private toastService = inject(ToastService);
 
     ngOnInit(): void {
         const nombre = this.facadeService.getUserDisplayName() ?? 'Estudiante';
@@ -89,4 +91,24 @@ export class MisEventos implements OnInit {
     setFiltro(f: Filtro): void { this.filtroActivo.set(f); }
 
     verDetalle(id: number): void { this.router.navigate(['/alumno/evento', id]); }
+
+    desinscribirse(evento: EventoInscrito): void {
+        const alumnoId = Number(this.facadeService.getUserId());
+        if (!alumnoId) {
+            console.error('alumnoId no disponible');
+            return;
+        }
+        if (!confirm(`¿Estás seguro de cancelar tu inscripción a "${evento.titulo}"?`)) return;
+
+        this.inscripcionService.cancelarInscripcion(evento.id, alumnoId).subscribe({
+            next: () => {
+                this.toastService.show('Te has desinscrito exitosamente.', 'success');
+                this.eventos.set(this.eventos().filter(e => e.id !== evento.id));
+                this.totalEventos.set(this.eventos().filter(e => e.estado === 'completado').length);
+            },
+            error: (err: any) => {
+                this.toastService.show('Error al cancelar la inscripción.', 'error');
+            }
+        });
+    }
 }

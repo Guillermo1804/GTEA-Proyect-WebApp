@@ -2,17 +2,19 @@ import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { timeout, catchError, finalize } from 'rxjs/operators';
-import { throwError, TimeoutError } from 'rxjs';
+import { throwError, TimeoutError, forkJoin, of } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { InscripcionService } from '../../../services/inscripcion.service';
 import { EventoService, Evento } from '../../../services/evento-service';
+import { FacadeService } from '../../../services/facade-service';
 import { ToastService } from '../../../services/tools/toast.service';
 import { BottomNav } from '../../../partials/bottom-nav/bottom-nav';
+import { ConfirmarAccionModalComponent } from '../../../modals/confirmar-accion-modal/confirmar-accion-modal.component';
 
 @Component({
     selector: 'app-evento-detalle',
-    imports: [CommonModule, BottomNav],
+    imports: [CommonModule, BottomNav, ConfirmarAccionModalComponent],
     templateUrl: './evento-detalle.component.html',
     styleUrl: './evento-detalle.component.scss',
 })
@@ -21,11 +23,15 @@ export class EventoDetalleComponent implements OnInit {
     private router = inject(Router);
     private inscripcionService = inject(InscripcionService);
     private eventoService = inject(EventoService);
+    private facadeService = inject(FacadeService);
     private toastService = inject(ToastService);
     private cdr = inject(ChangeDetectorRef); 
     // ── Signals de estado ──
     isProcessing = signal(false);
     cupoLleno = signal(false);
+    estaInscrito = signal(false);
+    inscripcionId = signal<number | null>(null);
+    mostrarConfirmar = false;
  
     // ── Datos del evento ──
     evento: Evento | null = null;
@@ -41,8 +47,12 @@ export class EventoDetalleComponent implements OnInit {
             return;
         }
 
-        this.eventoService.getEventoByID(id).subscribe({
-            next: (evento) => {
+        forkJoin({
+            evento: this.eventoService.getEventoByID(id),
+            misEventos: this.inscripcionService.getMisEventos().pipe(catchError(() => of([])))
+        }).subscribe({
+            next: (data) => {
+                const evento = data.evento;
                 if (!evento) {
                     this.toastService.show('Evento no encontrado.', 'error');
                     this.router.navigate(['/alumno']);
@@ -57,6 +67,14 @@ export class EventoDetalleComponent implements OnInit {
 
                 if (evento.isFull) {
                     this.cupoLleno.set(true);
+                }
+
+                // Check if already enrolled
+                const hit = data.misEventos.find((e: any) => (e.evento_id || e.id) === id);
+                if (hit) {
+                    this.estaInscrito.set(true);
+                    // The API returns the id (which is inscripcion_id when it's /mis-eventos/)
+                    this.inscripcionId.set(hit.id);
                 }
 
                 this.cdr.detectChanges();  // ← fuerza re-render
@@ -153,23 +171,62 @@ export class EventoDetalleComponent implements OnInit {
             )
             .subscribe({
                 next: (respuesta) => {
-                    this.isProcessing.set(false);
-                    this.toastService.show('¡Inscripción exitosa!', 'success');
-                    if (respuesta.success) {
-                        if (respuesta.posicionListaEspera) {
-                            this.toastService.show(
-                                `Te has unido a la lista de espera. Posición: ${respuesta.posicionListaEspera}`,
-                                'success'
-                            );
-                        } else {
-                            this.toastService.show(
-                                respuesta.mensaje || '¡Inscripción exitosa!',
-                                'success'
-                            );
-                        }
+                    if (respuesta.posicionListaEspera &&
+                        respuesta.posicionListaEspera > 0) {
+                        this.toastService.show(
+                            `Lista de espera. Posición: ${respuesta.posicionListaEspera}`,
+                            'success'
+                        );
+                    } else {
+                        this.estaInscrito.set(true);
+                        this.toastService.show(
+                            respuesta.mensaje || '¡Inscripción exitosa!',
+                            'success'
+                        );
+                        setTimeout(() => this.goBack(), 1500);
                     }
                 },
             });
+    }
+
+    desinscribirEvento(): void {
+        this.mostrarConfirmar = true;
+    }
+
+    confirmarDesinscripcion(): void {
+        this.mostrarConfirmar = false;
+
+        const alumnoId = Number(this.facadeService.getUserId());
+        const eventoId = Number(this.route.snapshot.paramMap.get('id'))
+                         || this.evento?.id;
+
+        if (!alumnoId || !eventoId) {
+            console.error('Faltan IDs:', { alumnoId, eventoId });
+            return;
+        }
+
+        if (this.isProcessing()) return;
+        this.isProcessing.set(true);
+
+        this.inscripcionService
+            .cancelarInscripcion(eventoId, alumnoId)
+            .subscribe({
+                next: () => {
+                    this.isProcessing.set(false);
+                    this.estaInscrito.set(false);
+                    this.inscripcionId.set(null);
+                    this.toastService.show('Te has desinscrito del evento.', 'success');
+                },
+                error: (err) => {
+                    this.isProcessing.set(false);
+                    console.error('Error desinscripción:', err);
+                    this.toastService.show('Error al intentar desinscribirse.', 'error');
+                }
+            });
+    }
+
+    cancelarModal(): void {
+        this.mostrarConfirmar = false;
     }
 
     goBack(): void {

@@ -52,6 +52,9 @@
               </div>
               <div class="evento-acciones">
                 <button class="btn-detalle" (click)="verDetalle(evento.id)">Ver Detalles</button>
+                @if (evento.estado === 'proximo' || evento.estado === 'lista-espera') {
+                  <button class="btn-detalle" style="background: #dc2626; border-color: #dc2626;" (click)="desinscribirse(evento)">Desinscribirse</button>
+                }
                 @if (evento.tieneCertificado) {
                   <button class="btn-certificado">Ver Constancia 📄</button>
                 }
