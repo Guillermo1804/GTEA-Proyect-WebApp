@@ -140,3 +140,13 @@
     (eventoCreado)="onEventoCreado($event)">
 </app-nuevo-evento-wizard>
 }
+
+@if (showDeleteModal && eventToDelete) {
+  <app-confirmar-eliminar-modal
+    [titulo]="'Eliminar evento'"
+    [mensaje]="'¿Deseas eliminar ' + eventToDelete.title + '? Esta acción no se puede deshacer.'"
+    [isLoading]="isDeleting"
+    (confirmado)="onConfirmDelete()"
+    (cancelado)="onCancelDelete()"
+  />
+}

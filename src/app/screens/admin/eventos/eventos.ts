@@ -11,6 +11,7 @@ import { NuevoUsuarioModal } from '../../../shared/modals/nuevo-usuario-modal/nu
 import { NuevoEventoWizard } from './nuevo-evento-wizard/nuevo-evento-wizard';
 import { EventoService, Evento } from '../../../services/evento-service';
 import { ToastService } from '../../../services/tools/toast.service';
+import { ConfirmarEliminarModal } from '../../../modals/confirmar-eliminar-modal/confirmar-eliminar-modal';
 
 interface EventItem {
   id: number;
@@ -38,7 +39,9 @@ interface EventItem {
     NuevaSedeModal,
     NuevaCategoriaModal,
     NuevoUsuarioModal,
-    NuevoEventoWizard  ],
+    NuevoEventoWizard,
+    ConfirmarEliminarModal,
+  ],
   templateUrl: './eventos.html',
   styleUrl: './eventos.scss',
 })
@@ -66,20 +69,20 @@ export class Eventos implements OnInit {
     private route: ActivatedRoute,
     private eventoService: EventoService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Cargar eventos desde el servicio (ahora retorna mocks centralizados)
     this.loadEvents();
-    
+
     // Verificar si hay query param para abrir el modal de nuevo evento o editar
     this.route.queryParams.subscribe(params => {
       if (params['new'] === 'true') {
         // Limpiar el query param de la URL
-        this.router.navigate([], { 
-          relativeTo: this.route, 
-          queryParams: {}, 
-          replaceUrl: true 
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {},
+          replaceUrl: true
         });
         // Abrir el modal de nuevo evento
         this.editingEventId = null;
@@ -89,10 +92,10 @@ export class Eventos implements OnInit {
         // Modo edición desde la vista de detalle
         const editId = Number(params['edit']);
         // Limpiar el query param de la URL
-        this.router.navigate([], { 
-          relativeTo: this.route, 
-          queryParams: {}, 
-          replaceUrl: true 
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {},
+          replaceUrl: true
         });
         // Cargar evento y abrir wizard en modo edición
         this.eventoService.getEventoByID(editId).subscribe({
@@ -113,6 +116,12 @@ export class Eventos implements OnInit {
       }
     });
   }
+
+  // ── Modal eliminar ──
+  showDeleteModal = false;
+  eventToDelete: EventItem | null = null;
+  isDeleting = false;
+
 
   // ── Carga desde API (usa mocks centralizados hasta que llegue el backend) ──
   loadEvents(): void {
@@ -203,11 +212,11 @@ export class Eventos implements OnInit {
 
   getStatusClass(status: string): string {
     switch (status) {
-      case 'Activo':     return 'status-active';
-      case 'Borrador':   return 'status-draft';
+      case 'Activo': return 'status-active';
+      case 'Borrador': return 'status-draft';
       case 'Finalizado': return 'status-finished';
-      case 'Cancelado':  return 'status-cancelled';
-      default:           return '';
+      case 'Cancelado': return 'status-cancelled';
+      default: return '';
     }
   }
 
@@ -222,34 +231,34 @@ export class Eventos implements OnInit {
     this.eventoService.getEventoByID(event.id).subscribe({
       next: (data: Evento | null) => {
         if (data) {
-          this.editingEventId   = event.id;
+          this.editingEventId = event.id;
           this.editingEventData = data;
-          this.activeModal      = 'nuevo-evento';
+          this.activeModal = 'nuevo-evento';
         } else {
           // Fallback si el servicio retorna null (modo mock sin datos)
           const eventoData: Evento = {
-            id:                    event.id,
-            titulo:                event.title,
-            categoriaId:           event.category,
-            descripcion:           'Descripción del evento (cargar desde backend)',
-            imagenPortada:         null,
-            fechaInicio:           event.date,
-            horaInicio:            event.time.split(' - ')[0] ?? '',
-            fechaFin:              event.date,
-            horaFin:               event.time.split(' - ')[1] ?? '',
-            modalidad:             event.location === 'Virtual' ? 'Virtual' : 'Presencial',
-            sedeId:                1, // Mock: usar ID 1 por defecto
-            aulaId:                101, // Mock: usar ID 101 por defecto
-            cupoMaximo:            event.capacity,
-            costoEntrada:          0,
-            listaEspera:           false,
-            status:                event.status,
+            id: event.id,
+            titulo: event.title,
+            categoriaId: event.category,
+            descripcion: 'Descripción del evento (cargar desde backend)',
+            imagenPortada: null,
+            fechaInicio: event.date,
+            horaInicio: event.time.split(' - ')[0] ?? '',
+            fechaFin: event.date,
+            horaFin: event.time.split(' - ')[1] ?? '',
+            modalidad: event.location === 'Virtual' ? 'Virtual' : 'Presencial',
+            sedeId: 1, // Mock: usar ID 1 por defecto
+            aulaId: 101, // Mock: usar ID 101 por defecto
+            cupoMaximo: event.capacity,
+            costoEntrada: 0,
+            listaEspera: false,
+            status: event.status,
             publicarInmediatamente: event.status === 'Activo',
-            esOrganizador:         true,
+            esOrganizador: true,
           };
-          this.editingEventId   = event.id;
+          this.editingEventId = event.id;
           this.editingEventData = eventoData;
-          this.activeModal      = 'nuevo-evento';
+          this.activeModal = 'nuevo-evento';
         }
       },
       error: (err) => {
@@ -262,17 +271,22 @@ export class Eventos implements OnInit {
   deleteEvent(event: EventItem): void {
     if (!confirm(`¿Eliminar el evento "${event.title}"?`)) return;
 
+    this.errorMessage = '';
+    this.successMessage = '';
+
     this.eventoService.eliminarEvento(event.id).subscribe({
       next: () => {
-        this.toastService.show(`Evento "${event.title}" eliminado correctamente.`, 'success');
+        this.successMessage = `Evento "${event.title}" eliminado correctamente.`;
         this.events = this.events.filter((e) => e.id !== event.id);
         this.cdr.detectChanges();
+        setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: (err: any) => {
         console.error('Error eliminando evento:', err);
         // Expand timeout to 8 seconds so the user can read if it fails
-        this.toastService.show(err?.error?.message || 'Error al eliminar el evento. Verifica tu conexión o intenta más tarde.', 'error', 8000);
+        this.errorMessage = err?.error?.message || 'Error al eliminar el evento. Verifica tu conexión o intenta más tarde.';
         this.cdr.detectChanges();
+        setTimeout(() => (this.errorMessage = ''), 8000);
       },
     });
   }
@@ -292,15 +306,15 @@ export class Eventos implements OnInit {
   onFabAction(action: string): void {
     if (action !== 'nuevo-evento') {
       // Asegurarse de limpiar el modo edición si se abre otro modal
-      this.editingEventId   = null;
+      this.editingEventId = null;
       this.editingEventData = null;
     }
     this.activeModal = action as any;
   }
 
   closeModal(): void {
-    this.activeModal      = null;
-    this.editingEventId   = null;
+    this.activeModal = null;
+    this.editingEventId = null;
     this.editingEventData = null;
   }
 }
