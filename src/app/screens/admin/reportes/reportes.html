@@ -41,6 +41,17 @@
             <div class="card-header">
                 <h2>Actividad Mensual</h2>
                 <p>Eventos realizados por mes</p>
+                @if (activePeriod === 'Semanal') {
+                <div class="navigation-buttons">
+                    <button (click)="prevWeeks()" [disabled]="weeksOffset === 0" class="nav-btn">
+                        <span class="material-icons">arrow_back</span>
+                    </button>
+                    <span class="week-counter">Semanas {{ weeksOffset * 6 + 1 }} - {{ (weeksOffset + 1) * 6 }}</span>
+                    <button (click)="nextWeeks()" class="nav-btn">
+                        <span class="material-icons">arrow_forward</span>
+                    </button>
+                </div>
+                }
             </div>
             <div class="chart-container">
                 <div class="bar-chart">
@@ -110,11 +121,11 @@
 
         <!-- Export Buttons -->
         <div class="export-section">
-            <button class="export-btn">
+            <button class="export-btn" (click)="exportarPDF()">
                 <span class="material-icons">picture_as_pdf</span>
                 Exportar PDF
             </button>
-            <button class="export-btn">
+            <button class="export-btn" (click)="exportarExcel()">
                 <span class="material-icons">table_chart</span>
                 Exportar Excel
             </button>

@@ -381,6 +381,50 @@
     }
 }
 
+// Navigation Buttons (Weekly)
+.navigation-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.nav-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+
+    .material-icons {
+        font-size: 18px;
+        color: #1e3fae;
+    }
+
+    &:hover:not(:disabled) {
+        background: #f3f4f6;
+        border-color: #1e3fae;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.week-counter {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+}
+
 // ──────────────── Responsive ────────────────
 
 // Tablet
