@@ -1,5 +1,6 @@
 import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { Injectable, Inject, Injector } from '@angular/core';
+import { Injectable, Inject, Injector, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -33,7 +34,12 @@ export class FacadeService {
     private validatorService: ValidatorService,
     private errorService: ErrorsService,
     private injector: Injector,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) { }
+
+  private get isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
 
   //Validar login
   //Funcion para validar login
@@ -88,14 +94,14 @@ export class FacadeService {
   }
 
   getCookieValue(key: string) {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      return localStorage.getItem(key) || '';
+    if (this.isBrowser) {
+      return localStorage.getItem(key) || sessionStorage.getItem(key) || '';
     }
     return '';
   }
 
   saveCookieValue(key: string, value: string) {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (this.isBrowser) {
       try {
         localStorage.setItem(key, value);
       } catch (e) {/* ignore */ }
@@ -103,18 +109,20 @@ export class FacadeService {
   }
 
   getSessionToken() {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      return localStorage.getItem(session_cookie_name) || '';
+    if (this.isBrowser) {
+      return localStorage.getItem(session_cookie_name) || sessionStorage.getItem(session_cookie_name) || '';
     }
     return '';
   }
 
 
-  saveUserData(user_data: any) {
-    if (typeof window === 'undefined' || !window.localStorage) return;
+  saveUserData(user_data: any, remember: boolean = true) {
+    if (!this.isBrowser) return;
 
     try {
-      const userPayload = user_data.user || user_data;
+      const userPayload = (user_data.user !== null && typeof user_data.user === 'object')
+        ? user_data.user
+        : user_data;
 
       const rawFirstName =
         userPayload.first_name ||
@@ -136,77 +144,76 @@ export class FacadeService {
         userPayload.id ||
         'Usuario';
 
-      localStorage.setItem(user_id_cookie_name, String(userPayload.id || ''));
-      localStorage.setItem(user_email_cookie_name, String(userPayload.email || ''));
-      localStorage.setItem(user_complete_name_cookie_name, String(completeName));
-      localStorage.setItem('user_complete_name', String(completeName));
-      localStorage.setItem('userName', String((completeName.split(' ')[0] || '').trim()));
+      const storage = remember ? localStorage : sessionStorage;
 
-      localStorage.setItem(session_cookie_name, String(user_data.token || ''));
-      localStorage.setItem(group_name_cookie_name, String(user_data.rol || userPayload.rol || ''));
-      localStorage.setItem('group_name', String(user_data.rol || userPayload.rol || ''));
+      storage.setItem(user_id_cookie_name, String(userPayload.id || ''));
+      storage.setItem(user_email_cookie_name, String(userPayload.email || ''));
+      storage.setItem(user_complete_name_cookie_name, String(completeName));
+      storage.setItem('user_complete_name', String(completeName));
+      storage.setItem('userName', String((completeName.split(' ')[0] || '').trim()));
 
-      console.debug('saveUserData:', { user_data, userPayload, completeName });
+      storage.setItem(session_cookie_name, String(user_data.token || ''));
+      storage.setItem(group_name_cookie_name, String(user_data.rol || userPayload.rol || ''));
+      storage.setItem('group_name', String(user_data.rol || userPayload.rol || ''));
+
+      console.debug('saveUserData:', { user_data, userPayload, completeName, remember });
     } catch (e) {
       console.error('saveUserData error:', e);
     }
   }
 
   destroyUser() {
-    if (typeof window === 'undefined' || !window.localStorage) return;
+    if (!this.isBrowser) return;
 
     try {
-      localStorage.removeItem(user_id_cookie_name);
-      localStorage.removeItem(user_email_cookie_name);
-      localStorage.removeItem(user_complete_name_cookie_name);
-      localStorage.removeItem(session_cookie_name);
-      localStorage.removeItem(group_name_cookie_name);
+      const keys = [
+        user_id_cookie_name,
+        user_email_cookie_name,
+        user_complete_name_cookie_name,
+        session_cookie_name,
+        group_name_cookie_name,
+        'user_complete_name',
+        'userName',
+        'group_name'
+      ];
+      keys.forEach(key => {
+        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
+      });
     } catch (e) {/* ignore */ }
   }
 
   getUserEmail() {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      return localStorage.getItem(user_email_cookie_name) || '';
-    }
-    return '';
+    return this.getCookieValue(user_email_cookie_name);
   }
 
   getUserCompleteName() {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      return localStorage.getItem(user_complete_name_cookie_name) || '';
-    }
-    return '';
+    return this.getCookieValue(user_complete_name_cookie_name);
   }
 
   getUserId() {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      return localStorage.getItem(user_id_cookie_name) || '';
-    }
-    return '';
+    return this.getCookieValue(user_id_cookie_name);
   }
 
   getUserGroup() {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      return localStorage.getItem(group_name_cookie_name) || '';
-    }
-    return '';
+    return this.getCookieValue(group_name_cookie_name);
   }
 
   getUserDisplayName() {
-    if (typeof window === 'undefined' || !window.localStorage) {
+    if (!this.isBrowser) {
       return 'Usuario';
     }
 
-    const completeName = localStorage.getItem(user_complete_name_cookie_name) ||
-      localStorage.getItem('user_complete_name') ||
-      localStorage.getItem('userName') ||
-      localStorage.getItem('user_name');
+    const completeName = this.getCookieValue(user_complete_name_cookie_name) ||
+      this.getCookieValue('user_complete_name') ||
+      this.getCookieValue('userName') ||
+      this.getCookieValue('user_name');
 
     if (completeName && completeName.trim().length > 0) {
       return completeName.trim();
     }
 
-    const email = localStorage.getItem(user_email_cookie_name) || localStorage.getItem('email');
+    const email = this.getCookieValue(user_email_cookie_name) || this.getCookieValue('email');
     if (email && email.includes('@')) {
       return email.split('@')[0];
     }

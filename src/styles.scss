@@ -35,6 +35,19 @@ body {
   box-sizing: border-box;
 }
 
+/* ── Selects nativos: ancho del control y lista acotada por texto de opciones ── */
+select.form-select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.select-wrapper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
 html,
 body {
   height: 100%;

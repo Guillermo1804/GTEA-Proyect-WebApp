@@ -16,9 +16,9 @@
     <!-- Filtros -->
     <div class="filtros-wrapper">
       <button class="filtro-btn" [class.active]="filtroActivo()==='todos'"        (click)="setFiltro('todos')">Todos</button>
-      <button class="filtro-btn" [class.active]="filtroActivo()==='proximos'"     (click)="setFiltro('proximos')">Próximos</button>
-      <button class="filtro-btn" [class.active]="filtroActivo()==='completados'"  (click)="setFiltro('completados')">Completados</button>
-      <button class="filtro-btn" [class.active]="filtroActivo()==='cancelados'"   (click)="setFiltro('cancelados')">Cancelados</button>
+      <button class="filtro-btn" [class.active]="filtroActivo()==='proximo'"      (click)="setFiltro('proximo')">Próximos</button>
+      <button class="filtro-btn" [class.active]="filtroActivo()==='completado'"   (click)="setFiltro('completado')">Completados</button>
+      <button class="filtro-btn" [class.active]="filtroActivo()==='cancelado'"    (click)="setFiltro('cancelado')">Cancelados</button>
       <button class="filtro-btn" [class.active]="filtroActivo()==='lista-espera'" (click)="setFiltro('lista-espera')">En Lista de Espera</button>
     </div>
 
@@ -52,6 +52,9 @@
               </div>
               <div class="evento-acciones">
                 <button class="btn-detalle" (click)="verDetalle(evento.id)">Ver Detalles</button>
+                @if (evento.estado === 'proximo' || evento.estado === 'lista-espera') {
+                  <button class="btn-detalle" style="background: #dc2626; border-color: #dc2626;" (click)="desinscribirse(evento)">Desinscribirse</button>
+                }
                 @if (evento.tieneCertificado) {
                   <button class="btn-certificado">Ver Constancia 📄</button>
                 }

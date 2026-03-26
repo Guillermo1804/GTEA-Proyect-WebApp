@@ -5,13 +5,6 @@ import { environment } from '../../environments/environment';
 import { RespuestaInscripcion } from '../models/inscripcion.model';
 import { FacadeService } from './facade-service';
 
-// ─────────────────────────────────────────────
-// Opciones HTTP por defecto
-// ─────────────────────────────────────────────
-const httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-};
-
 @Injectable({
     providedIn: 'root',
 })
@@ -30,27 +23,41 @@ export class InscripcionService {
         const payload = {
             evento_id: eventoId
         };
+        const token = this.facadeService.getSessionToken();
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': 'Token ' + token,
+        });
 
         return this.http.post<RespuestaInscripcion>(
           `${environment.url_api}/inscripciones/`,
           payload,
-          httpOptions
+          { headers }
         );
     }
 
     // ─────────────────────────────────────────────
-    // [POST] Cancelar inscripción / salir lista de espera
-    // Endpoint: POST /inscripciones/cancel/
+    // [DELETE] Cancelar inscripción / salir lista de espera
+    // Endpoint: DELETE /inscripciones/cancel/?evento_id=X&alumno_id=Y
     // ─────────────────────────────────────────────
-    public cancelarInscripcion(inscripcionId: number): Observable<any> {
-        const payload = {
-            inscripcion_id: inscripcionId
-        };
-
-        return this.http.post<any>(
+    public cancelarInscripcion(
+        eventoId: number,
+        alumnoId: number
+    ): Observable<any> {
+        const token = this.facadeService.getSessionToken();
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': 'Token ' + token,
+        });
+        return this.http.delete<any>(
           `${environment.url_api}/inscripciones/cancel/`,
-          payload,
-          httpOptions
+          {
+            params: {
+              evento_id: eventoId.toString(),
+              alumno_id: alumnoId.toString()
+            },
+            headers,
+          }
         );
     }
 
@@ -59,9 +66,14 @@ export class InscripcionService {
     // Endpoint: GET /inscripciones/lista-espera/?evento={id}
     // ─────────────────────────────────────────────
     public getListaEspera(eventoId: number): Observable<any[]> {
+        const token = this.facadeService.getSessionToken();
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': 'Token ' + token,
+        });
         return this.http.get<any[]>(
           `${environment.url_api}/inscripciones/lista-espera/?evento=${eventoId}`,
-          httpOptions
+          { headers }
         );
     }
 

@@ -8,11 +8,12 @@ import {
   ValidationErrors,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { EventoService, Evento } from '../../../../services/evento-service';
+import { EventoService, Evento, EventoStatus } from '../../../../services/evento-service';
 import { ValidatorService } from '../../../../services/tools/validator-service';
 import { ErrorsService } from '../../../../services/tools/errors-service';
 import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
+import { TruncateSelectLabelPipe } from '../../../../shared/pipes/truncate-select-label.pipe';
 
 // ─────────────────────────────────────────────
 // Validador cruzado: fecha/hora de fin > inicio
@@ -34,7 +35,7 @@ function fechaFinValidator(group: AbstractControl): ValidationErrors | null {
 @Component({
   selector: 'app-nuevo-evento-wizard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TruncateSelectLabelPipe],
   templateUrl: './nuevo-evento-wizard.html',
   styleUrl: './nuevo-evento-wizard.scss',
 })
@@ -68,8 +69,19 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
   sedes: { id: number; nombre: string }[] = [];
   aulas: { id: number; nombre: string; capacidad: number }[] = [];
 
+  /** Opciones del estado del evento (valor API; "Completado" = Finalizado). */
+  readonly eventStatusOptions: { value: EventoStatus; label: string }[] = [
+    { value: 'Activo', label: 'Activo' },
+    { value: 'Cancelado', label: 'Cancelado' },
+    { value: 'Finalizado', label: 'Completado' },
+    { value: 'Borrador', label: 'Borrador' },
+  ];
+
   // ── Preview imagen ──
   imagenPreviewUrl: string | null = null;
+  // Imagen seleccionada para upload (archivo local).
+  // Nota: el backend guarda una URL, así que convertimos con upload antes de guardar el evento.
+  imagenFile: File | null = null;
 
   // ── Formularios por paso ──
   step1Form!: FormGroup;
@@ -97,17 +109,21 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
   // Pre-relleno en modo edición
   // ─────────────────────────────────────────────
   private _prefillForms(data: Evento): void {
+    this.imagenFile = null;
     this.step1Form.patchValue({
       titulo: data.titulo,
       categoriaId: data.categoriaId,
       descripcion: data.descripcion,
-      imagenPortada: null,  // No se puede pre-rellenar un File; se muestra la URL existente
+      // En edición se debe preservar la URL existente si el usuario no sube una imagen nueva.
+      imagenPortada: (data.imagenPortada && typeof data.imagenPortada === 'string') ? data.imagenPortada : '',
     });
 
     // Si la imagen es una URL (string), mostrar como preview
     if (data.imagenPortada && typeof data.imagenPortada === 'string') {
       const src = data.imagenPortada;
       this.imagenPreviewUrl = src.startsWith('http') ? src : `${environment.url_api}${src}`;
+    } else {
+      this.imagenPreviewUrl = null;
     }
 
     // Guardar el aulaId antes de cambiar sedeId (para evitar que se limpie)
@@ -124,8 +140,17 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
       listaEspera: data.listaEspera,
     }, { emitEvent: false }); // No disparar listeners para evitar que se limpie aulaId
 
+    const statusFromApi = data.status as EventoStatus | undefined;
+    const allowed: EventoStatus[] = ['Activo', 'Borrador', 'Finalizado', 'Cancelado'];
+    const resolvedStatus: EventoStatus =
+      statusFromApi && allowed.includes(statusFromApi)
+        ? statusFromApi
+        : data.publicarInmediatamente
+          ? 'Activo'
+          : 'Borrador';
+
     this.step3Form.patchValue({
-      publicarInmediatamente: data.publicarInmediatamente,
+      status: resolvedStatus,
       esOrganizador: data.esOrganizador,
     });
 
@@ -198,9 +223,9 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
       }
     });
 
-    // Paso 3 — Publicación (solo opciones booleanas)
+    // Paso 3 — Publicación (estado + organizador; publicarInmediatamente se deriva al enviar)
     this.step3Form = this.fb.group({
-      publicarInmediatamente: [true],
+      status: ['Activo' as EventoStatus, Validators.required],
       esOrganizador: [true],
     });
   }
@@ -279,7 +304,9 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
     }
 
     this.errorMessage = '';
-    this.step1Form.get('imagenPortada')?.setValue(file);
+    this.imagenFile = file;
+    // No enviamos el File al backend: primero lo subimos y guardamos la URL devuelta.
+    this.step1Form.get('imagenPortada')?.setValue('');
 
     // Generar preview
     const reader = new FileReader();
@@ -289,7 +316,8 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
 
   removeImage(): void {
     this.imagenPreviewUrl = null;
-    this.step1Form.get('imagenPortada')?.setValue(null);
+    this.imagenFile = null;
+    this.step1Form.get('imagenPortada')?.setValue('');
   }
 
   // ─────────────────────────────────────────────
@@ -342,6 +370,16 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
 
   get resumenCosto(): number {
     return this.step2Form.get('costoEntrada')?.value || 0;
+  }
+
+  get resumenEstadoLabel(): string {
+    const v = this.step3Form.get('status')?.value as EventoStatus | undefined;
+    return this.eventStatusOptions.find((o) => o.value === v)?.label || '—';
+  }
+
+  /** Texto completo de opción aula (tooltip); el pipe trunca en la lista. */
+  aulaOptionLabel(aula: { nombre: string; capacidad: number }): string {
+    return `${aula.nombre} (${aula.capacidad} personas)`;
   }
 
   // ─────────────────────────────────────────────
@@ -408,47 +446,71 @@ export class NuevoEventoWizard implements OnInit, OnDestroy {
     this.errorMessage = '';
     this.successMessage = '';
 
+    const step3 = this.step3Form.value;
+    const status = step3.status as EventoStatus;
+
     const payload: Evento = {
       ...this.step1Form.value,
       ...this.step2Form.value,
-      ...this.step3Form.value,
+      ...step3,
+      publicarInmediatamente: status === 'Activo',
     };
 
-    // Sanitizar imagenPortada: el backend espera una URL string, no null ni File
-    if (payload.imagenPortada == null || payload.imagenPortada instanceof File) {
-      payload.imagenPortada = '';
-    }
+    const doSave = () => {
+      // Si no hay imagenFile, esperamos que `payload.imagenPortada` ya sea una URL string (o '' si no hay).
+      if (payload.imagenPortada == null || payload.imagenPortada instanceof File) {
+        payload.imagenPortada = '';
+      }
 
-    // ── Modo edición ──
-    if (this.isEditMode && this.editId !== null) {
-      this.eventoService.editarEvento(this.editId, payload).subscribe({
+      // ── Modo edición ──
+      if (this.isEditMode && this.editId !== null) {
+        this.eventoService.editarEvento(this.editId, payload).subscribe({
+          next: () => {
+            this.isSubmitting = false;
+            this.successMessage = '¡Evento actualizado exitosamente!';
+            this.eventoCreado.emit({ ...payload, id: this.editId! });
+            setTimeout(() => this.onClose(), 1500);
+          },
+          error: (err) => {
+            this.isSubmitting = false;
+            this.errorMessage = this._parseDRFError(err) || 'Error al actualizar el evento.';
+          },
+        });
+        return;
+      }
+
+      // ── Modo creación ──
+      this.eventoService.crearEvento(payload).subscribe({
         next: () => {
           this.isSubmitting = false;
-          this.successMessage = '¡Evento actualizado exitosamente!';
-          this.eventoCreado.emit({ ...payload, id: this.editId! });
+          this.successMessage = '¡Evento creado exitosamente!';
+          this.eventoCreado.emit(payload);
           setTimeout(() => this.onClose(), 1500);
         },
         error: (err) => {
           this.isSubmitting = false;
-          this.errorMessage = this._parseDRFError(err) || 'Error al actualizar el evento.';
+          this.errorMessage = this._parseDRFError(err) || 'Error al crear el evento. Intenta de nuevo.';
+        },
+      });
+    };
+
+    // ── Si el usuario seleccionó una imagen nueva, primero subirla y luego guardar evento ──
+    if (this.imagenFile) {
+      this.eventoService.subirImagenPortada(this.imagenFile).subscribe({
+        next: (res) => {
+          payload.imagenPortada = res?.imagen_url || '';
+          doSave();
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.errorMessage = this._parseDRFError(err) || 'Error al subir la imagen de portada.';
         },
       });
       return;
     }
 
-    // ── Modo creación ──
-    this.eventoService.crearEvento(payload).subscribe({
-      next: () => {
-        this.isSubmitting = false;
-        this.successMessage = '¡Evento creado exitosamente!';
-        this.eventoCreado.emit(payload);
-        setTimeout(() => this.onClose(), 1500);
-      },
-      error: (err) => {
-        this.isSubmitting = false;
-        this.errorMessage = this._parseDRFError(err) || 'Error al crear el evento. Intenta de nuevo.';
-      },
-    });
+    // Sin imagen nueva: guardar directamente (preserva URL existente en modo edición).
+    doSave();
   }
 
   /**
