@@ -41,18 +41,58 @@
     color: #111827;
 }
 
+.user-meta {
+    display: flex;
+    flex-direction: column;
+    margin-left: 12px;
+}
+
+.user-role {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #1e3fae;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: -2px;
+}
+
 .user-greeting {
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 500;
     color: #4b5563;
-    margin-left: 12px;
 }
 
 .actions {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 12px;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 9999px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+    }
+
+    .material-icons {
+        font-size: 20px;
+    }
 }
 
 .icon-btn {

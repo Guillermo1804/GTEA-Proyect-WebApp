@@ -86,18 +86,42 @@
     <div class="price-info">
       <span class="price-label">{{ evento?.costoEntrada === 0 ? 'Gratuito' : '$' + evento?.costoEntrada }}</span>
     </div>
-    <button class="enrollment-btn" [class.waitlist]="cupoLleno()" [disabled]="isProcessing() || cupoLleno()"
-      (click)="inscribirEvento()">
-      @if (isProcessing()) {
-      <span class="spinner"></span>
-      <span>Procesando…</span>
-      } @else {
-      <span class="material-icons btn-icon">{{ cupoLleno() ? 'hourglass_top' : 'how_to_reg' }}</span>
-      <span>{{ cupoLleno() ? 'Lista de Espera' : 'Inscribirme' }}</span>
-      }
-    </button>
+    
+    @if (estaInscrito()) {
+      <button class="enrollment-btn delete-btn" [disabled]="isProcessing()" (click)="desinscribirEvento()" style="background: #dc2626;">
+        @if (isProcessing()) {
+          <span class="spinner"></span>
+          <span>Procesando…</span>
+        } @else {
+          <span class="material-icons btn-icon">cancel</span>
+          <span>Desinscribirse</span>
+        }
+      </button>
+    } @else {
+      <button class="enrollment-btn" [class.waitlist]="cupoLleno()" [disabled]="isProcessing() || cupoLleno()"
+        (click)="inscribirEvento()">
+        @if (isProcessing()) {
+        <span class="spinner"></span>
+        <span>Procesando…</span>
+        } @else {
+        <span class="material-icons btn-icon">{{ cupoLleno() ? 'hourglass_top' : 'how_to_reg' }}</span>
+        <span>{{ cupoLleno() ? 'Lista de Espera' : 'Inscribirme' }}</span>
+        }
+      </button>
+    }
   </div>
 </div>
 </div>
+
+@if (mostrarConfirmar) {
+  <app-confirmar-accion-modal
+    [titulo]="'Cancelar inscripción'"
+    [mensaje]="'¿Estás seguro de cancelar tu inscripción a &quot;' + (evento?.titulo || '') + '&quot;?'"
+    [labelConfirmar]="'Desinscribirse'"
+    [labelCancelar]="'Volver'"
+    (confirmar)="confirmarDesinscripcion()"
+    (cancelar)="cancelarModal()"
+  />
+}
 
 <app-bottom-nav role="estudiante" activeTab="/alumno/catalogo"></app-bottom-nav>
