@@ -1,8 +1,9 @@
-import { Component, Output, EventEmitter, OnInit, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, HostListener, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SedeService } from '../../../services/sede.service';
+import { SedeService, Sede } from '../../../services/sede.service';
 import { ValidatorService } from '../../../services/tools/validator-service';
 import { ErrorsService } from '../../../services/tools/errors-service';
+import { ToastService } from '../../../services/tools/toast.service';
 
 @Component({
     selector: 'app-nueva-sede-modal',
@@ -11,7 +12,30 @@ import { ErrorsService } from '../../../services/tools/errors-service';
     styleUrl: './nueva-sede-modal.scss',
 })
 export class NuevaSedeModal implements OnInit {
-    ngOnInit(): void { }
+    // ── Modo edición: si se pasa editData, el modal actúa como editor ──
+    @Input() editData?: Sede;
+
+    private toastService = inject(ToastService);
+
+    get isEditMode(): boolean {
+        return !!this.editData;
+    }
+
+    ngOnInit(): void {
+        if (this.editData) {
+            this.sedeName = this.editData.nombre || '';
+            this.address = this.editData.domicilio || '';
+            this.phone = this.editData.telefono || '';
+            this.email = this.editData.email || '';
+            this.floors = this.editData.pisos || 1;
+            this.notes = this.editData.notas || '';
+            // Pre-llenar instalaciones desde los datos de edición
+            const enabledFacilities = this.editData.instalaciones || [];
+            this.facilities.forEach(f => {
+                f.enabled = enabledFacilities.includes(f.name);
+            });
+        }
+    }
     constructor(
         private sedeService: SedeService,
         private validatorService: ValidatorService,
@@ -103,8 +127,29 @@ export class NuevaSedeModal implements OnInit {
             instalaciones: instalaciones,
             activa: true,
         };
+
+        // ── Modo edición ──
+        if (this.isEditMode && this.editData) {
+            this.sedeService.editarSede(this.editData.id, data).subscribe({
+                next: () => {
+                    this.toastService.show('Sede actualizada correctamente.', 'success');
+                    this.close.emit();
+                },
+                error: (err: any) => {
+                    console.error('Error editando sede:', err);
+                    this.formError = this.parseApiError(err);
+                    this.toastService.show(this.parseApiError(err), 'error');
+                },
+            });
+            return;
+        }
+
+        // ── Modo creación ──
         this.sedeService.crearSede(data).subscribe({
-            next: () => this.close.emit(),
+            next: () => {
+                this.toastService.show('Sede creada correctamente.', 'success');
+                this.close.emit();
+            },
             error: (err: any) => {
                 console.error('Error creando sede:', err);
                 this.formError = this.parseApiError(err);

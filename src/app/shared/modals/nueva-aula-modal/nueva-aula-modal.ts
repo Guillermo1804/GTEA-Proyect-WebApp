@@ -1,9 +1,10 @@
-import { Component, Output, EventEmitter, OnInit, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, HostListener, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SedeService, Sede } from '../../../services/sede.service';
+import { SedeService, Sede, Aula } from '../../../services/sede.service';
 import { ValidatorService } from '../../../services/tools/validator-service';
 import { ErrorsService } from '../../../services/tools/errors-service';
 import { TruncateSelectLabelPipe } from '../../pipes/truncate-select-label.pipe';
+import { ToastService } from '../../../services/tools/toast.service';
 
 interface Equipment {
   name: string;
@@ -19,7 +20,17 @@ interface Equipment {
   styleUrl: './nueva-aula-modal.scss',
 })
 export class NuevaAulaModal implements OnInit {
+  // ── Modo edición: si se pasa editData, el modal actúa como editor ──
+  @Input() editData?: Aula;
+  @Input() editSedeNombre?: string;
+
   @Output() close = new EventEmitter<void>();
+
+  private toastService = inject(ToastService);
+
+  get isEditMode(): boolean {
+    return !!this.editData;
+  }
 
   constructor(
     private sedeService: SedeService,
@@ -32,6 +43,7 @@ export class NuevaAulaModal implements OnInit {
   capacity = 40;
   notes = '';
   piso = 1;
+  estado: 'disponible' | 'en-uso' | 'mantenimiento' = 'disponible';
   submitted = false;
   formError = '';
 
@@ -50,6 +62,15 @@ export class NuevaAulaModal implements OnInit {
       next: (data: any) => this.sedes = data || [],
       error: (err: any) => console.error('Error cargando sedes:', err),
     });
+
+    // Pre-llenar campos si estamos en modo edición
+    if (this.editData) {
+      this.selectedSede = String(this.editData.sedeId || '');
+      this.className = this.editData.nombre || '';
+      this.capacity = this.editData.capacidad || 40;
+      this.piso = this.editData.piso || 1;
+      this.estado = this.editData.estado || 'disponible';
+    }
   }
 
   incrementCapacity(): void {
@@ -124,6 +145,31 @@ export class NuevaAulaModal implements OnInit {
     this.formError = '';
     if (!this.isValidForm()) return;
 
+    // ── Modo edición ──
+    if (this.isEditMode && this.editData) {
+      const editPayload = {
+        sedeId: Number(this.selectedSede),
+        nombre: this.className.trim(),
+        capacidad: this.capacity,
+        piso: this.piso,
+        tipo: this.editData.tipo || 'Aula',
+        estado: this.estado,
+      };
+      this.sedeService.editarAula(this.editData.id, editPayload).subscribe({
+        next: () => {
+          this.toastService.show('Aula actualizada correctamente.', 'success');
+          this.close.emit();
+        },
+        error: (err: any) => {
+          console.error('Error editando aula:', err);
+          this.formError = this.parseApiError(err);
+          this.toastService.show(this.parseApiError(err), 'error');
+        },
+      });
+      return;
+    }
+
+    // ── Modo creación ──
     const data = {
       sedeId: Number(this.selectedSede),
       nombre: this.className.trim(),
@@ -132,7 +178,10 @@ export class NuevaAulaModal implements OnInit {
       tipo: 'Aula',
     };
     this.sedeService.crearAula(data).subscribe({
-      next: () => this.close.emit(),
+      next: () => {
+        this.toastService.show('Aula creada correctamente.', 'success');
+        this.close.emit();
+      },
       error: (err: any) => {
         console.error('Error creando aula:', err);
         this.formError = this.parseApiError(err);

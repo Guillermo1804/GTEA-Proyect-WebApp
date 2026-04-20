@@ -172,6 +172,88 @@
     color: #9ca3af;
 }
 
+// Venue header right side (actions + expand)
+.venue-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.venue-actions {
+    display: flex;
+    gap: 4px;
+}
+
+// Action buttons (sede level)
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    .material-icons {
+        font-size: 16px;
+    }
+
+    &:hover {
+        background: #e8ecf7;
+        color: #1e3fae;
+    }
+
+    &.delete:hover {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+}
+
+// Classroom right side (status + actions)
+.classroom-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.classroom-actions {
+    display: flex;
+    gap: 2px;
+}
+
+// Smaller action buttons (aula level)
+.action-btn-sm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    .material-icons {
+        font-size: 14px;
+    }
+
+    &:hover {
+        background: #e8ecf7;
+        color: #1e3fae;
+    }
+
+    &.delete:hover {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+}
+
 // Classrooms
 .classroom-list {
     background: #f9fafb;

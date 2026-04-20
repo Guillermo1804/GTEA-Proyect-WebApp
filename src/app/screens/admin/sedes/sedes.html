@@ -49,7 +49,17 @@
                                 asientos</span>
                         </div>
                     </div>
-                    <span class="material-icons expand-icon">{{ venue.expanded ? 'expand_less' : 'expand_more' }}</span>
+                    <div class="venue-header-right">
+                        <div class="venue-actions" (click)="$event.stopPropagation()">
+                            <button class="action-btn" (click)="editSede(venue)" title="Editar sede">
+                                <span class="material-icons">edit</span>
+                            </button>
+                            <button class="action-btn delete" (click)="deleteSede(venue)" title="Eliminar sede">
+                                <span class="material-icons">delete</span>
+                            </button>
+                        </div>
+                        <span class="material-icons expand-icon">{{ venue.expanded ? 'expand_less' : 'expand_more' }}</span>
+                    </div>
                 </div>
 
                 @if (venue.expanded && venue.classrooms.length) {
@@ -60,7 +70,17 @@
                             <span class="classroom-name">{{ room.name }}</span>
                             <span class="classroom-capacity">Capacidad: {{ room.capacity }}</span>
                         </div>
-                        <span class="status-badge" [class]="getStatusClass(room.status)">{{ room.status }}</span>
+                        <div class="classroom-right">
+                            <span class="status-badge" [class]="getStatusClass(room.status)">{{ room.status }}</span>
+                            <div class="classroom-actions">
+                                <button class="action-btn-sm" (click)="editAula(room, venue)" title="Editar aula">
+                                    <span class="material-icons">edit</span>
+                                </button>
+                                <button class="action-btn-sm delete" (click)="deleteAula(room, venue)" title="Eliminar aula">
+                                    <span class="material-icons">delete</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     }
                 </div>
@@ -99,4 +119,39 @@
   (close)="closeModal()"
   (aplicarFiltros)="onFiltrosAplicados($event)"
 ></app-filtros-sedes-modal>
+}
+
+@if (activeModal === 'editar-sede' && editingSedeData) {
+<app-nueva-sede-modal
+    [editData]="editingSedeData"
+    (close)="onSedeEdited()">
+</app-nueva-sede-modal>
+}
+
+@if (activeModal === 'editar-aula' && editingAulaData) {
+<app-nueva-aula-modal
+    [editData]="editingAulaData"
+    [editSedeNombre]="editingAulaSedeNombre"
+    (close)="onAulaEdited()">
+</app-nueva-aula-modal>
+}
+
+@if (showDeleteSedeModal && sedeToDelete) {
+  <app-confirmar-eliminar-modal
+    [titulo]="'Eliminar sede'"
+    [mensaje]="getDeleteSedeMessage(sedeToDelete)"
+    [isLoading]="isDeletingSede"
+    (confirmado)="onConfirmDeleteSede()"
+    (cancelado)="onCancelDeleteSede()"
+  />
+}
+
+@if (showDeleteAulaModal && aulaToDelete) {
+  <app-confirmar-eliminar-modal
+    [titulo]="'Eliminar aula'"
+    [mensaje]="'Esta acción no se puede deshacer. Los eventos que usen esta aula quedarán sin aula asignada.'"
+    [isLoading]="isDeletingAula"
+    (confirmado)="onConfirmDeleteAula()"
+    (cancelado)="onCancelDeleteAula()"
+  />
 }

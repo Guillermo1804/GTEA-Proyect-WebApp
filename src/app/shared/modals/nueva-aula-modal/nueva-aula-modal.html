@@ -2,7 +2,7 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
         <!-- Header -->
         <div class="modal-header">
-            <h2>Nueva Aula</h2>
+            <h2>{{ isEditMode ? 'Editar Aula' : 'Nueva Aula' }}</h2>
             <button class="close-btn" (click)="onCancel()">
                 <span class="material-icons">close</span>
             </button>
@@ -17,14 +17,18 @@
             <!-- Sede Select -->
             <div class="form-group">
                 <label class="form-label">Sede</label>
+                @if (isEditMode && editSedeNombre) {
+                <input class="form-input" type="text" [value]="editSedeNombre" disabled />
+                } @else {
                 <div class="select-wrapper">
-                    <select class="form-select" [(ngModel)]="selectedSede">
+                    <select class="form-select" [(ngModel)]="selectedSede" [disabled]="isEditMode">
                         <option value="" disabled>Seleccionar sede</option>
                         @for (sede of sedes; track sede.id) {
                         <option [value]="sede.id" [attr.title]="sede.nombre">{{ sede.nombre | truncateSelectLabel }}</option>
                         }
                     </select>
                 </div>
+                }
                 @if (hasError('selectedSede')) {
                 <small class="error-message">{{ getFieldError('selectedSede') }}</small>
                 }
@@ -56,6 +60,20 @@
                 }
             </div>
 
+            <!-- Estado (solo en modo edición) -->
+            @if (isEditMode) {
+            <div class="form-group">
+                <label class="form-label">Estado</label>
+                <div class="select-wrapper">
+                    <select class="form-select" [(ngModel)]="estado">
+                        <option value="disponible">Disponible</option>
+                        <option value="en-uso">En uso</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                    </select>
+                </div>
+            </div>
+            }
+
             <!-- Equipment Toggles -->
             <div class="form-group">
                 <label class="form-label">Equipamiento</label>
@@ -85,7 +103,7 @@
         <!-- Footer -->
         <div class="modal-footer">
             <button class="btn-cancel" (click)="onCancel()">Cancelar</button>
-            <button class="btn-save" (click)="onSave()">Guardar</button>
+            <button class="btn-save" (click)="onSave()">{{ isEditMode ? 'Guardar Cambios' : 'Guardar' }}</button>
         </div>
     </div>
 </div>

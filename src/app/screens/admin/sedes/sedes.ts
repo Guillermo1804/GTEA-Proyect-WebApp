@@ -8,6 +8,7 @@ import { NuevaSedeModal } from '../../../shared/modals/nueva-sede-modal/nueva-se
 import { NuevaCategoriaModal } from '../../../shared/modals/nueva-categoria-modal/nueva-categoria-modal';
 import { NuevoUsuarioModal } from '../../../shared/modals/nuevo-usuario-modal/nuevo-usuario-modal';
 import { FiltrosSedesModal } from '../../../shared/modals/filtros-sedes-modal/filtros-sedes-modal.component';
+import { ConfirmarEliminarModal } from '../../../modals/confirmar-eliminar-modal/confirmar-eliminar-modal';
 import { SedeService, Sede, Aula } from '../../../services/sede.service';
 import { ToastService } from '../../../services/tools/toast.service';
 import { jsPDF } from 'jspdf';
@@ -40,7 +41,7 @@ interface FiltrosSedes {
 
 @Component({
   selector: 'app-admin-sedes',
-  imports: [TopNavbar, BottomNav, NuevaAulaModal, NuevaSedeModal, NuevaCategoriaModal, NuevoUsuarioModal, FiltrosSedesModal, FormsModule],
+  imports: [TopNavbar, BottomNav, NuevaAulaModal, NuevaSedeModal, NuevaCategoriaModal, NuevoUsuarioModal, FiltrosSedesModal, ConfirmarEliminarModal, FormsModule],
   templateUrl: './sedes.html',
   styleUrl: './sedes.scss',
 })
@@ -61,7 +62,25 @@ export class Sedes implements OnInit {
     this.aplicarFiltros();
   }
 
-  activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | 'filtros' | null = null;
+  activeModal: 'nueva-aula' | 'nueva-sede' | 'nueva-categoria' | 'nuevo-usuario' | 'filtros' | 'editar-sede' | 'editar-aula' | null = null;
+
+  // ── Estado edición sede ──
+  editingSedeData: Sede | null = null;
+
+  // ── Estado edición aula ──
+  editingAulaData: Aula | null = null;
+  editingAulaSedeNombre = '';
+  editingAulaVenueId = 0;
+
+  // ── Estado eliminar sede ──
+  showDeleteSedeModal = false;
+  sedeToDelete: Venue | null = null;
+  isDeletingSede = false;
+
+  // ── Estado eliminar aula ──
+  showDeleteAulaModal = false;
+  aulaToDelete: { aula: Classroom; venue: Venue } | null = null;
+  isDeletingAula = false;
 
   venues: Venue[] = [];
   venuesFiltrados: Venue[] = [];
@@ -172,12 +191,178 @@ export class Sedes implements OnInit {
   closeModal(): void {
     const wasFiltrosModal = this.activeModal === 'filtros';
     this.activeModal = null;
+    this.editingSedeData = null;
+    this.editingAulaData = null;
+    this.editingAulaSedeNombre = '';
+    this.editingAulaVenueId = 0;
     if (!wasFiltrosModal) {
       this.loadSedes();
     }
   }
 
   openFiltros(): void { this.activeModal = 'filtros'; }
+
+  // ═════════════════════════════════════════════
+  // CRUD — Editar / Eliminar Sede
+  // ═════════════════════════════════════════════
+
+  editSede(venue: Venue): void {
+    // getSedeByID() existe en SedeService — usarlo para obtener datos completos
+    this.sedeService.getSedeByID(venue.id).subscribe({
+      next: (sede: Sede) => {
+        this.editingSedeData = sede;
+        this.activeModal = 'editar-sede';
+      },
+      error: (err) => {
+        console.error('Error cargando sede para editar:', err);
+        this.toastService.show('No se pudo cargar la sede para editar.', 'error');
+      },
+    });
+  }
+
+  onSedeEdited(): void {
+    this.activeModal = null;
+    this.editingSedeData = null;
+    this.loadSedes();
+  }
+
+  deleteSede(venue: Venue): void {
+    this.sedeToDelete = venue;
+    this.showDeleteSedeModal = true;
+  }
+
+  getDeleteSedeMessage(venue: Venue): string {
+    if (venue.classrooms.length > 0) {
+      return `Esta sede tiene ${venue.classrooms.length} aula${venue.classrooms.length > 1 ? 's' : ''}. Al eliminarla, todas sus aulas serán eliminadas permanentemente y no podrán recuperarse.`;
+    }
+    return 'Esta acción no se puede deshacer.';
+  }
+
+  onConfirmDeleteSede(): void {
+    if (!this.sedeToDelete) return;
+    this.isDeletingSede = true;
+    const venue = this.sedeToDelete;
+
+    this.sedeService.eliminarSede(venue.id).subscribe({
+      next: () => {
+        this.toastService.show(`Sede "${venue.name}" eliminada correctamente.`, 'success');
+        // Filtrar localmente sin recargar toda la lista
+        this.venues = this.venues.filter(v => v.id !== venue.id);
+        this.aplicarFiltros();
+        this.isDeletingSede = false;
+        this.showDeleteSedeModal = false;
+        this.sedeToDelete = null;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Error eliminando sede:', err);
+        this.toastService.show(err?.error?.details || 'Error al eliminar la sede.', 'error');
+        this.isDeletingSede = false;
+        this.showDeleteSedeModal = false;
+        this.sedeToDelete = null;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  onCancelDeleteSede(): void {
+    this.showDeleteSedeModal = false;
+    this.sedeToDelete = null;
+  }
+
+  // ═════════════════════════════════════════════
+  // CRUD — Editar / Eliminar Aula
+  // ═════════════════════════════════════════════
+
+  editAula(room: Classroom, venue: Venue): void {
+    // Mapear Classroom local al shape de Aula del servicio
+    const aulaData: Aula = {
+      id: room.id,
+      sedeId: venue.id,
+      nombre: room.name,
+      capacidad: room.capacity,
+      piso: 1, // Default — backend retornará el valor real
+      tipo: 'Aula',
+      estado: room.status === 'Disponible' ? 'disponible'
+            : room.status === 'Ocupada' ? 'en-uso'
+            : 'mantenimiento',
+    };
+    this.editingAulaData = aulaData;
+    this.editingAulaSedeNombre = venue.name;
+    this.editingAulaVenueId = venue.id;
+    this.activeModal = 'editar-aula';
+  }
+
+  onAulaEdited(): void {
+    this.activeModal = null;
+    this.editingAulaData = null;
+    this.editingAulaSedeNombre = '';
+    // Recargar solo las aulas del venue afectado
+    const venue = this.venues.find(v => v.id === this.editingAulaVenueId);
+    this.editingAulaVenueId = 0;
+    if (venue) {
+      this.sedeService.obtenerAulasPorSede(venue.id).subscribe({
+        next: (aulas) => {
+          venue.classrooms = aulas.map((a: any) => ({
+            id: a.id,
+            name: a.nombre,
+            capacity: a.capacidad,
+            status: a.estado === 'disponible' ? 'Disponible' : a.estado === 'en-uso' ? 'Ocupada' : 'Mantenimiento',
+          }));
+          venue.classroomCount = venue.classrooms.length;
+          venue.totalCapacity = venue.classrooms.reduce((sum, c) => sum + c.capacity, 0);
+          this.aplicarFiltros();
+          this.cdr.detectChanges();
+        },
+      });
+    }
+  }
+
+  deleteAula(room: Classroom, venue: Venue): void {
+    this.aulaToDelete = { aula: room, venue };
+    this.showDeleteAulaModal = true;
+  }
+
+  onConfirmDeleteAula(): void {
+    if (!this.aulaToDelete) return;
+    this.isDeletingAula = true;
+    const { aula, venue } = this.aulaToDelete;
+
+    this.sedeService.eliminarAula(aula.id).subscribe({
+      next: () => {
+        this.toastService.show(`Aula "${aula.name}" eliminada correctamente.`, 'success');
+        // Filtrar localmente solo las aulas del venue afectado
+        venue.classrooms = venue.classrooms.filter(r => r.id !== aula.id);
+        venue.classroomCount = venue.classrooms.length;
+        venue.totalCapacity = venue.classrooms.reduce((sum, c) => sum + c.capacity, 0);
+        // También actualizar el venue original en this.venues
+        const originalVenue = this.venues.find(v => v.id === venue.id);
+        if (originalVenue && originalVenue !== venue) {
+          originalVenue.classrooms = originalVenue.classrooms.filter(r => r.id !== aula.id);
+          originalVenue.classroomCount = originalVenue.classrooms.length;
+          originalVenue.totalCapacity = originalVenue.classrooms.reduce((sum, c) => sum + c.capacity, 0);
+        }
+        this.aplicarFiltros();
+        this.isDeletingAula = false;
+        this.showDeleteAulaModal = false;
+        this.aulaToDelete = null;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Error eliminando aula:', err);
+        this.toastService.show(err?.error?.details || 'Error al eliminar el aula.', 'error');
+        this.isDeletingAula = false;
+        this.showDeleteAulaModal = false;
+        this.aulaToDelete = null;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  onCancelDeleteAula(): void {
+    this.showDeleteAulaModal = false;
+    this.aulaToDelete = null;
+  }
 
   private async loadImageAsDataUrl(url: string): Promise<string> {
     const response = await fetch(url, { cache: 'no-cache' });

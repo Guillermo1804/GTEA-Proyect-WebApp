@@ -2,7 +2,7 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
         <!-- Header -->
         <div class="modal-header">
-            <h2>Nueva Sede</h2>
+            <h2>{{ isEditMode ? 'Editar Sede' : 'Nueva Sede' }}</h2>
             <button class="close-btn" (click)="onCancel()">
                 <span class="material-icons">close</span>
             </button>
@@ -84,7 +84,7 @@
         <!-- Footer -->
         <div class="modal-footer">
             <button class="btn-cancel" (click)="onCancel()">Cancelar</button>
-            <button class="btn-save" (click)="onSave()">Guardar</button>
+            <button class="btn-save" (click)="onSave()">{{ isEditMode ? 'Guardar Cambios' : 'Guardar' }}</button>
         </div>
     </div>
 </div>
