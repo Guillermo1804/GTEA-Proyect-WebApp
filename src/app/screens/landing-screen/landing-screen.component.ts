@@ -127,6 +127,10 @@ export class LandingScreenComponent implements OnInit {
    */
   private _resolveImageUrl(url: string | null | undefined): string {
     if (!url) return '';
+    // Upgrade http → https to prevent mixed-content on HTTPS sites
+    if (url.startsWith('http://')) {
+      url = url.replace('http://', 'https://');
+    }
     if (url.startsWith('http')) return url;
     return `${environment.url_api}${url}`;
   }
