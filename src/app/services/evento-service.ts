@@ -189,6 +189,19 @@ export class EventoService {
   }
 
   // ─────────────────────────────────────────────
+  // Helper: normalizar URL de imagen
+  // ─────────────────────────────────────────────
+  /**
+   * Resuelve URLs de imagen que pueden ser relativas (/media/...) o absolutas (http...).
+   * Retorna string vacío si no hay URL.
+   */
+  private _resolveImageUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `${environment.url_api}${url}`;
+  }
+
+  // ─────────────────────────────────────────────
   // Mapeo: API (snake_case) → Frontend (camelCase)
   // ─────────────────────────────────────────────
   /**
@@ -204,7 +217,7 @@ export class EventoService {
       categoriaId: raw.categoria,
       categoriaNombre: raw.categoria_nombre || '',
       descripcion: raw.descripcion,
-      imagenPortada: raw.imagen_portada || null,
+      imagenPortada: this._resolveImageUrl(raw.imagen_portada),
       fechaInicio: raw.fecha_inicio,
       horaInicio: raw.hora_inicio,
       fechaFin: raw.fecha_fin,
@@ -395,6 +408,11 @@ export class EventoService {
   }
 
   public getEventosPublicos(): Observable<any[]> {
-    return this.http.get<any[]>(`${environment.url_api}/eventos/public/`);
+    return this.http.get<any[]>(`${environment.url_api}/eventos/public/`).pipe(
+      map((eventos: any[]) => eventos.map(e => ({
+        ...e,
+        imagen_portada: this._resolveImageUrl(e.imagen_portada),
+      })))
+    );
   }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { TopNavbar } from '../../partials/top-navbar/top-navbar';
 import { EventoService } from '../../services/evento-service';
+import { environment } from '../../../environments/environment';
 
 interface EventCard {
   image: string;
@@ -80,7 +81,7 @@ export class LandingScreenComponent implements OnInit {
    */
   private mapToEventCard(e: any): EventCard {
     return {
-      image: e.imagen_portada ?? '',
+      image: this._resolveImageUrl(e.imagen_portada),
       category: e.categoria_nombre ?? 'General',
       categoryColor: this.getCategoryColor(e.categoria_nombre ?? ''),
       title: e.titulo ?? '',
@@ -118,5 +119,15 @@ export class LandingScreenComponent implements OnInit {
   getOccupancy(event: EventCard): number {
     if (!event.capacity) return 0;
     return Math.min(100, Math.round((event.enrolled / event.capacity) * 100));
+  }
+
+  /**
+   * Resuelve URLs de imagen relativas (/media/...) a absolutas.
+   * Duplicado local porque _resolveImageUrl es privado en EventoService.
+   */
+  private _resolveImageUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `${environment.url_api}${url}`;
   }
 }

@@ -40,7 +40,13 @@
 
           <!-- Imagen con badge encima -->
           <div class="taller-image-wrapper">
-            <img [src]="taller.imagen" [alt]="taller.titulo" class="taller-image" />
+            @if (taller.imagen) {
+            <img [src]="taller.imagen" [alt]="taller.titulo" class="taller-image" loading="lazy" />
+            } @else {
+            <div class="taller-image taller-image--placeholder">
+                <span class="material-icons">image_not_supported</span>
+            </div>
+            }
             <span class="category-badge" [ngClass]="'categoria-' + taller.categoria.toLowerCase()">
               {{ taller.categoria }}
             </span>
