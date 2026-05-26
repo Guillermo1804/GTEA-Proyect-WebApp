@@ -1,0 +1,26 @@
+<nav class="top-navbar">
+    <div class="navbar-inner">
+        <div class="brand">
+            <div class="logo-tile">
+                <span class="logo-text">GT</span>
+            </div>
+            <span class="brand-name">GTEA</span>
+            @if (mode === 'auth') {
+                <div class="user-meta">
+                    <span class="user-greeting">¡Hola, {{ userName }}!</span>
+                    <span class="user-role">{{ getRoleLabel() }}</span>
+                </div>
+            }
+        </div>
+        <div class="actions">
+            @if (mode === 'auth') {
+            <button class="logout-btn" (click)="logout()" aria-label="Cerrar Sesión">
+                <span class="material-icons">logout</span>
+                <span>Cerrar sesión</span>
+            </button>
+            } @else {
+            <button class="cta-btn" (click)="navigate(ctaRoute)">{{ ctaLabel }}</button>
+            }
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,88 @@
+<!-- Modal Overlay -->
+<div class="modal-overlay" (click)="cancelar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h2>Filtrar Sedes y Aulas</h2>
+      <button class="close-btn" (click)="cancelar()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Búsqueda -->
+      <div class="filter-section">
+        <label class="filter-label">Buscar por nombre</label>
+        <input
+          type="text"
+          class="filter-input"
+          placeholder="Nombre de sede o aula..."
+          [(ngModel)]="filtrosTemp.busqueda"
+        />
+      </div>
+
+      <!-- Estado de Aula -->
+      <div class="filter-section">
+        <label class="filter-label">Estado de aula</label>
+        <div class="estado-options">
+          <button
+            class="estado-btn"
+            [class.active]="isEstadoSelected('Disponible')"
+            (click)="toggleEstado('Disponible')"
+          >
+            <span class="estado-dot disponible"></span>
+            Disponible
+          </button>
+          <button
+            class="estado-btn"
+            [class.active]="isEstadoSelected('Ocupada')"
+            (click)="toggleEstado('Ocupada')"
+          >
+            <span class="estado-dot ocupada"></span>
+            Ocupada
+          </button>
+          <button
+            class="estado-btn"
+            [class.active]="isEstadoSelected('Mantenimiento')"
+            (click)="toggleEstado('Mantenimiento')"
+          >
+            <span class="estado-dot mantenimiento"></span>
+            Mantenimiento
+          </button>
+        </div>
+      </div>
+
+      <!-- Capacidad -->
+      <div class="filter-section">
+        <label class="filter-label">Capacidad de aula</label>
+        <div class="capacidad-inputs">
+          <input
+            type="number"
+            class="filter-input capacidad-input"
+            placeholder="Mínima"
+            [(ngModel)]="filtrosTemp.capacidadMin"
+            min="0"
+          />
+          <span class="capacidad-separator">-</span>
+          <input
+            type="number"
+            class="filter-input capacidad-input"
+            placeholder="Máxima"
+            [(ngModel)]="filtrosTemp.capacidadMax"
+            min="0"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="limpiar()">Limpiar</button>
+      <div class="footer-actions">
+        <button class="btn-cancel" (click)="cancelar()">Cancelar</button>
+        <button class="btn-primary" (click)="aplicar()">Aplicar Filtros</button>
+      </div>
+    </div>
+  </div>
+</div>

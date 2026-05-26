@@ -1,0 +1,129 @@
+<!-- Hero Image -->
+<div class="evento-detalle-wrapper">
+  <div class="hero-section">
+    <div class="hero-overlay">
+      <button class="back-btn" (click)="goBack()">
+        <span class="material-icons">arrow_back</span>
+      </button>
+      <button class="share-btn" (click)="compartirEvento()">
+        <span class="material-icons">share</span>
+      </button>
+    </div>
+    @if (evento?.imagenPortada) {
+    <img [src]="evento!.imagenPortada" [alt]="evento!.titulo" class="hero-image" />
+    } @else {
+    <div class="hero-placeholder">
+      <span class="material-icons">image</span>
+    </div>
+    }
+  </div>
+
+  <!-- Content Card -->
+  <div class="content-card">
+    <!-- Categoría Badge -->
+    <span class="category-badge">{{ categoriaNombre }}</span>
+
+    <!-- Título -->
+    <h1 class="evento-titulo">{{ evento?.titulo }}</h1>
+
+    <!-- Metadata -->
+    <div class="meta-section">
+      <div class="meta-item">
+        <span class="material-icons meta-icon">calendar_month</span>
+        <div class="meta-text">
+          <span class="meta-label">Fecha</span>
+          <span class="meta-value">{{ evento?.fechaInicio }} — {{ evento?.fechaFin }}</span>
+        </div>
+      </div>
+      <div class="meta-item">
+        <span class="material-icons meta-icon">schedule</span>
+        <div class="meta-text">
+          <span class="meta-label">Horario</span>
+          <span class="meta-value">{{ evento?.horaInicio }} - {{ evento?.horaFin }}</span>
+        </div>
+      </div>
+      <div class="meta-item">
+        <span class="material-icons meta-icon">location_on</span>
+        <div class="meta-text">
+          <span class="meta-label">Ubicación</span>
+          <span class="meta-value">
+            {{ evento?.modalidad === 'Virtual' ? 'Virtual' : sedeNombre + ' — ' + aulaNombre }}
+          </span>
+        </div>
+      </div>
+      <div class="meta-item">
+        <span class="material-icons meta-icon">group</span>
+        <div class="meta-text">
+          <span class="meta-label">Cupo</span>
+          <span class="meta-value">{{ evento?.inscritos ?? 0 }} / {{ evento?.cupoMaximo }} inscritos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Descripción -->
+    <div class="description-section">
+      <h2>Acerca del taller</h2>
+      <p>{{ evento?.descripcion }}</p>
+    </div>
+  </div>
+
+  <!-- Sticky Footer -->
+  <div class="sticky-footer">
+    <!-- Alerta de disponibilidad -->
+    @if (!cupoLleno() && lugaresDisponibles > 0 && lugaresDisponibles <= 10) { <div class="capacity-warning">
+      <span class="warning-dot"></span>
+      <span class="warning-text">Solo quedan {{ lugaresDisponibles }} lugares disponibles</span>
+  </div>
+  }
+  @if (cupoLleno()) {
+  <div class="capacity-full">
+    <span class="material-icons">info</span>
+    <span class="warning-text">Cupo lleno — Puedes unirte a la lista de espera</span>
+  </div>
+  }
+
+  <div class="footer-actions">
+    <div class="price-info">
+      <span class="price-label">{{ evento?.costoEntrada === 0 ? 'Gratuito' : '$' + evento?.costoEntrada }}</span>
+    </div>
+    
+    @if (estaInscrito()) {
+      <button class="enrollment-btn delete-btn" [disabled]="isProcessing()" (click)="desinscribirEvento()" style="background: #dc2626;">
+        @if (isProcessing()) {
+          <span class="spinner"></span>
+          <span>Procesando…</span>
+        } @else {
+          <span class="material-icons btn-icon">cancel</span>
+          <span>Desinscribirse</span>
+        }
+      </button>
+    } @else {
+      <button class="enrollment-btn" [class.waitlist]="cupoLleno()" [disabled]="isProcessing() || cupoLleno()"
+        (click)="inscribirEvento()">
+        @if (isProcessing()) {
+        <span class="spinner"></span>
+        <span>Procesando…</span>
+        } @else {
+        <span class="material-icons btn-icon">{{ cupoLleno() ? 'hourglass_top' : 'how_to_reg' }}</span>
+        <span>{{ cupoLleno() ? 'Lista de Espera' : 'Inscribirme' }}</span>
+        }
+      </button>
+    }
+  </div>
+</div>
+</div>
+
+@if (mostrarConfirmar) {
+  <app-confirmar-accion-modal
+    [titulo]="'Cancelar inscripción'"
+    [mensaje]="'¿Estás seguro de cancelar tu inscripción a &quot;' + (evento?.titulo || '') + '&quot;?'"
+    [labelConfirmar]="'Desinscribirse'"
+    [labelCancelar]="'Volver'"
+    (confirmar)="confirmarDesinscripcion()"
+    (cancelar)="cancelarModal()"
+  />
+}
+
+@if (!eventoId) {
+  <app-bottom-nav role="estudiante" activeTab="/alumno/catalogo"></app-bottom-nav>
+}

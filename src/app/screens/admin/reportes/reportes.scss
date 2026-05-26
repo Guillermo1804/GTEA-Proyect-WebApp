@@ -1,0 +1,482 @@
+.page-content {
+    background: #f6f6f8;
+    min-height: 100vh;
+    padding-bottom: 100px;
+}
+
+.main {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+
+    h1 {
+        font-family: 'Inter', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    p {
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        color: #6b7280;
+        margin: 2px 0 0;
+    }
+}
+
+// Period Tabs
+.period-tabs {
+    display: flex;
+    gap: 6px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 4px;
+    border: 0.8px solid #f3f4f6;
+}
+
+.period-tab {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    transition: all 0.2s ease;
+
+    &.active {
+        background: #1e3fae;
+        color: #fff;
+    }
+}
+
+// KPI Grid
+.kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.kpi-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px;
+    border: 0.8px solid #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.kpi-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+
+    .material-icons {
+        font-size: 18px;
+    }
+}
+
+.kpi-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.kpi-value {
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.kpi-change {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+
+    .material-icons {
+        font-size: 14px;
+    }
+}
+
+// Cards
+.card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px;
+    border: 0.8px solid #f3f4f6;
+}
+
+.card-header {
+    margin-bottom: 16px;
+
+    h2 {
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    p {
+        font-family: 'Inter', sans-serif;
+        font-size: 12px;
+        color: #6b7280;
+        margin: 2px 0 0;
+    }
+}
+
+// Bar Chart
+.chart-container {
+    height: 180px;
+}
+
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 16px;
+    height: 100%;
+}
+
+.bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.bar-value {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #1e3fae;
+}
+
+.bar-wrapper {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    min-height: 8px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #1e3fae 0%, #6b8cff 100%);
+    border-radius: 6px 6px 0 0;
+}
+
+.bar-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: #6b7280;
+}
+
+// Category Breakdown
+.category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.category-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.category-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 90px;
+}
+
+.category-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.category-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #374151;
+}
+
+.category-bar-wrap {
+    flex: 1;
+}
+
+.category-bar {
+    height: 6px;
+    background: #f3f4f6;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.category-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.category-stats {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 60px;
+    justify-content: flex-end;
+}
+
+.category-count {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.category-pct {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: #9ca3af;
+}
+
+// Ranking
+.ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+
+    &:not(:last-child) {
+        border-bottom: 0.8px solid #f3f4f6;
+    }
+}
+
+.rank-number {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    min-width: 28px;
+    text-align: center;
+
+    &.rank-1 {
+        color: #eab308;
+    }
+
+    &.rank-2 {
+        color: #94a3b8;
+    }
+
+    &.rank-3 {
+        color: #c2855a;
+    }
+
+    &.rank-4,
+    &.rank-5 {
+        color: #9ca3af;
+    }
+}
+
+.ranking-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ranking-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.ranking-category {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.ranking-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.ranking-enrolled {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.ranking-pct {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: #059669;
+    font-weight: 500;
+}
+
+// Export
+.export-section {
+    display: flex;
+    gap: 8px;
+}
+
+.export-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    transition: all 0.2s ease;
+
+    .material-icons {
+        font-size: 18px;
+    }
+
+    &:hover {
+        background: #f9fafb;
+    }
+}
+
+// Navigation Buttons (Weekly)
+.navigation-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.nav-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+
+    .material-icons {
+        font-size: 18px;
+        color: #1e3fae;
+    }
+
+    &:hover:not(:disabled) {
+        background: #f3f4f6;
+        border-color: #1e3fae;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.week-counter {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+}
+
+// ──────────────── Responsive ────────────────
+
+// Tablet
+@media (min-width: 768px) {
+    .main {
+        padding: 24px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .page-header h1 {
+        font-size: 22px;
+    }
+
+    .chart-container {
+        height: 220px;
+    }
+
+    .export-section {
+        max-width: 400px;
+    }
+}
+
+// Desktop
+@media (min-width: 1024px) {
+    .main {
+        padding: 32px 48px;
+        max-width: 1280px;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    .kpi-card {
+        padding: 20px;
+    }
+
+    .kpi-value {
+        font-size: 28px;
+    }
+
+    .chart-container {
+        height: 260px;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
+    }
+
+    .export-section {
+        max-width: 500px;
+    }
+}

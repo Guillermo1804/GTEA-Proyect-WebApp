@@ -1,0 +1,70 @@
+<!-- alumno-perfil.component.html -->
+<app-top-navbar role="estudiante" mode="auth"></app-top-navbar>
+
+<div class="perfil-screen">
+  <div class="perfil-grid">
+    
+    <!-- Columna Izquierda: Tarjeta de presentación -->
+    <div class="perfil-card left-col">
+      <div class="avatar-circle">
+        @if (perfil()?.avatarUrl) {
+          <img [src]="perfil()!.avatarUrl" [alt]="nombreCompleto" />
+        } @else {
+          <span class="avatar-initial">
+            {{ perfil()?.nombre?.[0] ?? '?' }}
+          </span>
+        }
+      </div>
+      <h2 class="perfil-nombre">{{ nombreCompleto }}</h2>
+      <div class="perfil-role">
+        <span class="role-chip">Alumno</span>
+      </div>
+    </div>
+
+    <!-- Columna Derecha: Tarjeta de datos -->
+    <div class="perfil-card right-col">
+      <div class="perfil-tabs">
+        <span class="tab active">Información Personal</span>
+      </div>
+
+      <div class="perfil-content">
+        <form class="perfil-form">
+          <div class="form-group">
+            <label>Nombre (s)</label>
+            <div class="input-wrapper readonly">
+              <span class="material-icons">badge</span>
+              <input type="text" [value]="perfil()?.nombre" readonly />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Apellidos</label>
+            <div class="input-wrapper readonly">
+              <span class="material-icons">badge</span>
+              <input type="text" [value]="perfil()?.apellidos" readonly />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Correo Institucional</label>
+            <div class="input-wrapper readonly">
+              <span class="material-icons">mail</span>
+              <input type="email" [value]="perfil()?.correo" readonly />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Matrícula</label>
+            <div class="input-wrapper readonly">
+              <span class="material-icons">fingerprint</span>
+              <input type="text" [value]="perfil()?.id" readonly />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<app-bottom-nav role="estudiante" activeTab="/alumno/perfil"></app-bottom-nav>
