@@ -247,7 +247,7 @@ export class EventoDetalleComponent implements OnInit {
     public compartirEvento(): void {
         if (typeof navigator === 'undefined') return;
 
-        const urlToShare = `https://torpid.iokoia.com/alumno/evento/${this.eventoId}`;
+        const urlToShare = `https://dq3sk5022uvcy8d6ip69xjsq.torpid.iokoia.com/alumno/evento/${this.eventoId}`;
         const titleToShare = this.evento?.titulo || 'Evento en GTEA';
 
         if (navigator.share) {
