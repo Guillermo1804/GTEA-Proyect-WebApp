@@ -3,6 +3,6 @@
 // El backend team debe reemplazar la URL placeholder antes del deploy.
 export const environment = {
   production: false,
-  url_api: "https://gtea.ezarr.rocks/api",
-  apiUrl: "https://gtea.ezarr.rocks/api"
+  url_api: "https://torpid.iokoia.com/api",
+  apiUrl: "https://torpid.iokoia.com/api"
 };
